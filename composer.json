@@ -3,10 +3,11 @@
     "type": "project",
     "require": {
         "altorouter/altorouter": "^2.0",
-        "vlucas/phpdotenv": "^5.5",
-        "respect/validation": "^2.2",
         "filp/whoops": "^2.15",
-        "gabordemooij/redbean": "^5.7"
+        "gabordemooij/redbean": "^5.7",
+        "phpmailer/phpmailer": "^6.9",
+        "respect/validation": "^2.2",
+        "vlucas/phpdotenv": "^5.5"
     },
     "autoload": {
         "psr-4": {
@@ -25,4 +26,4 @@
         "optimize-autoloader": true,
         "sort-packages": true
     }
-} 
+}

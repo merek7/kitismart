@@ -56,7 +56,7 @@
     if (!empty($pageScripts)): ?>
         <!-- Scripts spécifiques -->
         <?php foreach ($pageScripts as $script): ?>
-            <script src="/assets/js/<?= htmlspecialchars($script) ?>"></script>
+            <script src="/assets/js/<?= htmlspecialchars($script) ?>" defer></script>
             <?php error_log("Chargement du script: " . $script); ?>
         <?php endforeach; ?>
     <?php else: ?>

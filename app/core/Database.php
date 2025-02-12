@@ -3,6 +3,7 @@ namespace App\Core;
 use PDO;
 use PDOException;
 use RedBeanPHP\R;
+use App\Core\DataBaseException;
 class Database {
     private static $instance = null;
     private $connection;
@@ -38,9 +39,14 @@ class Database {
     }
     // Méthode helper pour exécuter les requêtes
     public function query(string $sql, array $params = []) {
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute($params);
-        return $stmt;
+        try {
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (PDOException $e) {
+            error_log("Erreur SQL: " . $e->getMessage());
+            throw new DataBaseException();
+        }
     }
     public static function initRedBean() {
        

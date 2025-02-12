@@ -1,6 +1,8 @@
 <?php
 namespace App\Utils;
 
+use App\Exceptions\TokenInvalidOrExpiredException;
+
 class Csrf {
     public static function generateToken(): string {
         if(!isset($_SESSION)) {
@@ -12,9 +14,9 @@ class Csrf {
         return $_SESSION['csrf_token'];
     }
 
-    public static function validatetoken($token) {
+    public static function validateToken($token) {
         if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
-            throw new \Exception('Token CSRF invalide');
+            throw new TokenInvalidOrExpiredException();
         }
         return true;
     }

@@ -34,6 +34,7 @@ class ComposerStaticInitafbd400d3c5b30c03b2d84925cbe6c5e
         array (
             'Psr\\Log\\' => 8,
             'PhpOption\\' => 10,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'G' => 
         array (
@@ -86,6 +87,10 @@ class ComposerStaticInitafbd400d3c5b30c03b2d84925cbe6c5e
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
         ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
         'GrahamCampbell\\ResultType\\' => 
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
@@ -102,7 +107,21 @@ class ComposerStaticInitafbd400d3c5b30c03b2d84925cbe6c5e
 
     public static $classMap = array (
         'AltoRouter' => __DIR__ . '/..' . '/altorouter/altorouter/AltoRouter.php',
+        'App\\Controllers\\ConfirmationController' => __DIR__ . '/../..' . '/app/Controllers/ConfirmationController.php',
+        'App\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Controllers/HomeController.php',
+        'App\\Controllers\\LoginController' => __DIR__ . '/../..' . '/app/Controllers/LoginController.php',
+        'App\\Controllers\\RegisterController' => __DIR__ . '/../..' . '/app/Controllers/RegisterController.php',
+        'App\\Core\\Config' => __DIR__ . '/../..' . '/app/Core/Config.php',
+        'App\\Core\\Controller' => __DIR__ . '/../..' . '/app/Core/Controller.php',
+        'App\\Core\\DataBaseException' => __DIR__ . '/../..' . '/app/Core/DataBaseException.php',
+        'App\\Core\\Database' => __DIR__ . '/../..' . '/app/Core/Database.php',
+        'App\\Core\\Router' => __DIR__ . '/../..' . '/app/Core/Router.php',
+        'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
+        'App\\Models\\UserAudit' => __DIR__ . '/../..' . '/app/Models/UserAudit.php',
         'App\\Utils\\Csrf' => __DIR__ . '/../..' . '/app/Utils/Csrf.php',
+        'App\\Utils\\Mailer' => __DIR__ . '/../..' . '/app/Utils/Mailer.php',
+        'App\\Utils\\Mailler' => __DIR__ . '/../..' . '/app/Utils/Mailler.php',
+        'App\\Validators\\RegisterValidator' => __DIR__ . '/../..' . '/app/Validators/RegisterValidator.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Dotenv\\Dotenv' => __DIR__ . '/..' . '/vlucas/phpdotenv/src/Dotenv.php',
@@ -149,6 +168,13 @@ class ComposerStaticInitafbd400d3c5b30c03b2d84925cbe6c5e
         'GrahamCampbell\\ResultType\\Error' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Error.php',
         'GrahamCampbell\\ResultType\\Result' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Result.php',
         'GrahamCampbell\\ResultType\\Success' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Success.php',
+        'PHPMailer\\PHPMailer\\DSNConfigurator' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/DSNConfigurator.php',
+        'PHPMailer\\PHPMailer\\Exception' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/Exception.php',
+        'PHPMailer\\PHPMailer\\OAuth' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/OAuth.php',
+        'PHPMailer\\PHPMailer\\OAuthTokenProvider' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/OAuthTokenProvider.php',
+        'PHPMailer\\PHPMailer\\PHPMailer' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/PHPMailer.php',
+        'PHPMailer\\PHPMailer\\POP3' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/POP3.php',
+        'PHPMailer\\PHPMailer\\SMTP' => __DIR__ . '/..' . '/phpmailer/phpmailer/src/SMTP.php',
         'PhpOption\\LazyOption' => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption/LazyOption.php',
         'PhpOption\\None' => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption/None.php',
         'PhpOption\\Option' => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption/Option.php',

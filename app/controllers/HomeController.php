@@ -8,21 +8,24 @@ class HomeController extends Controller
 {
     public function index()
     {
-     if(isset($_SESSION['user_id'])){
-        return $this->view('/dashboard');
-    }
-    var_dump("coucou");
-    $data = [
-        'title' => 'KitiSmart - Gérez vos dépenses intelligement',
-    ];
-    return $this->view('home/index', $data);
+        if(isset($_SESSION['user_id'])){
+            return $this->redirect('/dashboard');
+        }
+        
+        return $this->view('home/index', [
+            'title' => 'KitiSmart - Gérez vos dépenses intelligement',
+        ]);
     }
 
     public function dashboard()
     {
-        if(!isset($_SESSION['user_id'])){
+        if (!isset($_SESSION['user_id'])) {
             return $this->redirect('/login');
         }
-        return $this->view('home/dashboard');
+        
+        return $this->view('dashboard/index', [
+            'title' => 'Dashboard - KitiSmart',
+            'userName' => $_SESSION['user_name'] ?? 'Utilisateur'
+        ]);
     }
 }

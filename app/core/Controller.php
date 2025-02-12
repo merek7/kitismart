@@ -78,6 +78,7 @@ class Controller {
 
         if(file_exists($fullCssPath)) { 
            $this->styles[] = $cssFile;
+           error_log("Styles: " . print_r($this->styles, true));
         }
 
 }
@@ -88,4 +89,11 @@ class Controller {
         exit;
     }
     
+    // Ajouter une méthode pour vérifier l'authentification
+    protected function requireAuth() {
+        if (!isset($_SESSION['user_id'])) {
+            $this->redirect('/login');
+            exit;
+        }
+    }
 }

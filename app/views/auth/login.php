@@ -6,7 +6,8 @@ $title = 'Connexion - KitiSmart';
     <div class="auth-card">
         <img src="assets/img/logo.svg" alt="KitiSmart">
         <h1>Connexion</h1>
-        <form action="/login" method="POST">
+        <div id="error-container" style="display: none;"></div>
+        <form id="loginForm" action="/login" method="POST">
         <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
             <div class="form-group">
                 <label for="email">Adresse e-mail</label>

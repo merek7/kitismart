@@ -99,7 +99,6 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify(formData),
             success: function (response) {
-                console.log("Réponse du serveur:", response); // Vérifiez si ce log apparaît
                 if (response.success) {
                     showGlobalMessage('Inscription réussie ! Redirection en cours...', 'success');
                     setTimeout(() => {
