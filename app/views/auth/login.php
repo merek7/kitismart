@@ -19,6 +19,9 @@ $title = 'Connexion - KitiSmart';
             </div>
             <button type="submit" class="btn-primary">Se connecter</button>
         </form>
+        <p class="auth-link">
+            <a href="/forgot-password">Mot de passe oublié ?</a>
+        </p>
         <p class="auth-link">Pas encore de compte ? <a href="/register">Inscrivez-vous</a></p>
     </div>
 </section>

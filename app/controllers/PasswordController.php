@@ -9,8 +9,9 @@ use App\Exceptions\TokenInvalidOrExpiredException;
 
 class PasswordController extends Controller {
     public function showForgotForm() {
+
         $csrfToken = Csrf::generateToken();
-        return $this->view('auth/forgot-password', [
+         $this->view('auth/forgot-password', [
             'title' => 'Mot de passe oublié - KitiSmart',
             'csrfToken' => $csrfToken
         ]);
@@ -101,6 +102,7 @@ class PasswordController extends Controller {
 
             // Mettre à jour le mot de passe
             $user->password = password_hash($data['password'], PASSWORD_DEFAULT);
+            $user->updated_at = date('Y-m-d H:i:s');
             $user->reset_token = null;
             $user->reset_expires = null;
             User::update($user);
