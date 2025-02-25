@@ -1,0 +1,83 @@
+/* Style pour le résumé du budget */
+.budget-summary {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.budget-progress {
+  margin-top: 1rem;
+  background-color: #e5e7eb;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.budget-status {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Animation pour les changements de valeurs */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.value-changed {
+  animation: pulse 0.3s ease-in-out;
+}
+
+/* Style pour le dépassement de budget */
+.text-danger {
+  color: var(--danger-color) !important;
+  font-weight: bold;
+}
+
+#remaining-budget.text-danger {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* Style pour les messages d'alerte */
+#global-message.error {
+  background-color: #fef2f2;
+  border-left: 4px solid var(--danger-color);
+  color: #991b1b;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

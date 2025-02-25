@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Exceptions\BudgetNotFoundException;
+use App\Models\Budget;
 
 class HomeController extends Controller
 {
@@ -22,10 +24,43 @@ class HomeController extends Controller
         if (!isset($_SESSION['user_id'])) {
             return $this->redirect('/login');
         }
-        
-        return $this->view('dashboard/index', [
-            'title' => 'Dashboard - KitiSmart',
-            'userName' => $_SESSION['user_name'] ?? 'Utilisateur'
-        ]);
+
+        try {
+            // Vérifier si l'utilisateur a un budget actif
+            
+            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+            
+            // Si pas de budget actif, rediriger vers la création de budget
+            if (!$activeBudget) {
+                return $this->redirect('/budget/create');
+            }
+            
+            // Récupérer le résumé du budget pour l'affichage
+            $budgetSummary = Budget::getBudgetSummary($activeBudget->id);
+            error_log("Budget summary: " . print_r($budgetSummary, true));
+            
+            return $this->view('dashboard/index', [
+                'title' => 'Dashboard - KitiSmart',
+                'userName' => $_SESSION['user_name'] ?? 'Utilisateur',
+                'currentPage' => 'dashboard',
+                'layout' => 'dashboard',
+                'activeBudget' => $activeBudget,
+                'budgetSummary' => $budgetSummary
+            ]);
+
+        } catch (BudgetNotFoundException $e) {
+            // Si pas de budget trouvé, rediriger vers la création
+            return $this->redirect('/budget/create');
+        } catch (\Exception $e) {
+            // Log l'erreur et afficher un message générique
+            error_log("Erreur dashboard: " . $e->getMessage());
+            return $this->view('dashboard/index', [
+                'title' => 'Dashboard - KitiSmart',
+                'userName' => $_SESSION['user_name'] ?? 'Utilisateur',
+                'currentPage' => 'dashboard',
+                'layout' => 'dashboard',
+                'error' => 'Une erreur est survenue lors du chargement du dashboard'
+            ]);
+        }
     }
 }

@@ -1,14 +1,19 @@
 <?php
+
 namespace App\Core;
+
 use PDO;
 use PDOException;
 use RedBeanPHP\R;
 use App\Core\DataBaseException;
-class Database {
+
+class Database
+{
     private static $instance = null;
     private $connection;
-    
-    private function __construct() {
+
+    private function __construct()
+    {
         try {
             $this->connection = new PDO(
                 'mysql:host=' . $_ENV['DB_HOST'] .
@@ -28,17 +33,20 @@ class Database {
             throw new \RuntimeException('Service temporairement indisponible');
         }
     }
-    public static function getInstance(): self {
+    public static function getInstance(): self
+    {
         if (!self::$instance) {
             self::$instance = new self();
         }
         return self::$instance;
     }
-    public function getConnection(): PDO {
+    public function getConnection(): PDO
+    {
         return $this->connection;
     }
     // Méthode helper pour exécuter les requêtes
-    public function query(string $sql, array $params = []) {
+    public function query(string $sql, array $params = [])
+    {
         try {
             $stmt = $this->connection->prepare($sql);
             $stmt->execute($params);
@@ -48,17 +56,19 @@ class Database {
             throw new DataBaseException();
         }
     }
-    public static function initRedBean() {
-       
-            R::setup(
-                'mysql:host=' . $_ENV['DB_HOST'] .
-                ';dbname=' . $_ENV['DB_NAME'],
-                $_ENV['DB_USER'],
-                $_ENV['DB_PASS']
-            );
-           
-            R::useFeatureSet('novice/latest');
-            R::freeze(false); // En développement seulement
-       
+    public static function initRedBean()
+    {
+
+        R::setup(
+            'mysql:host=' . $_ENV['DB_HOST'] .
+            ';dbname=' . $_ENV['DB_NAME'],
+            $_ENV['DB_USER'],
+            $_ENV['DB_PASS']
+        );
+
+        R::useFeatureSet('latest');
+        R::freeze(false); // En développement seulement
+
     }
+
 }

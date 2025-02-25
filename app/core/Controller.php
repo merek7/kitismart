@@ -77,6 +77,7 @@ class Controller {
         }
 
         if(file_exists($fullCssPath)) { 
+            error_log("Fichier css trouvé: " . $cssFile);
            $this->styles[] = $cssFile;
            error_log("Styles: " . print_r($this->styles, true));
         }

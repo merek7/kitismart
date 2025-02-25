@@ -6,8 +6,8 @@
     <title><?= $title ?? 'KitiSmart - Gérez vos dépenses avec intelligence' ?></title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/assets/css/style.css" rel="stylesheet">
-    <?php if (!empty($pageStyles)): ?>
-        <?php foreach ($pageStyles as $style): ?>
+    <?php if (!empty($styles)): ?>
+        <?php foreach ($styles as $style): ?>
             <link href="/assets/css/<?= htmlspecialchars($style) ?>" rel="stylesheet">
         <?php endforeach; ?>
     <?php endif; ?>
@@ -49,7 +49,7 @@
             <p>&copy; <?= date('Y') ?> KitiSmart. Tous droits réservés.</p>
         </div>
     </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/assets/js/app.js"></script>
     <?php
     error_log("Scripts disponibles dans le layout: " . print_r($pageScripts ?? [], true));
