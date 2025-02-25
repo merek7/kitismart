@@ -37,3 +37,27 @@ class TooManyAttemptsException extends AppException
         parent::__construct($message, $code, $previous);
     }
 }
+
+class BudgetNotFoundException extends AppException
+{
+    public function __construct($message = "Budget non trouvé ou inactif", $code = 404, \Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
+}
+
+class InvalidExpenseDataException extends AppException
+{
+    public function __construct($message = "Données de dépense invalides", $code = 400, \Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
+}
+
+class ExpenseNotFoundException extends AppException
+{
+    public function __construct($message = "Dépense non trouvée ou invalide", $code = 404, \Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
+}
