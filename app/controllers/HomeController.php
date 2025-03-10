@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Exceptions\BudgetNotFoundException;
 use App\Models\Budget;
+use App\Models\Expense;
 
 class HomeController extends Controller
 {
@@ -37,12 +38,14 @@ class HomeController extends Controller
             
             // Récupérer le résumé du budget pour l'affichage
             $budgetSummary = Budget::getBudgetSummary($activeBudget->id);
+            $depenseEnAttente = Expense::getPendingExpensesByUser($activeBudget->id, $_SESSION['user_id']);
             error_log("Budget summary: " . print_r($budgetSummary, true));
             
             return $this->view('dashboard/index', [
                 'title' => 'Dashboard - KitiSmart',
                 'userName' => $_SESSION['user_name'] ?? 'Utilisateur',
                 'currentPage' => 'dashboard',
+                'depenseEnAttente' => $depenseEnAttente,
                 'layout' => 'dashboard',
                 'activeBudget' => $activeBudget,
                 'budgetSummary' => $budgetSummary

@@ -20,6 +20,7 @@ return [
     ['GET','/parametrage','ParametrageController#showCreateParametrageForm','parametrage_form'],
     ['GET','/expenses/create','ExpenseController#showCreateExpenseForm','expense_form'],
     ['POST','/expenses/create','ExpenseController#create','expense_submit'],
-    ['GET', '/expenses/list', 'ExpenseController#list', 'expense_list'],
-    ['POST','/expenses/mark-paid/[i:id]','ExpenseController#markAsPaid', 'expense_paid']
+    ['GET', '/expenses/list', 'ExpenseController#listPaginated', 'expense_list'],
+    ['POST','/expenses/mark-paid/[i:id]','ExpenseController#markAsPaid', 'expense_paid'],
+    ['PUT', '/expenses/update/[i:id]', 'ExpenseController#update', 'expense_update']
 ];

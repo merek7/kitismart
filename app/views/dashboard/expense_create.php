@@ -61,11 +61,11 @@
                                 <i class="fas fa-plus-circle"></i> Ajouter des dépenses
                             </h3>
                             <div class="card-tools">
-                                <button type="button" id="add-expense" class="btn btn-tool">
+                                <button type="button" id="add-expense" class="btn btn-tool btn-action">
                                     <i class="fas fa-plus"></i> Nouvelle dépense
                                 </button>
-                                <a type="button" href="/expenses/list">
-                                    <i class="fas fa-list"></i>
+                                <a href="/expenses/list" class="btn btn-tool btn-action">
+                                    <i class="fas fa-list"></i> Liste des dépenses
                                 </a>
                             </div>
                         </div>

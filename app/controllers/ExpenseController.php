@@ -9,7 +9,9 @@ use App\Exceptions\TokenInvalidOrExpiredException;
 use App\Models\Budget;
 use App\Models\Categorie;
 
-$activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+
+
+$activeBudget = Budget::getActiveBudget(isset($_SESSION['user_id']));
 if ($activeBudget && !defined('BUDGET')) {
     define('BUDGET', $activeBudget);
 }
@@ -67,7 +69,7 @@ class ExpenseController extends Controller
                     try {
                         // Validation pour chaque dépense
                         $this->validateExpenseData($expenseData);
-
+                        
                         // Création de la dépense
                         $expense = Expense::create($expenseData);
                         $createdExpenses[] = $expense;
@@ -113,17 +115,17 @@ class ExpenseController extends Controller
 
             // Vérification que la dépense appartient à l'utilisateur
             $expense = Expense::findById($id);
-            if (!$expense || $expense->user_id !== $_SESSION['user_id']) {
+
+            if (!$expense) {
                 return $this->jsonResponse(['success' => false, 'message' => 'Dépense non trouvée'], 404);
             }
-
+            error_log(print_r($data, true));
             $updated = Expense::update($id, $data);
-            return $this->jsonResponse([
+            $this->jsonResponse([
                 'success' => true,
                 'message' => 'Dépense mise à jour avec succès',
                 'expense' => $updated
             ]);
-
         } catch (\Exception $e) {
             return $this->jsonResponse([
                 'success' => false,
@@ -169,7 +171,7 @@ class ExpenseController extends Controller
                 return $this->jsonResponse(['success' => false, 'message' => 'Dépense non trouvée'], 404);
             }
 
-            $updated = Expense::update($id, ['status' => 'paid']);
+            $updated = Expense::markAsPaid($id, $_SESSION['user_id']);
             return $this->jsonResponse([
                 'success' => true,
                 'message' => 'Dépense marquée comme payée',
@@ -243,6 +245,62 @@ class ExpenseController extends Controller
             // Rediriger vers le tableau de bord avec un message d'erreur
             $_SESSION['error'] = "Une erreur est survenue lors du chargement des dépenses: " . $e->getMessage();
 
+        }
+    }
+
+    public function listPaginated()
+    {
+        try {
+            // Récupérer l'ID de l'utilisateur connecté
+            $userId = $_SESSION['user_id'];
+
+            // Récupérer le budget actif
+            $activeBudget = Budget::getActiveBudget($userId);
+            if (!$activeBudget) {
+                throw new \Exception("Aucun budget actif trouvé");
+            }
+
+            // Récupérer le numéro de page depuis la requête
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+            // Récupérer les dépenses paginées
+            $paginatedExpenses = Expense::getPaginatedExpensesByUser($activeBudget->id, $userId, $page);
+
+            $categories = Categorie::getDefaultCategories();
+            // Calculer les statistiques pour les dépenses de la page
+            $stats = [
+                'total' => 0,
+                'paid' => 0,
+                'pending' => 0,
+                'categories' => []
+            ];
+
+            foreach ($paginatedExpenses['expenses'] as $expense) {
+                $stats['total'] += $expense->amount;
+                if ($expense->status === Expense::STATUS_PAID) {
+                    $stats['paid'] += $expense->amount;
+                } else {
+                    $stats['pending'] += $expense->amount;
+                }
+            }
+            $stats['categories'] = $categories;
+
+            // Afficher la vue avec les données
+            $this->view('dashboard/expense_list', [
+                'title' => 'Liste des dépenses',
+                'categories' => $categories,
+                'currentPage' => $paginatedExpenses['current_page'],
+                'lastPage' => $paginatedExpenses['last_page'],
+                'nextPage' => $paginatedExpenses['next_page'],
+                'previousPage' => $paginatedExpenses['previous_page'],
+                'expenses' => $paginatedExpenses['expenses'],
+                'stats' => $stats,
+                'layout' => 'dashboard'
+            ]);
+
+        } catch (\Exception $e) {
+            error_log("Erreur lors de l'affichage de la liste des dépenses: " . $e->getMessage());
+            $_SESSION['error'] = "Une erreur est survenue lors du chargement des dépenses: " . $e->getMessage();
         }
     }
 

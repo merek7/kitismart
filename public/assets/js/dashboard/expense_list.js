@@ -1,4 +1,7 @@
 $(document).ready(function () {
+  // S'assurer que le modal est caché au démarrage
+  $("#editExpenseModal").modal("hide");
+
   // Configuration des animations
   const animationDuration = 300;
   const fadeOutOptions = { opacity: 0, transform: "scale(0.95)" };
@@ -304,4 +307,132 @@ $(document).ready(function () {
 
   // Initialisation des stats au chargement
   updateStats();
+
+  // Ouvrir le modal lors du clic sur "Modifier"
+  $(document).on("click", ".edit-expense-btn", function () {
+    const expenseId = $(this).data("id");
+    const card = $(this).closest(".expense-cards");
+
+    // Récupérer les données de la carte
+    const description = card.find(".expense-titles").text().trim();
+    const amount = parseFloat(card.data("amount"));
+    const category = card.data("category");
+    const categoryname = card.data("categoryname");
+    const date = card.data("date").split(" ")[0]; // Obtenir seulement la date
+    const status = card.data("status");
+
+    // Remplir le formulaire dans le modal
+    $("#edit-expense-id").val(expenseId);
+    $("#edit-description").val(description);
+    $("#edit-amount").val(amount);
+    $("#edit-category").val(categoryname);
+    $("#edit-date").val(date);
+    $("#edit-status").val(status);
+
+    // Afficher le modal
+    $("#editExpenseModal").modal("show");
+  });
+
+  // Enregistrer les modifications
+  $("#save-expense-edit").on("click", function () {
+    const expenseId = $("#edit-expense-id").val();
+    const formData = {
+      description: $("#edit-description").val(),
+      amount: parseFloat($("#edit-amount").val()),
+      category_type: $("#edit-category").val(),
+      paid_at: $("#edit-date").val(),
+      status: $("#edit-status").val(),
+    };
+
+    // Envoyer la requête AJAX pour mettre à jour la dépense
+    $.ajax({
+      url: `/expenses/update/${expenseId}`,
+      method: "PUT",
+      contentType: "application/json",
+      data: JSON.stringify(formData),
+      success: function (response) {
+        if (response.success) {
+          // Mettre à jour l'affichage de la carte
+          const card = $(`.expense-cards[data-id="${expenseId}"]`);
+
+          card.data("category", formData.category_type);
+          card.data("amount", formData.amount);
+          card.data("date", formData.payment_date);
+          card.data("status", formData.status);
+
+          // Mettre à jour l'affichage
+          card.find(".expense-titles").text(formData.description);
+          card
+            .find(".expense-amounts")
+            .text(formData.amount.toFixed(2) + " FCFA");
+          card
+            .find(".expense-dates")
+            .text(new Date(formData.payment_date).toLocaleDateString());
+
+          const statusClass =
+            formData.status === "paid" ? "successs" : "warnings";
+          const statusText = formData.status === "paid" ? "Payé" : "En attente";
+
+          card
+            .find(".status-badges")
+            .removeClass("badge-successs badge-warnings")
+            .addClass(`badge-${statusClass}`)
+            .text(statusText);
+
+          // Si le statut est passé à "payé", masquer le bouton "Marquer payé"
+          if (formData.status === "paid") {
+            card.find(".mark-paid-btn").remove();
+          }
+
+          // Fermer le modal
+          $("#editExpenseModal").modal("hide");
+
+          // Mettre à jour les statistiques
+          updateStats();
+
+          // Afficher un message de succès
+          showNotification("Dépense mise à jour avec succès", "success");
+        } else {
+          showNotification("Erreur : " + response.message, "error");
+        }
+      },
+      error: function () {
+        showNotification("Erreur de communication avec le serveur", "error");
+      },
+    });
+  });
+
+  // Fonction pour afficher des notifications
+  function showNotification(message, type = "info") {
+    // Si vous avez déjà un système de notification, utilisez-le ici
+    // Sinon, créons une notification simple
+    const notificationId = "notification-" + Date.now();
+    const notificationClass =
+      type === "success"
+        ? "alert-success"
+        : type === "error"
+        ? "alert-danger"
+        : "alert-info";
+
+    const notification = `
+      <div id="${notificationId}" class="alert ${notificationClass} notification-toast">
+        ${message}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    `;
+
+    // Ajouter la notification au DOM
+    if (!$(".notifications-container").length) {
+      $("body").append('<div class="notifications-container"></div>');
+    }
+
+    $(".notifications-container").append(notification);
+
+    // Faire disparaître la notification après 5 secondes
+    setTimeout(function () {
+      $(`#${notificationId}`).fadeOut(500, function () {
+        $(this).remove();
+      });
+    }, 5000);
+  }
 });

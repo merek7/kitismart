@@ -15,13 +15,16 @@
 <body>
     <nav class="navbar">
         <div class="nav-content">
-            <div class="logo">KitiSmart</div>
+            <div class="logo">
+            <a href="/" class="nav-links">
+                KitiSmart
+            </a>    
+        </div>
             <?php if (!isset($_SESSION['user_id'])): ?>
                 <div class="nav-links">
-                    <a href="#features">Fonctionnalités</a>
-                    <a href="#pricing">Tarifs</a>
-                    <a href="#about">À propos</a>
-                    <a href="#contact">Contact</a>
+                  <a href="#features">Fonctionnalités</a>
+                  <a href="#how-it-works">Comment ça marche</a>
+                  <a href="#testimonials">Témoignages</a>
                 </div>
                 <div class="auth-buttons">
                     <a href="/login" class="login-btn">Connexion</a>

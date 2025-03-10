@@ -9,6 +9,7 @@ $title = 'Dashboard - KitiSmart';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - KitiSmart</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <body>
     <div class="dashboard-container">
@@ -23,8 +24,10 @@ $title = 'Dashboard - KitiSmart';
                 <i class="fas fa-exclamation-circle"></i> <?= $error ?>
             </div>
         <?php else: ?>
+            
             <main class="dashboard-content">
                 <div class="dashboard-stats">
+                    <!-- ajoutons une card qui va boucle sur les depense pour avoir les depense en attente -->
                     <div class="stat-card">
                         <h3>Budget Initial</h3>
                         <p class="stat-value">
@@ -40,10 +43,17 @@ $title = 'Dashboard - KitiSmart';
                         </p>
                     </div>
                     <div class="stat-card">
+                        <h3>Dépenses en attente</h3>
+                        <p class="stat-value text-warning">
+                            <i class="fas fa-clock"></i>
+                            <?= number_format($depenseEnAttente, 2) ?> FCFA
+                        </p>
+                    </div>
+                    <div class="stat-card">
                         <h3>Budget restant</h3>
                         <p class="stat-value <?= $activeBudget->remaining_amount < 0 ? 'text-danger' : 'text-success' ?>">
                             <i class="fas fa-<?= $activeBudget->remaining_amount < 0 ? 'exclamation-triangle' : 'piggy-bank' ?>"></i>
-                            <?= number_format($activeBudget->remaining_amount, 2) ?> €
+                            <?= number_format($activeBudget->remaining_amount, 2) ?> FCFA
                         </p>
                     </div>
                 </div>
@@ -52,25 +62,11 @@ $title = 'Dashboard - KitiSmart';
                     <a href="/budget/create" class="btn-primary">
                         <i class="fas fa-plus"></i> Créer un budget
                     </a>
-                    <a href="/expense/create" class="btn-primary">
+                    <a href="/expenses/create" class="btn-primary">
                         <i class="fas fa-plus"></i> Ajouter une dépense
                     </a>
                 </div>
 
-                <?php if (!empty($budgetSummary['expenses_categories'])): ?>
-                    <div class="expenses-summary">
-                        <h3>Répartition des dépenses</h3>
-                        <div class="categories-grid">
-                            <?php foreach ($budgetSummary['expenses_categories'] as $category): ?>
-                                <div class="category-card">
-                                    <h4><?= ucfirst($category['category']) ?></h4>
-                                    <p class="amount"><?= number_format($category['total'], 2) ?> €</p>
-                                    <p class="count"><?= $category['count'] ?> dépense(s)</p>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
             </main>
         <?php endif; ?>
     </div>

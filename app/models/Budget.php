@@ -93,11 +93,11 @@ class Budget {
                 'budget_id' => $newBudget->id,
                 'payment_date' => $newDate,
                 'amount' => $charge->amount,
-                'category' => $charge->category,
                 'description' => $charge->description,
                 'is_fixed' => true,
                 'status' => 'pending',
                 'created_at' => date('Y-m-d H:i:s'),
+                'is_replicated' => true
             ]);
             R::store($newCharge);
         }
