@@ -732,28 +732,7 @@ body {
   color: #94a3b8;
 }
 
-/* Input group with icons */
-.input-group {
-  position: relative;
-}
-
-.input-group .form-control {
-  padding-left: 2.5rem;
-}
-
-.input-group i {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #64748b;
-  pointer-events: none;
-}
-
-.input-group.amount i,
-.input-group.date i {
-  color: var(--primary-color);
-}
+/* Input group with icons - voir définition complète plus bas dans le fichier */
 
 /* Custom Buttons */
 .btn {
@@ -1076,21 +1055,7 @@ body {
 }
 
 /* Styles pour les inputs */
-.input-group {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-group-prepend {
-  position: absolute;
-  left: 1rem;
-  color: var(--text-secondary);
-}
-
-.input-group .form-control {
-  padding-left: 2.5rem;
-}
+/* Définition de .input-group et .input-group-prepend déplacée plus bas pour éviter les conflits */
 
 .select2-container {
   width: 100% !important;
