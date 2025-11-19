@@ -3,6 +3,42 @@
     <h1>Gérez vos dépenses intelligemment</h1>
     <p>KitiSmart est votre partenaire financier personnel qui vous aide à prendre le contrôle de vos finances, suivre vos dépenses et atteindre vos objectifs d'épargne en toute simplicité.</p>
     <a href="/register" class="cta-btn">Commencer gratuitement</a>
+
+    <div class="hero-badges">
+      <div class="badge">
+        <i class="fas fa-check-circle"></i>
+        <span>100% Gratuit</span>
+      </div>
+      <div class="badge">
+        <i class="fas fa-lock"></i>
+        <span>Sécurisé</span>
+      </div>
+      <div class="badge">
+        <i class="fas fa-heart"></i>
+        <span>Sans engagement</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number" data-target="500">0</div>
+        <div class="stat-label">Utilisateurs actifs</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="10000">0</div>
+        <div class="stat-label">Budgets créés</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="50000">0</div>
+        <div class="stat-label">Dépenses suivies</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="98">0</div>
+        <div class="stat-label">% Satisfaction</div>
+      </div>
+    </div>
   </section>
 
   <section class="features" id="features">

@@ -1,33 +1,133 @@
 $(document).ready(function () {
-    // Fonction pour afficher les messages d'erreur
-    function showError(input, message) {
-        const formGroup = input.closest('.form-group');
-        let errorElement = formGroup.find('.error-message');
-        if (!errorElement.length) {
-            errorElement = $('<span class="error-message"></span>');
-            formGroup.append(errorElement);
+    // Auto-focus sur le champ nom
+    $('#name').focus();
+
+    // Toggle password visibility
+    $('#togglePassword').on('click', function() {
+        const passwordInput = $('#password');
+        const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+        passwordInput.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+
+    $('#toggleConfirmPassword').on('click', function() {
+        const passwordInput = $('#confirm_password');
+        const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+        passwordInput.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+
+    // Validation du nom en temps réel
+    $('#name').on('input blur', function() {
+        const name = $(this).val().trim();
+        const formGroup = $(this).closest('.form-group');
+        const errorElement = $('#name-error');
+
+        if (name === '') {
+            formGroup.removeClass('valid error');
+            errorElement.hide();
+        } else if (name.length < 3) {
+            formGroup.removeClass('valid').addClass('error');
+            errorElement.text('Le nom doit contenir au moins 3 caractères.').show();
+        } else {
+            formGroup.removeClass('error').addClass('valid');
+            errorElement.hide();
         }
-        errorElement.text(message).show();
-        formGroup.addClass('has-error');
+    });
+
+    // Validation de l'email en temps réel
+    $('#email').on('input blur', function() {
+        const email = $(this).val().trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const formGroup = $(this).closest('.form-group');
+        const errorElement = $('#email-error');
+
+        if (email === '') {
+            formGroup.removeClass('valid error');
+            errorElement.hide();
+        } else if (emailRegex.test(email)) {
+            formGroup.removeClass('error').addClass('valid');
+            errorElement.hide();
+        } else {
+            formGroup.removeClass('valid').addClass('error');
+            errorElement.text('Veuillez entrer une adresse e-mail valide.').show();
+        }
+    });
+
+    // Indicateur de force du mot de passe
+    $('#password').on('input', function() {
+        const password = $(this).val();
+        const formGroup = $(this).closest('.form-group');
+
+        // Vérifier les critères
+        const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+        };
+
+        // Mettre à jour les icônes des critères
+        $('#req-length').toggleClass('met', requirements.length);
+        $('#req-uppercase').toggleClass('met', requirements.uppercase);
+        $('#req-number').toggleClass('met', requirements.number);
+        $('#req-special').toggleClass('met', requirements.special);
+
+        // Calculer le score de force
+        const score = Object.values(requirements).filter(Boolean).length;
+        const strengthBar = $('#strengthBar');
+        const strengthText = $('#strengthText');
+
+        // Retirer toutes les classes
+        strengthBar.removeClass('weak medium strong very-strong');
+
+        if (password.length === 0) {
+            strengthText.text('');
+            formGroup.removeClass('valid error');
+        } else if (score === 1) {
+            strengthBar.addClass('weak');
+            strengthText.text('Faible').css('color', '#ef4444');
+            formGroup.removeClass('valid').addClass('error');
+        } else if (score === 2) {
+            strengthBar.addClass('medium');
+            strengthText.text('Moyen').css('color', '#f59e0b');
+            formGroup.removeClass('valid error');
+        } else if (score === 3) {
+            strengthBar.addClass('strong');
+            strengthText.text('Fort').css('color', '#10b981');
+            formGroup.removeClass('error').addClass('valid');
+        } else if (score === 4) {
+            strengthBar.addClass('very-strong');
+            strengthText.text('Très fort').css('color', '#059669');
+            formGroup.removeClass('error').addClass('valid');
+        }
+
+        // Valider la confirmation si déjà remplie
+        if ($('#confirm_password').val() !== '') {
+            validateConfirmPassword();
+        }
+    });
+
+    // Validation de la confirmation du mot de passe
+    function validateConfirmPassword() {
+        const password = $('#password').val();
+        const confirmPassword = $('#confirm_password').val();
+        const formGroup = $('#confirm_password').closest('.form-group');
+        const errorElement = $('#confirm-password-error');
+
+        if (confirmPassword === '') {
+            formGroup.removeClass('valid error');
+            errorElement.hide();
+        } else if (confirmPassword === password) {
+            formGroup.removeClass('error').addClass('valid');
+            errorElement.hide();
+        } else {
+            formGroup.removeClass('valid').addClass('error');
+            errorElement.text('Les mots de passe ne correspondent pas.').show();
+        }
     }
 
-    // Fonction pour masquer les messages d'erreur
-    function hideError(input) {
-        const formGroup = input.closest('.form-group');
-        formGroup.find('.error-message').hide();
-        formGroup.removeClass('has-error');
-    }
-
-    // Fonction pour afficher un message global (erreur ou succès)
-    function showGlobalMessage(message, type = 'error') {
-        const messageElement = $('#global-message');
-        messageElement.removeClass('error success').addClass(type).text(message).show();
-    }
-
-    // Fonction pour masquer le message global
-    function hideGlobalMessage() {
-        $('#global-message').hide();
-    }
+    $('#confirm_password').on('input blur', validateConfirmPassword);
 
     // Fonction pour valider le formulaire
     function validateForm() {
@@ -36,63 +136,84 @@ $(document).ready(function () {
         // Validation du nom
         const name = $('#name').val().trim();
         if (name.length < 3) {
-            showError($('#name'), 'Le nom doit contenir au moins 3 caractères.');
+            $('#name').closest('.form-group').addClass('error');
+            $('#name-error').text('Le nom doit contenir au moins 3 caractères.').show();
             isValid = false;
-        } else {
-            hideError($('#name'));
         }
 
         // Validation de l'e-mail
         const email = $('#email').val().trim();
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailPattern.test(email)) {
-            showError($('#email'), 'Veuillez entrer une adresse e-mail valide.');
+            $('#email').closest('.form-group').addClass('error');
+            $('#email-error').text('Veuillez entrer une adresse e-mail valide.').show();
             isValid = false;
-        } else {
-            hideError($('#email'));
         }
 
         // Validation du mot de passe
-        const password = $('#password').val().trim();
-        if (password.length < 6) {
-            showError($('#password'), 'Le mot de passe doit contenir au moins 6 caractères.');
+        const password = $('#password').val();
+        const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+        };
+        const score = Object.values(requirements).filter(Boolean).length;
+
+        if (score < 3) {
+            $('#password').closest('.form-group').addClass('error');
             isValid = false;
-        } else {
-            hideError($('#password'));
         }
 
-        // Validation de la confirmation du mot de passe
-        const confirmPassword = $('#confirm_password').val().trim();
+        // Validation de la confirmation
+        const confirmPassword = $('#confirm_password').val();
         if (confirmPassword !== password) {
-            showError($('#confirm_password'), 'Les mots de passe ne correspondent pas.');
+            $('#confirm_password').closest('.form-group').addClass('error');
+            $('#confirm-password-error').text('Les mots de passe ne correspondent pas.').show();
             isValid = false;
-        } else {
-            hideError($('#confirm_password'));
         }
 
         return isValid;
     }
 
-    $('form').on('submit', function (e) {
+    // Soumission du formulaire
+    $('#registerForm').on('submit', function (e) {
         e.preventDefault();
-        console.log("Formulaire soumis"); // Vérifiez si ce log apparaît
-    
-        hideGlobalMessage();
-    
+        console.log("Formulaire soumis");
+
+        $('#global-message').hide();
+
         if (!validateForm()) {
-            console.log("Validation du formulaire échouée"); // Vérifiez si ce log apparaît
-            showGlobalMessage('Veuillez corriger les erreurs avant de soumettre le formulaire.', 'error');
+            console.log("Validation du formulaire échouée");
+            $('#global-message')
+                .removeClass('success').addClass('error')
+                .html('<i class="fas fa-exclamation-circle"></i> Veuillez corriger les erreurs avant de soumettre le formulaire.')
+                .show();
+
+            // Shake animation
+            $('.auth-card').css('animation', 'shake 0.5s');
+            setTimeout(() => {
+                $('.auth-card').css('animation', '');
+            }, 500);
+
             return;
         }
-    
+
+        // Ajouter loading state
+        const submitBtn = $(this).find('button[type="submit"]');
+        submitBtn.addClass('loading');
+        submitBtn.prop('disabled', true);
+
         const formData = {
             name: $('#name').val().trim(),
             email: $('#email').val().trim(),
-            password: $('#password').val().trim(),
+            password: $('#password').val(),
+            confirm_password: $('#confirm_password').val(),
             csrf_token: $('input[name="csrf_token"]').val(),
         };
-        console.log("Données du formulaire:", formData); // Vérifiez si ce log apparaît
-    
+
+        console.log("Données du formulaire:", formData);
+
         $.ajax({
             url: '/register',
             method: 'POST',
@@ -100,32 +221,69 @@ $(document).ready(function () {
             data: JSON.stringify(formData),
             success: function (response) {
                 if (response.success) {
-                    showGlobalMessage('Inscription réussie ! Redirection en cours...', 'success');
+                    // Retirer loading state
+                    submitBtn.removeClass('loading');
+                    submitBtn.html('<i class="fas fa-check"></i> Inscription réussie !');
+
+                    // Message de succès
+                    $('#global-message')
+                        .removeClass('error').addClass('success')
+                        .html('<i class="fas fa-check-circle"></i> Inscription réussie ! Redirection en cours...')
+                        .show();
+
                     setTimeout(() => {
                         window.location.href = '/login';
                     }, 2000);
                 } else {
-                    showGlobalMessage(response.message || 'Une erreur est survenue.', 'error');
+                    // Retirer loading state
+                    submitBtn.removeClass('loading');
+                    submitBtn.prop('disabled', false);
+
+                    $('#global-message')
+                        .removeClass('success').addClass('error')
+                        .html(`<i class="fas fa-exclamation-circle"></i> ${response.message || 'Une erreur est survenue.'}`)
+                        .show();
                 }
             },
             error: function (xhr) {
-                console.log("Erreur AJAX:", xhr.responseText); // Vérifiez si ce log apparaît
+                console.log("Erreur AJAX:", xhr.responseText);
+
+                // Retirer loading state
+                submitBtn.removeClass('loading');
+                submitBtn.prop('disabled', false);
+
                 try {
                     const response = xhr.responseJSON;
                     if (response.errors) {
                         Object.keys(response.errors).forEach(field => {
-                            showError($('#' + field), response.errors[field]);
+                            const errorElement = $(`#${field}-error`);
+                            errorElement.text(response.errors[field]).show();
+                            $(`#${field}`).closest('.form-group').addClass('error');
                         });
-                        showGlobalMessage(response.message || 'Des erreurs ont été détectées.', 'error');
+                        $('#global-message')
+                            .removeClass('success').addClass('error')
+                            .html(`<i class="fas fa-exclamation-circle"></i> ${response.message || 'Des erreurs ont été détectées.'}`)
+                            .show();
                     } else {
-                        showGlobalMessage(response.message || 'Une erreur est survenue.', 'error');
+                        $('#global-message')
+                            .removeClass('success').addClass('error')
+                            .html(`<i class="fas fa-exclamation-circle"></i> ${response.message || 'Une erreur est survenue.'}`)
+                            .show();
                     }
                 } catch (e) {
-                    showGlobalMessage('Une erreur inattendue est survenue.', 'error');
+                    $('#global-message')
+                        .removeClass('success').addClass('error')
+                        .html('<i class="fas fa-exclamation-circle"></i> Une erreur inattendue est survenue.')
+                        .show();
                     console.error("Erreur lors de la gestion de l'erreur AJAX:", e);
                 }
+
+                // Shake animation
+                $('.auth-card').css('animation', 'shake 0.5s');
+                setTimeout(() => {
+                    $('.auth-card').css('animation', '');
+                }, 500);
             }
         });
     });
-
 });
