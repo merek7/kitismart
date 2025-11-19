@@ -17,10 +17,15 @@ return [
     ['POST', '/budget/create', 'BudgetController#create', 'create_budget'],
     ['GET', '/budget/active', 'BudgetController#getActiveBudget', 'get_active_budget'],
     ['GET', '/budget/[i:id]/summary', 'BudgetController#getBudgetSummary', 'budget_summary'],
-    ['GET','/parametrage','ParametrageController#showCreateParametrageForm','parametrage_form'],
     ['GET','/expenses/create','ExpenseController#showCreateExpenseForm','expense_form'],
     ['POST','/expenses/create','ExpenseController#create','expense_submit'],
     ['GET', '/expenses/list', 'ExpenseController#listPaginated', 'expense_list'],
     ['POST','/expenses/mark-paid/[i:id]','ExpenseController#markAsPaid', 'expense_paid'],
-    ['PUT', '/expenses/update/[i:id]', 'ExpenseController#update', 'expense_update']
+    ['PUT', '/expenses/update/[i:id]', 'ExpenseController#update', 'expense_update'],
+    ['GET', '/expenses/export/csv', 'ExportController#exportCsv', 'export_csv'],
+    ['GET', '/expenses/export/pdf', 'ExportController#exportPdf', 'export_pdf'],
+    ['GET', '/settings', 'SettingsController#index', 'settings'],
+    ['POST', '/settings/update-profile', 'SettingsController#updateProfile', 'settings_update_profile'],
+    ['POST', '/settings/update-password', 'SettingsController#updatePassword', 'settings_update_password'],
+    ['POST', '/settings/delete-account', 'SettingsController#deleteAccount', 'settings_delete_account']
 ];

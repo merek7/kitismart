@@ -10,11 +10,17 @@ class Mailer {
     public function __construct() {
         $this->mailer = new PHPMailer(true);
         $this->mailer->isSMTP();
-        $this->mailer->Host = 'sandbox.smtp.mailtrap.io';
+        $this->mailer->Host = $_ENV['SMTP_HOST'] ?? 'sandbox.smtp.mailtrap.io';
         $this->mailer->SMTPAuth = true;
-        $this->mailer->Username = 'bd3a4818da4ef4';
-        $this->mailer->Password = 'af26d38e9f242b';
-        $this->mailer->Port = 2525;
+        $this->mailer->Username = $_ENV['SMTP_USERNAME'] ?? '';
+        $this->mailer->Password = $_ENV['SMTP_PASSWORD'] ?? '';
+        $this->mailer->Port = (int)($_ENV['SMTP_PORT'] ?? 2525);
+
+        // Configuration optionnelle de l'encryption (tls, ssl)
+        if (!empty($_ENV['SMTP_ENCRYPTION'])) {
+            $this->mailer->SMTPSecure = $_ENV['SMTP_ENCRYPTION'];
+        }
+
         $this->mailer->CharSet = 'UTF-8';
     }
 
