@@ -15,10 +15,23 @@ class Database
     private function __construct()
     {
         try {
+            // Déterminer le driver à utiliser (par défaut pgsql)
+            $driver = $_ENV['DB_DRIVER'] ?? 'pgsql';
+            $port = $_ENV['DB_PORT'] ?? ($driver === 'pgsql' ? '5432' : '3306');
+
+            if ($driver === 'pgsql') {
+                $dsn = 'pgsql:host=' . $_ENV['DB_HOST'] .
+                       ';port=' . $port .
+                       ';dbname=' . $_ENV['DB_NAME'];
+            } else {
+                $dsn = 'mysql:host=' . $_ENV['DB_HOST'] .
+                       ';port=' . $port .
+                       ';dbname=' . $_ENV['DB_NAME'] .
+                       ';charset=' . ($_ENV['DB_CHARSET'] ?? 'utf8mb4');
+            }
+
             $this->connection = new PDO(
-                'mysql:host=' . $_ENV['DB_HOST'] .
-                ';dbname=' . $_ENV['DB_NAME'] .
-                ';charset=' . $_ENV['DB_CHARSET'],
+                $dsn,
                 $_ENV['DB_USER'],
                 $_ENV['DB_PASS'],
                 [
@@ -28,6 +41,11 @@ class Database
                     PDO::ATTR_STRINGIFY_FETCHES => false
                 ]
             );
+
+            // Pour PostgreSQL, configurer l'encodage
+            if ($driver === 'pgsql') {
+                $this->connection->exec("SET NAMES 'UTF8'");
+            }
         } catch (PDOException $e) {
             error_log('[SECURITY] Database connection attempt failed: ' . $e->getMessage());
             throw new \RuntimeException('Service temporairement indisponible');
@@ -58,17 +76,28 @@ class Database
     }
     public static function initRedBean()
     {
+        // Déterminer le driver à utiliser (par défaut pgsql)
+        $driver = $_ENV['DB_DRIVER'] ?? 'pgsql';
+        $port = $_ENV['DB_PORT'] ?? ($driver === 'pgsql' ? '5432' : '3306');
+
+        if ($driver === 'pgsql') {
+            $dsn = 'pgsql:host=' . $_ENV['DB_HOST'] .
+                   ';port=' . $port .
+                   ';dbname=' . $_ENV['DB_NAME'];
+        } else {
+            $dsn = 'mysql:host=' . $_ENV['DB_HOST'] .
+                   ';port=' . $port .
+                   ';dbname=' . $_ENV['DB_NAME'];
+        }
 
         R::setup(
-            'mysql:host=' . $_ENV['DB_HOST'] .
-            ';dbname=' . $_ENV['DB_NAME'],
+            $dsn,
             $_ENV['DB_USER'],
             $_ENV['DB_PASS']
         );
 
         R::useFeatureSet('latest');
         R::freeze(false); // En développement seulement
-
     }
 
 }
