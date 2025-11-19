@@ -113,8 +113,8 @@
                 <!-- Graphiques -->
                 <div class="row">
                     <!-- Graphique de progression -->
-                    <div class="col-lg-4 mb-4">
-                        <div class="card shadow-sm">
+                    <div class="col-lg-4 mb-4 fade-in-up delay-1">
+                        <div class="card shadow-sm hover-lift">
                             <div class="card-header bg-white">
                                 <h5 class="mb-0">
                                     <i class="fas fa-chart-pie text-primary"></i>
@@ -144,8 +144,8 @@
                     </div>
 
                     <!-- Graphique des catégories -->
-                    <div class="col-lg-4 mb-4">
-                        <div class="card shadow-sm">
+                    <div class="col-lg-4 mb-4 fade-in-up delay-2">
+                        <div class="card shadow-sm hover-lift">
                             <div class="card-header bg-white">
                                 <h5 class="mb-0">
                                     <i class="fas fa-chart-pie text-success"></i>
@@ -162,8 +162,8 @@
                     </div>
 
                     <!-- Graphique des types -->
-                    <div class="col-lg-4 mb-4">
-                        <div class="card shadow-sm">
+                    <div class="col-lg-4 mb-4 fade-in-up delay-3">
+                        <div class="card shadow-sm hover-lift">
                             <div class="card-header bg-white">
                                 <h5 class="mb-0">
                                     <i class="fas fa-chart-bar text-warning"></i>
@@ -181,8 +181,8 @@
 
                 <!-- Liste des catégories détaillée -->
                 <div class="row">
-                    <div class="col-12">
-                        <div class="card shadow-sm">
+                    <div class="col-12 fade-in-up delay-1">
+                        <div class="card shadow-sm hover-lift">
                             <div class="card-header bg-white">
                                 <h5 class="mb-0">
                                     <i class="fas fa-list"></i>
@@ -191,7 +191,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover transition-all">
                                         <thead class="thead-light">
                                             <tr>
                                                 <th>Catégorie</th>
@@ -247,8 +247,8 @@
 
                 <!-- Actions rapides -->
                 <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="card shadow-sm">
+                    <div class="col-12 fade-in-up delay-1">
+                        <div class="card shadow-sm hover-lift">
                             <div class="card-header bg-white">
                                 <h5 class="mb-0">
                                     <i class="fas fa-bolt"></i>
@@ -258,7 +258,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-3 mb-3">
-                                        <a href="/expenses/create" class="quick-action-card">
+                                        <a href="/expenses/create" class="quick-action-card transition-all">
                                             <div class="icon bg-primary">
                                                 <i class="fas fa-plus"></i>
                                             </div>
@@ -269,7 +269,7 @@
                                         </a>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <a href="/expenses/list" class="quick-action-card">
+                                        <a href="/expenses/list" class="quick-action-card transition-all">
                                             <div class="icon bg-info">
                                                 <i class="fas fa-list"></i>
                                             </div>
@@ -280,7 +280,7 @@
                                         </a>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <a href="/budget/create" class="quick-action-card">
+                                        <a href="/budget/create" class="quick-action-card transition-all">
                                             <div class="icon bg-success">
                                                 <i class="fas fa-wallet"></i>
                                             </div>
@@ -291,7 +291,7 @@
                                         </a>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <a href="/settings" class="quick-action-card">
+                                        <a href="/settings" class="quick-action-card transition-all">
                                             <div class="icon bg-secondary">
                                                 <i class="fas fa-cog"></i>
                                             </div>

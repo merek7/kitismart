@@ -1,5 +1,5 @@
 <div class="content-wrapper">
-    <section class="content-header">
+    <section class="content-header fade-in-up">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
@@ -7,7 +7,7 @@
                 </div>
                 <div class="col-md-6">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a></li>
+                        <li class="breadcrumb-item"><a href="/dashboard" class="transition-colors"><i class="fas fa-home"></i> Tableau de bord</a></li>
                         <li class="breadcrumb-item active">Nouvelle Dépense</li>
                     </ol>
                 </div>
@@ -19,8 +19,8 @@
         <div class="container">
             <!-- Résumé des dépenses -->
             <div class="row mb-4">
-                    <div class="col-md-12">
-                        <div class="expense-summary-card">
+                    <div class="col-md-12 fade-in-up delay-1">
+                        <div class="expense-summary-card card hover-lift">
                             <div class="summary-item">
                                 <i class="fas fa-list-ul"></i>
                                 <div class="summary-content">
@@ -54,46 +54,43 @@
                 </div>
 
             <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
+                <div class="col-md-12 fade-in-up delay-2">
+                    <div class="card hover-lift">
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-plus-circle"></i> Ajouter des dépenses
                             </h3>
                             <div class="card-tools">
-                                <button type="button" id="add-expense" class="btn btn-tool btn-action">
+                                <button type="button" id="add-expense" class="btn btn-tool btn-action hover-lift transition-all">
                                     <i class="fas fa-plus"></i> Nouvelle dépense
                                 </button>
-                                <a href="/expenses/list" class="btn btn-tool btn-action">
+                                <a href="/expenses/list" class="btn btn-tool btn-action hover-lift transition-all">
                                     <i class="fas fa-list"></i> Liste des dépenses
                                 </a>
                             </div>
                         </div>
 
-                        <div id="global-message" class="message"></div>
+                        <div id="global-message" class="message alert" style="display: none;"></div>
 
                         <form id="expense-form" action="/expenses/create" method="POST">
                             <div class="card-body">
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                                 
                                 <div id="expense-container" class="expense-scroll">
-                                    <div class="expense-item">
+                                    <div class="expense-item card fade-in">
                                         <div class="expense-header">
-                                            <span class="expense-number">#1</span>
-                                            <button type="button" class="btn-remove" title="Supprimer cette dépense">
+                                            <span class="expense-number badge">#1</span>
+                                            <button type="button" class="btn-remove transition-all" title="Supprimer cette dépense">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <div class="form-group">
+                                                <div class="form-group input-group">
                                                     <label for="category">Type de dépense</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
-                                                        </div>
-                                                        <select class="form-control select2 category-select" name="category[]" required>
+                                                    <i class="fas fa-tag input-group-icon"></i>
+                                                    <select class="form-control select2 category-select transition-all" name="category[]" required>
                                                             <option value="" disabled selected>Choisir un type</option>
                                                             <?php foreach($categories as $cat): ?>
                                                                 <option value="<?= htmlspecialchars($cat) ?>" 
@@ -106,76 +103,60 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="form-group">
+                                                <div class="form-group input-group">
                                                     <label for="amount">Montant</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text"><i class="fas fa-euro-sign"></i></span>
-                                                        </div>
-                                                        <input type="number"
-                                                            class="form-control amount-input"
-                                                            name="amount[]"
-                                                            placeholder="0.00"
-                                                            min="0"
-                                                            step="0.01"
-                                                            required>
-                                                    </div>
+                                                    <i class="fas fa-euro-sign input-group-icon"></i>
+                                                    <input type="number"
+                                                        class="form-control amount-input transition-all"
+                                                        name="amount[]"
+                                                        placeholder="0.00"
+                                                        min="0"
+                                                        step="0.01"
+                                                        required>
                                                 </div>
                                             </div>
                                         </div>
                                     
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <div class="form-group">
+                                                <div class="form-group input-group">
                                                     <label for="date">Date de paiement</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                                                        </div>
-                                                        <input type="date"
-                                                            class="form-control"
-                                                            name="date[]"
-                                                            required>
-                                                    </div>
+                                                    <i class="fas fa-calendar-alt input-group-icon"></i>
+                                                    <input type="date"
+                                                        class="form-control transition-all"
+                                                        name="date[]"
+                                                        required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="form-group">
+                                                <div class="form-group input-group">
                                                     <label for="status">Statut</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
-                                                        </div>
-                                                        <select class="form-control" name="status[]" required>
-                                                            <option value="pending">En attente</option>
-                                                            <option value="paid">Payé</option>
-                                                        </select>
-                                                    </div>
+                                                    <i class="fas fa-check-circle input-group-icon"></i>
+                                                    <select class="form-control transition-all" name="status[]" required>
+                                                        <option value="pending">En attente</option>
+                                                        <option value="paid">Payé</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        <div class="form-group">
+
+                                        <div class="form-group input-group">
                                             <label for="description">Description</label>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="fas fa-align-left"></i></span>
-                                                </div>
-                                                <textarea class="form-control"
-                                                        name="description[]"
-                                                        rows="2"
-                                                        placeholder="Détails de la dépense..."></textarea>
-                                            </div>
+                                            <i class="fas fa-align-left input-group-icon"></i>
+                                            <textarea class="form-control transition-all"
+                                                    name="description[]"
+                                                    rows="2"
+                                                    placeholder="Détails de la dépense..."></textarea>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="card-footer">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary hover-lift transition-all">
                                     <i class="fas fa-save"></i> Enregistrer les dépenses
                                 </button>
-                                <a href="/dashboard" class="btn btn-cancel">
+                                <a href="/dashboard" class="btn btn-cancel transition-all">
                                     <i class="fas fa-times"></i> Annuler
                                 </a>
                             </div>
@@ -186,3 +167,42 @@
         </div>
     </section>
 </div>
+
+<script>
+// Form submission with loading state
+document.getElementById('expense-form').addEventListener('submit', function(e) {
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.classList.add('btn-loading');
+    submitBtn.disabled = true;
+
+    // Show toast notification
+    const loadingToast = toast.loading('Enregistrement des dépenses en cours...');
+});
+
+// Input validation feedback
+document.querySelectorAll('.form-control').forEach(input => {
+    input.addEventListener('blur', function() {
+        if (this.value && this.checkValidity()) {
+            this.classList.add('success');
+            this.classList.remove('error');
+        } else if (this.value && !this.checkValidity()) {
+            this.classList.add('error');
+            this.classList.remove('success');
+        }
+    });
+
+    input.addEventListener('input', function() {
+        this.classList.remove('error', 'success');
+    });
+});
+
+// Add expense item animation
+document.getElementById('add-expense')?.addEventListener('click', function() {
+    const newExpense = document.querySelector('.expense-item').cloneNode(true);
+    newExpense.classList.add('scale-in');
+    document.getElementById('expense-container').appendChild(newExpense);
+
+    // Show toast notification
+    toast.success('Nouvelle dépense ajoutée');
+});
+</script>
