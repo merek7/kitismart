@@ -6,6 +6,8 @@
     <title><?= $title ?? 'KitiSmart - Gérez vos dépenses avec intelligence' ?></title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/assets/css/style.css" rel="stylesheet">
+    <link href="/assets/css/animations.css" rel="stylesheet">
+    <link href="/assets/css/enhanced-ux.css" rel="stylesheet">
     <?php if (!empty($styles)): ?>
         <?php foreach ($styles as $style): ?>
             <link href="/assets/css/<?= htmlspecialchars($style) ?>" rel="stylesheet">
@@ -13,29 +15,29 @@
     <?php endif; ?>
 </head>
 <body>
-    <nav class="navbar">
+    <nav class="navbar fade-in-down">
         <div class="nav-content">
             <div class="logo">
-            <a href="/" class="nav-links">
+            <a href="/" class="nav-links hover-scale">
                 KitiSmart
-            </a>    
+            </a>
         </div>
             <?php if (!isset($_SESSION['user_id'])): ?>
                 <div class="nav-links">
-                  <a href="#features">Fonctionnalités</a>
-                  <a href="#how-it-works">Comment ça marche</a>
-                  <a href="#testimonials">Témoignages</a>
+                  <a href="#features" class="transition-all">Fonctionnalités</a>
+                  <a href="#how-it-works" class="transition-all">Comment ça marche</a>
+                  <a href="#testimonials" class="transition-all">Témoignages</a>
                 </div>
                 <div class="auth-buttons">
-                    <a href="/login" class="login-btn">Connexion</a>
-                    <a href="/register" class="register-btn">Inscription</a>
+                    <a href="/login" class="login-btn btn transition-all">Connexion</a>
+                    <a href="/register" class="register-btn btn transition-all">Inscription</a>
                 </div>
             <?php else: ?>
                 <div class="nav-links">
-                    <a href="/dashboard">Tableau de bord</a>
-                    <a href="/expenses">Dépenses</a>
-                    <a href="/profile">Profil</a>
-                    <a href="/logout">Déconnexion</a>
+                    <a href="/dashboard" class="transition-all">Tableau de bord</a>
+                    <a href="/expenses" class="transition-all">Dépenses</a>
+                    <a href="/profile" class="transition-all">Profil</a>
+                    <a href="/logout" class="transition-all">Déconnexion</a>
                 </div>
             <?php endif; ?>
         </div>
@@ -53,6 +55,7 @@
         </div>
     </footer>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/toast.js"></script>
     <script src="/assets/js/app.js"></script>
     <?php
     error_log("Scripts disponibles dans le layout: " . print_r($pageScripts ?? [], true));
