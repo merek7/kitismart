@@ -43,55 +43,63 @@
 
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="form-group input-group">
+                                            <div class="form-group">
                                                 <label for="name">Nom du Budget</label>
-                                                <i class="fas fa-tag input-group-icon"></i>
-                                                <input type="text"
-                                                    class="form-control transition-all"
-                                                    id="name"
-                                                    name="name"
-                                                    placeholder="Ex: Budget vacances été 2025"
-                                                    required>
+                                                <div class="input-group">
+                                                    <i class="fas fa-tag input-group-icon"></i>
+                                                    <input type="text"
+                                                        class="form-control transition-all"
+                                                        id="name"
+                                                        name="name"
+                                                        placeholder="Ex: Budget vacances été 2025"
+                                                        required>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="form-group input-group">
+                                            <div class="form-group">
                                                 <label for="amount">Montant Total</label>
-                                                <i class="fas fa-coins input-group-icon"></i>
-                                                <input type="number"
-                                                    class="form-control transition-all"
-                                                    id="amount"
-                                                    name="amount"
-                                                    step="0.01"
-                                                    min="0.01"
-                                                    placeholder="0.00"
-                                                    required>
+                                                <div class="input-group">
+                                                    <i class="fas fa-coins input-group-icon"></i>
+                                                    <input type="number"
+                                                        class="form-control transition-all"
+                                                        id="amount"
+                                                        name="amount"
+                                                        step="0.01"
+                                                        min="0.01"
+                                                        placeholder="0.00"
+                                                        required>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="form-group input-group">
+                                            <div class="form-group">
                                                 <label for="start_date">Date de début</label>
-                                                <i class="fas fa-calendar-alt input-group-icon"></i>
-                                                <input type="date"
-                                                    class="form-control transition-all"
-                                                    id="start_date"
-                                                    name="start_date"
-                                                    required>
+                                                <div class="input-group">
+                                                    <i class="fas fa-calendar-alt input-group-icon"></i>
+                                                    <input type="date"
+                                                        class="form-control transition-all"
+                                                        id="start_date"
+                                                        name="start_date"
+                                                        required>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="form-group input-group">
+                                    <div class="form-group">
                                         <label for="description">Description</label>
-                                        <i class="fas fa-align-left input-group-icon"></i>
-                                        <textarea class="form-control transition-all"
-                                                id="description"
-                                                name="description"
-                                                rows="4"
-                                                placeholder="Décrivez l'objectif et les détails de ce budget..."></textarea>
+                                        <div class="input-group">
+                                            <i class="fas fa-align-left input-group-icon"></i>
+                                            <textarea class="form-control transition-all"
+                                                    id="description"
+                                                    name="description"
+                                                    rows="4"
+                                                    placeholder="Décrivez l'objectif et les détails de ce budget..."></textarea>
+                                        </div>
                                     </div>
                                 </div>
 

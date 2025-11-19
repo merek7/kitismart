@@ -87,66 +87,75 @@
 
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <div class="form-group input-group">
+                                                <div class="form-group">
                                                     <label for="category">Type de dépense</label>
-                                                    <i class="fas fa-tag input-group-icon"></i>
-                                                    <select class="form-control select2 category-select transition-all" name="category[]" required>
-                                                            <option value="" disabled selected>Choisir un type</option>
-                                                            <?php foreach($categories as $cat): ?>
-                                                                <option value="<?= htmlspecialchars($cat) ?>" 
-                                                                        data-icon="<?= $cat === 'fixe' ? 'calendar-check' : ($cat === 'epargne' ? 'piggy-bank' : 'shopping-cart') ?>">
-                                                                    <?= ucfirst(htmlspecialchars($cat)) ?>
-                                                                </option>
-                                                            <?php endforeach; ?>
-                                                        </select>
+                                                    <div class="input-group">
+                                                        <i class="fas fa-tag input-group-icon"></i>
+                                                        <select class="form-control select2 category-select transition-all" name="category[]" required>
+                                                                <option value="" disabled selected>Choisir un type</option>
+                                                                <?php foreach($categories as $cat): ?>
+                                                                    <option value="<?= htmlspecialchars($cat) ?>"
+                                                                            data-icon="<?= $cat === 'fixe' ? 'calendar-check' : ($cat === 'epargne' ? 'piggy-bank' : 'shopping-cart') ?>">
+                                                                        <?= ucfirst(htmlspecialchars($cat)) ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </select>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="form-group input-group">
+                                                <div class="form-group">
                                                     <label for="amount">Montant</label>
-                                                    <i class="fas fa-euro-sign input-group-icon"></i>
-                                                    <input type="number"
-                                                        class="form-control amount-input transition-all"
-                                                        name="amount[]"
-                                                        placeholder="0.00"
-                                                        min="0"
-                                                        step="0.01"
-                                                        required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group input-group">
-                                                    <label for="date">Date de paiement</label>
-                                                    <i class="fas fa-calendar-alt input-group-icon"></i>
-                                                    <input type="date"
-                                                        class="form-control transition-all"
-                                                        name="date[]"
-                                                        required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group input-group">
-                                                    <label for="status">Statut</label>
-                                                    <i class="fas fa-check-circle input-group-icon"></i>
-                                                    <select class="form-control transition-all" name="status[]" required>
-                                                        <option value="pending">En attente</option>
-                                                        <option value="paid">Payé</option>
-                                                    </select>
+                                                    <div class="input-group">
+                                                        <i class="fas fa-euro-sign input-group-icon"></i>
+                                                        <input type="number"
+                                                            class="form-control amount-input transition-all"
+                                                            name="amount[]"
+                                                            placeholder="0.00"
+                                                            min="0"
+                                                            step="0.01"
+                                                            required>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="form-group input-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="date">Date de paiement</label>
+                                                    <div class="input-group">
+                                                        <i class="fas fa-calendar-alt input-group-icon"></i>
+                                                        <input type="date"
+                                                            class="form-control transition-all"
+                                                            name="date[]"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="status">Statut</label>
+                                                    <div class="input-group">
+                                                        <i class="fas fa-check-circle input-group-icon"></i>
+                                                        <select class="form-control transition-all" name="status[]" required>
+                                                            <option value="pending">En attente</option>
+                                                            <option value="paid">Payé</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
                                             <label for="description">Description</label>
-                                            <i class="fas fa-align-left input-group-icon"></i>
-                                            <textarea class="form-control transition-all"
-                                                    name="description[]"
-                                                    rows="2"
-                                                    placeholder="Détails de la dépense..."></textarea>
+                                            <div class="input-group">
+                                                <i class="fas fa-align-left input-group-icon"></i>
+                                                <textarea class="form-control transition-all"
+                                                        name="description[]"
+                                                        rows="2"
+                                                        placeholder="Détails de la dépense..."></textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
