@@ -48,18 +48,22 @@
                             <form id="profile-form" method="POST" action="/settings/update-profile">
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
-                                <div class="form-group input-group">
+                                <div class="form-group">
                                     <label for="nom"><i class="fas fa-user-circle"></i> Nom</label>
-                                    <i class="fas fa-user-circle input-group-icon"></i>
-                                    <input type="text" class="form-control transition-all" id="nom" name="nom"
-                                           value="<?= htmlspecialchars($user->nom) ?>" required>
+                                    <div class="input-group">
+                                        <i class="fas fa-user-circle input-group-icon"></i>
+                                        <input type="text" class="form-control transition-all" id="nom" name="nom"
+                                               value="<?= htmlspecialchars($user->nom) ?>" required>
+                                    </div>
                                 </div>
 
-                                <div class="form-group input-group">
+                                <div class="form-group">
                                     <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                                    <i class="fas fa-envelope input-group-icon"></i>
-                                    <input type="email" class="form-control transition-all" id="email" name="email"
-                                           value="<?= htmlspecialchars($user->email) ?>" required>
+                                    <div class="input-group">
+                                        <i class="fas fa-envelope input-group-icon"></i>
+                                        <input type="email" class="form-control transition-all" id="email" name="email"
+                                               value="<?= htmlspecialchars($user->email) ?>" required>
+                                    </div>
                                 </div>
 
                                 <div class="form-group mb-0">
@@ -87,35 +91,41 @@
                             <form id="password-form" method="POST" action="/settings/update-password">
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
-                                <div class="form-group input-group">
+                                <div class="form-group">
                                     <label for="current_password"><i class="fas fa-lock"></i> Mot de passe actuel</label>
-                                    <i class="fas fa-lock input-group-icon"></i>
-                                    <input type="password" class="form-control transition-all" id="current_password"
-                                           name="current_password" required>
-                                    <button type="button" class="password-toggle" onclick="togglePasswordField('current_password')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <div class="input-group">
+                                        <i class="fas fa-lock input-group-icon"></i>
+                                        <input type="password" class="form-control transition-all" id="current_password"
+                                               name="current_password" required>
+                                        <button type="button" class="password-toggle" onclick="togglePasswordField('current_password')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div class="form-group input-group">
+                                <div class="form-group">
                                     <label for="new_password"><i class="fas fa-lock"></i> Nouveau mot de passe</label>
-                                    <i class="fas fa-lock input-group-icon"></i>
-                                    <input type="password" class="form-control transition-all" id="new_password"
-                                           name="new_password" required minlength="8">
-                                    <button type="button" class="password-toggle" onclick="togglePasswordField('new_password')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <div class="input-group">
+                                        <i class="fas fa-lock input-group-icon"></i>
+                                        <input type="password" class="form-control transition-all" id="new_password"
+                                               name="new_password" required minlength="8">
+                                        <button type="button" class="password-toggle" onclick="togglePasswordField('new_password')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                     <small class="form-text text-muted">Minimum 8 caractères</small>
                                 </div>
 
-                                <div class="form-group input-group">
+                                <div class="form-group">
                                     <label for="confirm_password"><i class="fas fa-lock"></i> Confirmer le nouveau mot de passe</label>
-                                    <i class="fas fa-lock input-group-icon"></i>
-                                    <input type="password" class="form-control transition-all" id="confirm_password"
-                                           name="confirm_password" required minlength="8">
-                                    <button type="button" class="password-toggle" onclick="togglePasswordField('confirm_password')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <div class="input-group">
+                                        <i class="fas fa-lock input-group-icon"></i>
+                                        <input type="password" class="form-control transition-all" id="confirm_password"
+                                               name="confirm_password" required minlength="8">
+                                        <button type="button" class="password-toggle" onclick="togglePasswordField('confirm_password')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div id="password-strength" class="password-strength" style="display: none;">
@@ -188,19 +198,23 @@
                         <li>Votre historique d'activité</li>
                     </ul>
 
-                    <div class="form-group input-group">
+                    <div class="form-group">
                         <label for="password">Entrez votre mot de passe pour confirmer</label>
-                        <i class="fas fa-lock input-group-icon"></i>
-                        <input type="password" class="form-control transition-all" id="password" name="password" required>
+                        <div class="input-group">
+                            <i class="fas fa-lock input-group-icon"></i>
+                            <input type="password" class="form-control transition-all" id="password" name="password" required>
+                        </div>
                     </div>
 
-                    <div class="form-group input-group">
+                    <div class="form-group">
                         <label for="confirmation">
                             Tapez <strong>SUPPRIMER</strong> pour confirmer
                         </label>
-                        <i class="fas fa-keyboard input-group-icon"></i>
-                        <input type="text" class="form-control transition-all" id="confirmation"
-                               name="confirmation" placeholder="SUPPRIMER" required>
+                        <div class="input-group">
+                            <i class="fas fa-keyboard input-group-icon"></i>
+                            <input type="text" class="form-control transition-all" id="confirmation"
+                                   name="confirmation" placeholder="SUPPRIMER" required>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

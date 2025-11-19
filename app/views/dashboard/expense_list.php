@@ -213,41 +213,51 @@
           <form id="edit-expense-form">
             <input type="hidden" id="edit-expense-id" name="id">
 
-            <div class="form-group input-group">
+            <div class="form-group">
               <label for="edit-description">Description</label>
-              <i class="fas fa-align-left input-group-icon"></i>
-              <input type="text" class="form-control transition-all" id="edit-description" name="description" required>
+              <div class="input-group">
+                <i class="fas fa-align-left input-group-icon"></i>
+                <input type="text" class="form-control transition-all" id="edit-description" name="description" required>
+              </div>
             </div>
 
-            <div class="form-group input-group">
+            <div class="form-group">
               <label for="edit-amount">Montant</label>
-              <i class="fas fa-euro-sign input-group-icon"></i>
-              <input type="number" class="form-control transition-all" id="edit-amount" name="amount" step="0.01" min="0" required>
+              <div class="input-group">
+                <i class="fas fa-euro-sign input-group-icon"></i>
+                <input type="number" class="form-control transition-all" id="edit-amount" name="amount" step="0.01" min="0" required>
+              </div>
             </div>
 
-            <div class="form-group input-group">
+            <div class="form-group">
               <label for="edit-category">Catégorie</label>
-              <i class="fas fa-tag input-group-icon"></i>
-              <select class="form-control transition-all" id="edit-category" name="category_type" required>
-                <?php foreach ($categories as $category): ?>
-                  <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
-                <?php endforeach; ?>
-              </select>
+              <div class="input-group">
+                <i class="fas fa-tag input-group-icon"></i>
+                <select class="form-control transition-all" id="edit-category" name="category_type" required>
+                  <?php foreach ($categories as $category): ?>
+                    <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
             </div>
 
-            <div class="form-group input-group">
+            <div class="form-group">
               <label for="edit-date">Date</label>
-              <i class="fas fa-calendar-alt input-group-icon"></i>
-              <input type="date" class="form-control transition-all" id="edit-date" name="payment_date" required>
+              <div class="input-group">
+                <i class="fas fa-calendar-alt input-group-icon"></i>
+                <input type="date" class="form-control transition-all" id="edit-date" name="payment_date" required>
+              </div>
             </div>
 
-            <div class="form-group input-group">
+            <div class="form-group">
               <label for="edit-status">Statut</label>
-              <i class="fas fa-check-circle input-group-icon"></i>
-              <select class="form-control transition-all" id="edit-status" name="status">
-                <option value="pending">En attente</option>
-                <option value="paid">Payé</option>
-              </select>
+              <div class="input-group">
+                <i class="fas fa-check-circle input-group-icon"></i>
+                <select class="form-control transition-all" id="edit-status" name="status">
+                  <option value="pending">En attente</option>
+                  <option value="paid">Payé</option>
+                </select>
+              </div>
             </div>
           </form>
         </div>
