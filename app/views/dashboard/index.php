@@ -2,21 +2,21 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row align-items-center">
-                <div class="col-md-6">
+                <div class="col-md-6 fade-in-up">
                     <h1><i class="fas fa-chart-line"></i> Tableau de bord</h1>
                     <p class="text-muted mb-0">
                         Bonjour, <strong><?= htmlspecialchars($userName) ?></strong> 👋
                     </p>
                 </div>
-                <div class="col-md-6 text-right">
+                <div class="col-md-6 text-right fade-in-up delay-1">
                     <div class="btn-group">
-                        <a href="/expenses/create" class="btn btn-primary">
+                        <a href="/expenses/create" class="btn btn-primary hover-lift transition-all">
                             <i class="fas fa-plus"></i> Nouvelle dépense
                         </a>
-                        <a href="/expenses/export/csv" class="btn btn-outline-success">
+                        <a href="/expenses/export/csv" class="btn btn-outline-success hover-lift transition-all">
                             <i class="fas fa-file-csv"></i> Export CSV
                         </a>
-                        <a href="/expenses/export/pdf" class="btn btn-outline-danger" target="_blank">
+                        <a href="/expenses/export/pdf" class="btn btn-outline-danger hover-lift transition-all" target="_blank">
                             <i class="fas fa-file-pdf"></i> Export PDF
                         </a>
                     </div>
@@ -57,9 +57,9 @@
 
                 <!-- Cards des statistiques -->
                 <div class="row">
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card bg-primary text-white">
-                            <div class="stat-icon">
+                    <div class="col-lg-3 col-md-6 mb-4 fade-in-up delay-1">
+                        <div class="stat-card bg-primary text-white hover-lift card">
+                            <div class="stat-icon pulse">
                                 <i class="fas fa-wallet"></i>
                             </div>
                             <div class="stat-content">
@@ -70,9 +70,9 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card bg-danger text-white">
-                            <div class="stat-icon">
+                    <div class="col-lg-3 col-md-6 mb-4 fade-in-up delay-2">
+                        <div class="stat-card bg-danger text-white hover-lift card">
+                            <div class="stat-icon pulse">
                                 <i class="fas fa-shopping-cart"></i>
                             </div>
                             <div class="stat-content">
@@ -83,9 +83,9 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card bg-warning text-white">
-                            <div class="stat-icon">
+                    <div class="col-lg-3 col-md-6 mb-4 fade-in-up delay-3">
+                        <div class="stat-card bg-warning text-white hover-lift card">
+                            <div class="stat-icon pulse">
                                 <i class="fas fa-clock"></i>
                             </div>
                             <div class="stat-content">
@@ -96,9 +96,9 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card bg-<?= $alertLevel ?> text-white">
-                            <div class="stat-icon">
+                    <div class="col-lg-3 col-md-6 mb-4 fade-in-up delay-4">
+                        <div class="stat-card bg-<?= $alertLevel ?> text-white hover-lift card">
+                            <div class="stat-icon pulse">
                                 <i class="fas fa-piggy-bank"></i>
                             </div>
                             <div class="stat-content">
