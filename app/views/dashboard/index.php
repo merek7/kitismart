@@ -15,7 +15,8 @@ $title = 'Dashboard - KitiSmart';
     <div class="dashboard-container">
         <header class="dashboard-header">
             <div class="user-info">
-                <h1>Bonjour, <?= htmlspecialchars($userName) ?></h1>
+                <h1>Bonjour, <?= htmlspecialchars($userName) ?> 👋</h1>
+                <p class="subtitle">Voici un résumé de votre situation financière</p>
             </div>
         </header>
 
@@ -24,46 +25,97 @@ $title = 'Dashboard - KitiSmart';
                 <i class="fas fa-exclamation-circle"></i> <?= $error ?>
             </div>
         <?php else: ?>
-            
+
             <main class="dashboard-content">
+                <!-- Barre de progression du budget -->
+                <div class="budget-overview">
+                    <?php
+                    $budgetUsedPercent = $activeBudget->initial_amount > 0
+                        ? (($activeBudget->initial_amount - $activeBudget->remaining_amount) / $activeBudget->initial_amount) * 100
+                        : 0;
+                    $progressClass = $budgetUsedPercent >= 90 ? 'danger' : ($budgetUsedPercent >= 70 ? 'warning' : 'success');
+                    ?>
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span class="progress-label">Utilisation du budget</span>
+                            <span class="progress-percentage"><?= number_format($budgetUsedPercent, 1) ?>%</span>
+                        </div>
+                        <div class="budget-progress-bar">
+                            <div class="progress-bar-fill <?= $progressClass ?>"
+                                 data-progress="<?= $budgetUsedPercent ?>"
+                                 style="width: 0%">
+                            </div>
+                        </div>
+                        <div class="progress-footer">
+                            <span><?= number_format($activeBudget->initial_amount - $activeBudget->remaining_amount, 2) ?> € utilisés</span>
+                            <span><?= number_format($activeBudget->initial_amount, 2) ?> € total</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="dashboard-stats">
-                    <!-- ajoutons une card qui va boucle sur les depense pour avoir les depense en attente -->
-                    <div class="stat-card">
-                        <h3>Budget Initial</h3>
-                        <p class="stat-value">
+                    <div class="stat-card" data-delay="0">
+                        <div class="stat-icon success">
                             <i class="fas fa-wallet"></i>
-                            <?= number_format($activeBudget->initial_amount, 2) ?> €
-                        </p>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Budget Initial</h3>
+                            <p class="stat-value" data-value="<?= $activeBudget->initial_amount ?>">
+                                0 €
+                            </p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Dépenses du mois</h3>
-                        <p class="stat-value">
+
+                    <div class="stat-card" data-delay="100">
+                        <div class="stat-icon primary">
                             <i class="fas fa-shopping-cart"></i>
-                            <?= number_format($activeBudget->initial_amount - $activeBudget->remaining_amount, 2) ?> €
-                        </p>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Dépenses du mois</h3>
+                            <p class="stat-value" data-value="<?= $activeBudget->initial_amount - $activeBudget->remaining_amount ?>">
+                                0 €
+                            </p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Dépenses en attente</h3>
-                        <p class="stat-value text-warning">
+
+                    <div class="stat-card" data-delay="200">
+                        <div class="stat-icon warning">
                             <i class="fas fa-clock"></i>
-                            <?= number_format($depenseEnAttente, 2) ?> FCFA
-                        </p>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Dépenses en attente</h3>
+                            <p class="stat-value" data-value="<?= $depenseEnAttente ?>">
+                                0 FCFA
+                            </p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Budget restant</h3>
-                        <p class="stat-value <?= $activeBudget->remaining_amount < 0 ? 'text-danger' : 'text-success' ?>">
+
+                    <div class="stat-card" data-delay="300">
+                        <div class="stat-icon <?= $activeBudget->remaining_amount < 0 ? 'danger' : 'success' ?>">
                             <i class="fas fa-<?= $activeBudget->remaining_amount < 0 ? 'exclamation-triangle' : 'piggy-bank' ?>"></i>
-                            <?= number_format($activeBudget->remaining_amount, 2) ?> FCFA
-                        </p>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Budget restant</h3>
+                            <p class="stat-value <?= $activeBudget->remaining_amount < 0 ? 'text-danger' : 'text-success' ?>"
+                               data-value="<?= $activeBudget->remaining_amount ?>">
+                                0 FCFA
+                            </p>
+                        </div>
                     </div>
                 </div>
 
                 <div class="dashboard-actions">
-                    <a href="/budget/create" class="btn-primary">
-                        <i class="fas fa-plus"></i> Créer un budget
+                    <a href="/budget/create" class="btn-action btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Créer un budget</span>
                     </a>
-                    <a href="/expenses/create" class="btn-primary">
-                        <i class="fas fa-plus"></i> Ajouter une dépense
+                    <a href="/expenses/create" class="btn-action btn-secondary">
+                        <i class="fas fa-receipt"></i>
+                        <span>Ajouter une dépense</span>
+                    </a>
+                    <a href="/expenses/list" class="btn-action btn-outline">
+                        <i class="fas fa-list"></i>
+                        <span>Voir les dépenses</span>
                     </a>
                 </div>
 

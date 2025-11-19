@@ -42,31 +42,32 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="name">Nom du Budget</label>
-                                                <div class="input-group">
+                                                <div class="input-with-icon">
                                                     <i class="fas fa-tag"></i>
-                                                    <input type="text" 
-                                                        class="form-control" 
-                                                        id="name" 
-                                                        name="name" 
+                                                    <input type="text"
+                                                        class="form-control"
+                                                        id="name"
+                                                        name="name"
                                                         placeholder="Ex: Budget vacances été 2025"
                                                         required>
+                                                    <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="amount">Montant Total</label>
-                                                <div class="input-group amount">
+                                                <div class="input-with-icon">
                                                     <i class="fas fa-coins"></i>
-                                                    <input type="number" 
-                                                        class="form-control" 
-                                                        id="amount" 
-                                                        name="amount" 
-                                                        step="0.01" 
+                                                    <input type="number"
+                                                        class="form-control"
+                                                        id="amount"
+                                                        name="amount"
+                                                        step="0.01"
                                                         min="0.01"
                                                         placeholder="0.00"
-                                                       
                                                         required>
+                                                    <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -76,25 +77,26 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="start_date">Date de début</label>
-                                                <div class="input-group date">
+                                                <div class="input-with-icon">
                                                     <i class="fas fa-calendar-alt"></i>
-                                                    <input type="date" 
-                                                        class="form-control" 
-                                                        id="start_date" 
-                                                        name="start_date" 
+                                                    <input type="date"
+                                                        class="form-control"
+                                                        id="start_date"
+                                                        name="start_date"
                                                         required>
+                                                    <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="description">Description</label>
-                                        <div class="input-group">
+                                        <label for="description">Description (optionnel)</label>
+                                        <div class="input-with-icon">
                                             <i class="fas fa-align-left"></i>
-                                            <textarea class="form-control" 
-                                                    id="description" 
-                                                    name="description" 
+                                            <textarea class="form-control"
+                                                    id="description"
+                                                    name="description"
                                                     rows="4"
                                                     placeholder="Décrivez l'objectif et les détails de ce budget..."></textarea>
                                         </div>
