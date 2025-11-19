@@ -39,21 +39,8 @@ class HomeController extends Controller
             // Récupérer le résumé du budget pour l'affichage
             $budgetSummary = Budget::getBudgetSummary($activeBudget->id);
             $depenseEnAttente = Expense::getPendingExpensesByUser($activeBudget->id, $_SESSION['user_id']);
-
-            // Calculer le pourcentage utilisé du budget
-            $percentUsed = 0;
-            if ($activeBudget->initial_amount > 0) {
-                $percentUsed = (($activeBudget->initial_amount - $activeBudget->remaining_amount) / $activeBudget->initial_amount) * 100;
-            }
-
-            // Déterminer le niveau d'alerte
-            $alertLevel = 'success'; // Vert
-            if ($percentUsed >= 80) {
-                $alertLevel = 'danger'; // Rouge
-            } elseif ($percentUsed >= 60) {
-                $alertLevel = 'warning'; // Orange
-            }
-
+            error_log("Budget summary: " . print_r($budgetSummary, true));
+            
             return $this->view('dashboard/index', [
                 'title' => 'Dashboard - KitiSmart',
                 'userName' => $_SESSION['user_name'] ?? 'Utilisateur',
@@ -61,9 +48,7 @@ class HomeController extends Controller
                 'depenseEnAttente' => $depenseEnAttente,
                 'layout' => 'dashboard',
                 'activeBudget' => $activeBudget,
-                'budgetSummary' => $budgetSummary,
-                'percentUsed' => round($percentUsed, 2),
-                'alertLevel' => $alertLevel
+                'budgetSummary' => $budgetSummary
             ]);
 
         } catch (BudgetNotFoundException $e) {
