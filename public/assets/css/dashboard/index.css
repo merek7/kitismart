@@ -295,8 +295,8 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
-  opacity: 0;
-  transform: translateY(20px);
+  opacity: 1;
+  transform: translateY(0);
   border: 1px solid var(--border-color);
 }
 
@@ -1259,6 +1259,24 @@ body {
   color: var(--text-secondary);
   pointer-events: none;
   z-index: 1;
+}
+
+.input-group-text {
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-group-text i {
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+.input-group:focus-within .input-group-text i {
+  color: var(--primary-color);
 }
 
 .form-control {
