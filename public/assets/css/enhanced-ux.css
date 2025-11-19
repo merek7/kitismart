@@ -23,7 +23,7 @@ body {
    FOCUS STYLES AMÉLIORÉS
    ========================================== */
 :focus-visible {
-    outline: 2px solid #007bff;
+    outline: 2px solid #0d9488;
     outline-offset: 2px;
     border-radius: 4px;
 }
@@ -33,7 +33,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-    outline: 2px solid #007bff;
+    outline: 2px solid #0d9488;
     outline-offset: 2px;
 }
 
@@ -52,12 +52,12 @@ button,
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
 }
 
 .btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
 }
 
 .btn:disabled {
@@ -114,8 +114,8 @@ textarea:hover {
 input:focus,
 select:focus,
 textarea:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
     transform: translateY(-1px);
 }
 
@@ -152,7 +152,7 @@ input.success {
 }
 
 .input-group input:focus ~ .input-group-icon {
-    color: #007bff;
+    color: #0d9488;
 }
 
 /* Password toggle */
@@ -305,7 +305,7 @@ input.success {
 
 .progress-bar {
     border-radius: 10px;
-    background: linear-gradient(90deg, #007bff, #0056b3);
+    background: linear-gradient(90deg, #0d9488, #14b8a6);
     position: relative;
     overflow: hidden;
 }
@@ -441,15 +441,15 @@ input.success {
 }
 
 .page-link:hover {
-    background-color: #007bff;
+    background-color: #0d9488;
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 4px 8px rgba(13, 148, 136, 0.3);
 }
 
 .page-item.active .page-link {
-    background-color: #007bff;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    background-color: #0d9488;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
 }
 
 /* ==========================================

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Dashboard - KitiSmart' ?></title>
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="/assets/css/dashboard/index.css">
+    <!-- CSS - Ordre optimisé : Global → Améliorations → Spécifique -->
     <link rel="stylesheet" href="/assets/css/animations.css">
     <link rel="stylesheet" href="/assets/css/enhanced-ux.css">
+    <link rel="stylesheet" href="/assets/css/dashboard/index.css">
     <?php if (!empty($styles)): ?>
         <?php foreach ($styles as $style): ?>
             <link rel="stylesheet" href="/assets/css/<?= htmlspecialchars($style) ?>" rel="stylesheet">
