@@ -902,9 +902,14 @@ html {
 
 .input-with-icon {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.input-with-icon i {
+/* Icône à gauche (lock, envelope, user) */
+.input-with-icon > i.fa-lock,
+.input-with-icon > i.fa-envelope,
+.input-with-icon > i.fa-user {
   position: absolute;
   left: 1rem;
   top: 50%;
@@ -912,15 +917,25 @@ html {
   color: #94a3b8;
   transition: color 0.3s ease;
   z-index: 1;
+  pointer-events: none;
 }
 
 .input-with-icon input {
+  width: 100%;
   padding-left: 3rem;
+  padding-right: 1rem;
   transition: all 0.3s ease;
 }
 
-.input-with-icon input:focus + i,
-.input-with-icon.has-value i {
+/* Padding spécial pour les inputs avec toggle password */
+.input-with-icon:has(.toggle-password) input {
+  padding-right: 5rem;
+}
+
+/* Change la couleur de l'icône quand l'input a le focus */
+.input-with-icon:focus-within > i.fa-lock,
+.input-with-icon:focus-within > i.fa-envelope,
+.input-with-icon:focus-within > i.fa-user {
   color: var(--primary-color);
 }
 
@@ -929,16 +944,20 @@ html {
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1), 0 0 20px rgba(13, 148, 136, 0.2);
 }
 
-/* Toggle password visibility */
+/* Toggle password visibility - à droite */
 .toggle-password {
   position: absolute;
-  right: 1rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
   color: #94a3b8;
   transition: color 0.3s ease;
-  z-index: 2;
+  z-index: 3;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .toggle-password:hover {
@@ -982,12 +1001,14 @@ html {
 
 .validation-icon {
   position: absolute;
-  right: 3rem;
+  right: 3.5rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.2rem;
+  font-size: 1rem;
   opacity: 0;
   transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .form-group.valid .validation-icon {
@@ -998,6 +1019,23 @@ html {
 .form-group.error .validation-icon {
   opacity: 1;
   color: #ef4444;
+}
+
+/* Ajustement pour les inputs sans toggle password */
+.input-with-icon:not(:has(.toggle-password)) .validation-icon {
+  right: 1rem;
+}
+
+/* Messages d'erreur sous les champs */
+.error-message {
+  display: none;
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.error-message:not(:empty) {
+  display: block;
 }
 
 /* Password strength indicator */

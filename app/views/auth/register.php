@@ -15,6 +15,7 @@ $title = 'Inscription - KitiSmart';
             <div class="form-group">
                 <label for="name">Nom complet</label>
                 <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
                     <input
                         type="text"
                         id="name"
@@ -22,7 +23,6 @@ $title = 'Inscription - KitiSmart';
                         placeholder=" "
                         required
                         autocomplete="name">
-                    <i class="fas fa-user"></i>
                     <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                 </div>
                 <small class="error-message" id="name-error"></small>
@@ -31,6 +31,7 @@ $title = 'Inscription - KitiSmart';
             <div class="form-group">
                 <label for="email">Adresse e-mail</label>
                 <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
                     <input
                         type="email"
                         id="email"
@@ -38,7 +39,6 @@ $title = 'Inscription - KitiSmart';
                         placeholder=" "
                         required
                         autocomplete="email">
-                    <i class="fas fa-envelope"></i>
                     <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                 </div>
                 <small class="error-message" id="email-error"></small>
@@ -47,6 +47,7 @@ $title = 'Inscription - KitiSmart';
             <div class="form-group">
                 <label for="password">Mot de passe</label>
                 <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
                     <input
                         type="password"
                         id="password"
@@ -54,7 +55,6 @@ $title = 'Inscription - KitiSmart';
                         placeholder=" "
                         required
                         autocomplete="new-password">
-                    <i class="fas fa-lock"></i>
                     <i class="fas fa-eye toggle-password" id="togglePassword"></i>
                     <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                 </div>
@@ -89,6 +89,7 @@ $title = 'Inscription - KitiSmart';
             <div class="form-group">
                 <label for="confirm_password">Confirmez le mot de passe</label>
                 <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
                     <input
                         type="password"
                         id="confirm_password"
@@ -96,7 +97,6 @@ $title = 'Inscription - KitiSmart';
                         placeholder=" "
                         required
                         autocomplete="new-password">
-                    <i class="fas fa-lock"></i>
                     <i class="fas fa-eye toggle-password" id="toggleConfirmPassword"></i>
                     <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                 </div>

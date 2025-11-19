@@ -16,6 +16,7 @@ $title = 'Connexion - KitiSmart';
             <div class="form-group">
                 <label for="email">Adresse e-mail</label>
                 <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
                     <input
                         type="email"
                         id="email"
@@ -23,7 +24,6 @@ $title = 'Connexion - KitiSmart';
                         placeholder=" "
                         required
                         autocomplete="email">
-                    <i class="fas fa-envelope"></i>
                     <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                 </div>
             </div>
@@ -31,6 +31,7 @@ $title = 'Connexion - KitiSmart';
             <div class="form-group">
                 <label for="password">Mot de passe</label>
                 <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
                     <input
                         type="password"
                         id="password"
@@ -38,7 +39,6 @@ $title = 'Connexion - KitiSmart';
                         placeholder=" "
                         required
                         autocomplete="current-password">
-                    <i class="fas fa-lock"></i>
                     <i class="fas fa-eye toggle-password" id="togglePassword"></i>
                     <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                 </div>
