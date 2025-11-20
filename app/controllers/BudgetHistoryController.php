@@ -94,10 +94,11 @@ class BudgetHistoryController extends Controller
             // Récupérer les dépenses de ce budget
             $expenses = Expense::getExpensesByBudget($budget->id);
 
-            // Calculer les stats
+            // Calculer les stats ET enrichir les dépenses avec les catégories
             $totalExpenses = 0;
             $paidExpenses = 0;
             $pendingExpenses = 0;
+            $enrichedExpenses = [];
 
             foreach ($expenses as $expense) {
                 $totalExpenses += $expense->amount;
@@ -106,6 +107,36 @@ class BudgetHistoryController extends Controller
                 } else {
                     $pendingExpenses += $expense->amount;
                 }
+
+                // Enrichir avec les informations de catégorie
+                $categoryName = 'Autre';
+
+                // Vérifier d'abord si c'est une catégorie personnalisée
+                if (!empty($expense->custom_category_id)) {
+                    $customCat = \App\Models\CustomCategory::findById(
+                        (int)$expense->custom_category_id,
+                        $userId
+                    );
+                    if ($customCat && $customCat->id) {
+                        $categoryName = $customCat->name;
+                    }
+                }
+                // Sinon, récupérer la catégorie par défaut
+                elseif (!empty($expense->categorie_id)) {
+                    $categorie = \App\Models\Categorie::findById((int)$expense->categorie_id);
+                    if ($categorie && $categorie->id) {
+                        $categoryName = $categorie->type;
+                    }
+                }
+
+                $enrichedExpenses[] = [
+                    'id' => $expense->id,
+                    'description' => $expense->description,
+                    'amount' => $expense->amount,
+                    'payment_date' => $expense->payment_date,
+                    'status' => $expense->status,
+                    'category' => $categoryName
+                ];
             }
 
             $budgetData = [
@@ -125,7 +156,7 @@ class BudgetHistoryController extends Controller
             return $this->jsonResponse([
                 'success' => true,
                 'budget' => $budgetData,
-                'expenses' => $expenses
+                'expenses' => $enrichedExpenses
             ]);
 
         } catch (\Exception $e) {
