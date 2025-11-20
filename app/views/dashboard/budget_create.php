@@ -38,6 +38,39 @@
 
                                     <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
 
+                                    <!-- Section de duplication de budget -->
+                                    <div class="duplicate-budget-section">
+                                        <div class="duplicate-header">
+                                            <i class="fas fa-copy"></i>
+                                            <span>Dupliquer depuis un budget existant</span>
+                                        </div>
+                                        <div class="duplicate-content">
+                                            <div class="form-group">
+                                                <label for="budget-select">Sélectionner un budget à dupliquer (optionnel)</label>
+                                                <div class="input-with-icon">
+                                                    <i class="fas fa-history"></i>
+                                                    <select class="form-control" id="budget-select">
+                                                        <option value="">-- Créer un nouveau budget --</option>
+                                                        <?php if(isset($previousBudgets) && !empty($previousBudgets)): ?>
+                                                            <?php foreach($previousBudgets as $budget): ?>
+                                                                <option value="<?= $budget->id ?>"
+                                                                        data-name="<?= htmlspecialchars($budget->name) ?>"
+                                                                        data-amount="<?= $budget->initial_amount ?>"
+                                                                        data-description="<?= htmlspecialchars($budget->description ?? '') ?>">
+                                                                    <?= htmlspecialchars($budget->name) ?> - <?= number_format($budget->initial_amount, 2, ',', ' ') ?> FCFA
+                                                                    (<?= date('d/m/Y', strtotime($budget->start_date)) ?>)
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        <?php endif; ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-secondary" id="load-budget-btn" disabled>
+                                                <i class="fas fa-download"></i> Charger les données
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">

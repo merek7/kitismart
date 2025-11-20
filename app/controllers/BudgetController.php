@@ -14,6 +14,8 @@ class BudgetController extends Controller {
         try{
             $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
             $depense= $activeBudget ? Budget::getBudgetSummary($activeBudget->id) : null;
+            $previousBudgets = Budget::getPreviousBudgets($_SESSION['user_id'], 10);
+
             $this->view('dashboard/budget_create', [
                 'title' => 'Créer un budget',
                 'currentPage' => 'budget',
@@ -21,6 +23,7 @@ class BudgetController extends Controller {
                 'csrfToken' => $csrfToken,
                 'activeBudget' => $activeBudget,
                 'expensesSummary' => $depense,
+                'previousBudgets' => $previousBudgets,
             ]);
         } catch (\Exception $e) {
             error_log("Erreur lors de la création du formulaire de budget: " . $e->getMessage());
