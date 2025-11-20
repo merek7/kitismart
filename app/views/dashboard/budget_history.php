@@ -189,17 +189,26 @@
 
 <!-- Modal de détails -->
 <div class="modal fade" id="budgetDetailModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Détails du budget</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content budget-detail-modal">
+      <div class="modal-header bg-gradient">
+        <h5 class="modal-title">
+          <i class="fas fa-chart-pie"></i> Détails du budget
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
       </div>
-      <div class="modal-body" id="modal-content">
-        <div class="text-center">
-          <i class="fas fa-spinner fa-spin fa-2x"></i>
-          <p>Chargement...</p>
+      <div class="modal-body p-4" id="modal-content">
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          <p class="mt-3 text-muted">Chargement des détails...</p>
         </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times"></i> Fermer
+        </button>
       </div>
     </div>
   </div>

@@ -27,22 +27,94 @@
         </div>
     </section>
 
+    <!-- Catégories par défaut -->
     <section class="categories-section">
         <div class="container">
+            <h3 class="section-title">
+                <i class="fas fa-star"></i> Catégories par défaut
+            </h3>
+            <p class="section-description">Ces catégories sont disponibles pour tous les utilisateurs</p>
+
             <div class="categories-grid">
-                <?php if (empty($categories)): ?>
+                <?php foreach ($defaultCategories as $category): ?>
+                    <?php
+                        // Définir les icônes et couleurs pour chaque catégorie par défaut
+                        $categoryData = [
+                            'fixe' => [
+                                'icon' => 'fa-calendar-check',
+                                'color' => '#3b82f6',
+                                'description' => 'Dépenses régulières et prévisibles (loyer, abonnements, etc.)'
+                            ],
+                            'diver' => [
+                                'icon' => 'fa-shopping-cart',
+                                'color' => '#8b5cf6',
+                                'description' => 'Dépenses diverses et occasionnelles'
+                            ],
+                            'epargne' => [
+                                'icon' => 'fa-piggy-bank',
+                                'color' => '#10b981',
+                                'description' => 'Épargne et investissements'
+                            ]
+                        ];
+                        $data = $categoryData[$category] ?? ['icon' => 'fa-tag', 'color' => '#6b7280', 'description' => ''];
+                    ?>
+                    <div class="category-card default-category">
+                        <div class="category-icon" style="background-color: <?= $data['color'] ?>">
+                            <i class="fas <?= $data['icon'] ?>"></i>
+                        </div>
+
+                        <div class="category-content">
+                            <h4 class="category-title">
+                                <?= ucfirst(htmlspecialchars($category)) ?>
+                                <span class="badge-default">Défaut</span>
+                            </h4>
+
+                            <p class="category-description">
+                                <?= htmlspecialchars($data['description']) ?>
+                            </p>
+
+                            <div class="category-meta">
+                                <span class="category-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    Catégorie système (non modifiable)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- Catégories personnalisées -->
+    <section class="categories-section">
+        <div class="container">
+            <h3 class="section-title">
+                <i class="fas fa-user-tag"></i> Mes catégories personnalisées
+                <?php if ($customCategoriesCount > 0): ?>
+                    <span class="count-badge"><?= $customCategoriesCount ?></span>
+                <?php endif; ?>
+            </h3>
+            <p class="section-description">Catégories créées spécialement pour vos besoins</p>
+
+            <div class="categories-grid">
+                <?php if (empty($customCategories)): ?>
                     <div class="alert-info" role="alert">
-                        Aucune catégorie trouvée. Créez votre première catégorie personnalisée en cliquant sur "Nouvelle Catégorie".
+                        <i class="fas fa-info-circle"></i>
+                        Aucune catégorie personnalisée. Créez votre première catégorie en cliquant sur "Nouvelle Catégorie".
                     </div>
                 <?php else: ?>
-                    <?php foreach ($categories as $category): ?>
-                        <div class="category-card" data-id="<?= $category->id ?>">
+                    <?php foreach ($customCategories as $category): ?>
+                        <div class="category-card custom-category" data-id="<?= $category->id ?>">
                             <div class="category-icon" style="background-color: <?= htmlspecialchars($category->color) ?>">
                                 <i class="fas <?= htmlspecialchars($category->icon) ?>"></i>
                             </div>
 
                             <div class="category-content">
-                                <h4 class="category-title"><?= htmlspecialchars($category->name) ?></h4>
+                                <h4 class="category-title">
+                                    <?= htmlspecialchars($category->name) ?>
+                                    <span class="badge-custom">Perso</span>
+                                </h4>
 
                                 <?php if (!empty($category->description)): ?>
                                     <p class="category-description">
@@ -53,7 +125,7 @@
                                 <div class="category-meta">
                                     <span class="category-date">
                                         <i class="fas fa-calendar"></i>
-                                        <?= date('d/m/Y', strtotime($category->created_at)) ?>
+                                        Créée le <?= date('d/m/Y', strtotime($category->created_at)) ?>
                                     </span>
                                 </div>
 

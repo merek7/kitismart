@@ -84,6 +84,36 @@
   padding: 0 1rem;
 }
 
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-title i {
+  color: var(--primary-color, #0d9488);
+}
+
+.section-description {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.count-badge {
+  background: linear-gradient(135deg, var(--primary-color, #0d9488) 0%, var(--secondary-color, #14b8a6) 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
 .categories-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -100,11 +130,29 @@
   gap: 1.25rem;
   transition: all 0.3s ease;
   border: 2px solid transparent;
+  position: relative;
 }
 
 .category-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  border-color: var(--primary-color, #0d9488);
+}
+
+.category-card.default-category {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-color: #e5e7eb;
+}
+
+.category-card.default-category:hover {
+  border-color: #3b82f6;
+}
+
+.category-card.custom-category {
+  background-color: #fff;
+}
+
+.category-card.custom-category:hover {
   border-color: var(--primary-color, #0d9488);
 }
 
@@ -132,6 +180,30 @@
   font-weight: 600;
   color: #2c3e50;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge-default,
+.badge-custom {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-default {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-custom {
+  background: linear-gradient(135deg, var(--primary-color, #0d9488) 0%, var(--secondary-color, #14b8a6) 100%);
+  color: white;
 }
 
 .category-description {
@@ -149,8 +221,17 @@
   color: #95a5a6;
 }
 
-.category-date i {
+.category-date i,
+.category-info i {
   margin-right: 0.25rem;
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #6b7280;
+  font-style: italic;
 }
 
 .category-actions {

@@ -55,9 +55,20 @@
                     <label for="filter-category">Catégorie</label>
                     <select id="filter-category" class="filter-select" name="category">
                         <option value="">Toutes les catégories</option>
-                        <?php foreach ($categories as $category): ?>
-                            <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
-                        <?php endforeach; ?>
+                        <optgroup label="Catégories par défaut">
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <?php if (!empty($customCategories)): ?>
+                            <optgroup label="Mes catégories personnalisées">
+                                <?php foreach ($customCategories as $customCat): ?>
+                                    <option value="custom_<?= $customCat->id ?>">
+                                        <?= htmlspecialchars($customCat->name) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        <?php endif; ?>
                     </select>
                 </div>
                 <div class="filter-group">

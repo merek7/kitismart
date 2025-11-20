@@ -23,14 +23,24 @@ class CategoryController extends Controller
             }
 
             $userId = (int)$_SESSION['user_id'];
-            $categories = CustomCategory::findByUser($userId);
-            $categoriesCount = CustomCategory::countByUser($userId);
+
+            // Récupérer les catégories par défaut
+            $defaultCategories = \App\Models\Categorie::getDefaultCategories();
+
+            // Récupérer les catégories personnalisées de l'utilisateur
+            $customCategories = CustomCategory::findByUser($userId);
+            $customCategoriesCount = CustomCategory::countByUser($userId);
+
+            // Total = 3 catégories par défaut + catégories personnalisées
+            $totalCount = count($defaultCategories) + $customCategoriesCount;
 
             $this->view('dashboard/categories_list', [
                 'title' => 'Mes Catégories',
                 'currentPage' => 'categories',
-                'categories' => $categories,
-                'categoriesCount' => $categoriesCount,
+                'defaultCategories' => $defaultCategories,
+                'customCategories' => $customCategories,
+                'categoriesCount' => $totalCount,
+                'customCategoriesCount' => $customCategoriesCount,
                 'styles' => ['dashboard/categories_list.css'],
                 'pageScripts' => ['dashboard/categories_list.js'],
                 'layout' => 'dashboard'
