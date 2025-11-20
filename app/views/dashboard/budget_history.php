@@ -1,21 +1,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="content-wrapper">
-  <section class="content-header">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-6">
-          <h1><i class="fas fa-history"></i> Historique des Budgets</h1>
-        </div>
-        <div class="col-md-6 d-flex justify-content-end align-items-center">
-          <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a></li>
-            <li class="breadcrumb-item active">Historique</li>
-          </ol>
-        </div>
-      </div>
+  <div class="page-header">
+    <h1><i class="fas fa-history"></i> Historique des Budgets</h1>
+    <div class="breadcrumb">
+      <a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a>
+      <span>/</span>
+      <span>Historique</span>
     </div>
-  </section>
+  </div>
 
   <!-- Statistiques globales -->
   <section class="history-summary">

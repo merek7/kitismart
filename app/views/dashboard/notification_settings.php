@@ -1,21 +1,14 @@
 <div class="content-wrapper">
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <h1><i class="fas fa-bell"></i> Paramètres de Notifications</h1>
-                </div>
-                <div class="col-md-6 d-flex justify-content-end align-items-center">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a></li>
-                        <li class="breadcrumb-item active">Notifications</li>
-                    </ol>
-                </div>
-            </div>
+    <div class="page-header">
+        <h1><i class="fas fa-bell"></i> Paramètres de Notifications</h1>
+        <div class="breadcrumb">
+            <a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a>
+            <span>/</span>
+            <span>Notifications</span>
         </div>
-    </section>
+    </div>
 
-    <section class="content">
+    <div class="page-content">
         <div class="container">
             <div class="settings-header">
                 <div>
@@ -220,5 +213,5 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 </div>

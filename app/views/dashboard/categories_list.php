@@ -1,19 +1,12 @@
 <div class="content-wrapper">
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <h1><i class="fas fa-tags"></i> Mes Catégories</h1>
-                </div>
-                <div class="col-md-6 d-flex justify-content-end align-items-center">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a></li>
-                        <li class="breadcrumb-item active">Mes Catégories</li>
-                    </ol>
-                </div>
-            </div>
+    <div class="page-header">
+        <h1><i class="fas fa-tags"></i> Mes Catégories</h1>
+        <div class="breadcrumb">
+            <a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a>
+            <span>/</span>
+            <span>Mes Catégories</span>
         </div>
-    </section>
+    </div>
 
     <section class="category-summary">
         <div class="container">

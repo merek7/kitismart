@@ -1,22 +1,16 @@
 <div class="content-wrapper">
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <h1><i class="fas fa-edit"></i> Modifier la Catégorie</h1>
-                </div>
-                <div class="col-md-6">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a></li>
-                        <li class="breadcrumb-item"><a href="/categories"><i class="fas fa-tags"></i> Mes Catégories</a></li>
-                        <li class="breadcrumb-item active">Modifier</li>
-                    </ol>
-                </div>
-            </div>
+    <div class="page-header">
+        <h1><i class="fas fa-edit"></i> Modifier la Catégorie</h1>
+        <div class="breadcrumb">
+            <a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a>
+            <span>/</span>
+            <a href="/categories"><i class="fas fa-tags"></i> Mes Catégories</a>
+            <span>/</span>
+            <span>Modifier</span>
         </div>
-    </section>
+    </div>
 
-    <section class="content">
+    <div class="page-content">
         <div class="container">
             <div class="row">
                 <div class="col-md-8 offset-md-2">
@@ -119,5 +113,5 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 </div>
