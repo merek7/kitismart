@@ -41,6 +41,8 @@ return [
     ['PUT', '/categories/[i:id]', 'CategoryController#update', 'category_update'],
     ['DELETE', '/categories/[i:id]', 'CategoryController#delete', 'category_delete'],
     ['GET', '/categories/all', 'CategoryController#getAll', 'categories_get_all'],
+    ['GET', '/notifications/settings', 'NotificationController#index', 'notifications_settings'],
+    ['POST', '/notifications/settings', 'NotificationController#update', 'notifications_update'],
     ['GET', '/settings', 'SettingsController#index', 'settings'],
     ['POST', '/settings/update-profile', 'SettingsController#updateProfile', 'settings_update_profile'],
     ['POST', '/settings/update-password', 'SettingsController#updatePassword', 'settings_update_password'],

@@ -67,6 +67,24 @@ class Expense
             R::store($expense);
             R::store($budget);
             R::commit();
+
+            // Déclencher les notifications après le commit
+            try {
+                // Notification pour dépense importante
+                \App\Controllers\NotificationController::sendExpenseAlert($data['user_id'], $expense);
+
+                // Notification pour seuil de budget (80% ou 100%)
+                $usagePercentage = $budget->initial_amount > 0 ?
+                    (($budget->initial_amount - $budget->remaining_amount) / $budget->initial_amount) * 100 : 0;
+
+                if ($usagePercentage >= 80) {
+                    \App\Controllers\NotificationController::sendBudgetAlert($data['user_id'], $usagePercentage, $budget);
+                }
+            } catch (\Exception $e) {
+                error_log("Erreur lors de l'envoi des notifications: " . $e->getMessage());
+                // Ne pas faire échouer la création de la dépense si les notifications échouent
+            }
+
             return $expense;
         } catch (\Exception $e) {
             R::rollback();
@@ -115,9 +133,11 @@ class Expense
                 throw new BudgetNotFoundException();
             }
 
+            $budgetChanged = false;
             if($expense->is_replicated == true){
                 $budget->remaining_amount -= $expense->amount;
                 R::store($budget);
+                $budgetChanged = true;
             }
 
 
@@ -127,6 +147,22 @@ class Expense
 
             R::store($expense);
             R::commit();
+
+            // Déclencher les notifications si le budget a changé
+            if ($budgetChanged) {
+                try {
+                    // Notification pour seuil de budget (80% ou 100%)
+                    $usagePercentage = $budget->initial_amount > 0 ?
+                        (($budget->initial_amount - $budget->remaining_amount) / $budget->initial_amount) * 100 : 0;
+
+                    if ($usagePercentage >= 80) {
+                        \App\Controllers\NotificationController::sendBudgetAlert($userId, $usagePercentage, $budget);
+                    }
+                } catch (\Exception $e) {
+                    error_log("Erreur lors de l'envoi des notifications: " . $e->getMessage());
+                }
+            }
+
             return $expense;
         } catch (\Exception $e) {
             R::rollback();
