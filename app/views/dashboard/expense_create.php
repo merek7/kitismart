@@ -95,12 +95,27 @@
                                                         </div>
                                                         <select class="form-control select2 category-select" name="category[]" required>
                                                             <option value="" disabled selected>Choisir un type</option>
-                                                            <?php foreach($categories as $cat): ?>
-                                                                <option value="<?= htmlspecialchars($cat) ?>" 
-                                                                        data-icon="<?= $cat === 'fixe' ? 'calendar-check' : ($cat === 'epargne' ? 'piggy-bank' : 'shopping-cart') ?>">
-                                                                    <?= ucfirst(htmlspecialchars($cat)) ?>
-                                                                </option>
-                                                            <?php endforeach; ?>
+                                                            <optgroup label="Catégories par défaut">
+                                                                <?php foreach($categories as $cat): ?>
+                                                                    <option value="<?= htmlspecialchars($cat) ?>"
+                                                                            data-icon="<?= $cat === 'fixe' ? 'calendar-check' : ($cat === 'epargne' ? 'piggy-bank' : 'shopping-cart') ?>"
+                                                                            data-type="default">
+                                                                        <?= ucfirst(htmlspecialchars($cat)) ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </optgroup>
+                                                            <?php if (!empty($customCategories)): ?>
+                                                                <optgroup label="Mes catégories personnalisées">
+                                                                    <?php foreach($customCategories as $customCat): ?>
+                                                                        <option value="custom_<?= $customCat->id ?>"
+                                                                                data-icon="<?= htmlspecialchars($customCat->icon) ?>"
+                                                                                data-color="<?= htmlspecialchars($customCat->color) ?>"
+                                                                                data-type="custom">
+                                                                            <i class="fas <?= htmlspecialchars($customCat->icon) ?>"></i> <?= htmlspecialchars($customCat->name) ?>
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                </optgroup>
+                                                            <?php endif; ?>
                                                         </select>
                                                     </div>
                                                 </div>
