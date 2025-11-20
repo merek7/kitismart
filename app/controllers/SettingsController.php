@@ -25,11 +25,11 @@ class SettingsController extends Controller
             return $this->redirect('/dashboard');
         }
 
-        $this->render('dashboard/settings', [
+        $this->view('dashboard/settings', [
             'user' => $user,
             'csrf_token' => Csrf::generateToken(),
             'currentPage' => 'settings'
-        ]);
+        ], 'dashboard');
     }
 
     public function updateProfile()
