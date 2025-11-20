@@ -27,10 +27,13 @@ class BudgetController extends Controller {
             ]);
         } catch (\Exception $e) {
             error_log("Erreur lors de la création du formulaire de budget: " . $e->getMessage());
-            $this->view('dashboard/create_budget', [
+            $this->view('dashboard/budget_create', [
                 'title' => 'Créer un budget',
+                'currentPage' => 'budget',
+                'layout' => 'dashboard',
                 'csrfToken' => $csrfToken,
                 'error' => $e->getMessage(),
+                'previousBudgets' => [], // Liste vide en cas d'erreur
             ]);
         }
     }
