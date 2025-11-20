@@ -4,23 +4,28 @@ $(document).ready(function () {
     // ===================================
 
     // Fonction pour initialiser Select2 sur un élément
-    function initializeSelect2(element) {
+    function initializeSelect2(element, placeholder) {
         $(element).select2({
-            placeholder: 'Choisir un type',
+            placeholder: placeholder || 'Choisir une option',
             allowClear: false,
             width: '100%',
             minimumResultsForSearch: Infinity, // Désactive la recherche (peu d'options)
             language: {
                 noResults: function() {
-                    return "Aucune catégorie trouvée";
+                    return "Aucun résultat trouvé";
                 }
             }
         });
     }
 
-    // Initialiser Select2 sur tous les selects existants
+    // Initialiser Select2 sur les selects de catégorie
     $('.category-select').each(function() {
-        initializeSelect2(this);
+        initializeSelect2(this, 'Choisir un type');
+    });
+
+    // Initialiser Select2 sur les selects de statut
+    $('select[name="status[]"]').each(function() {
+        initializeSelect2(this, 'Choisir un statut');
     });
 
     // Fonctions utilitaires de gestion des erreurs
@@ -77,6 +82,61 @@ $(document).ready(function () {
         return isValid;
     }
 
+    // ===================================
+    // MODAL DE CONFIRMATION
+    // ===================================
+
+    let formToSubmit = null;
+
+    // Fonction pour afficher la modale
+    function showConfirmationModal(expenseCount, totalAmount) {
+        $('#modal-expense-count').text(expenseCount);
+        $('#modal-total-amount').text(totalAmount.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' FCFA');
+        $('#confirmation-modal').addClass('active');
+        // Empêcher le scroll du body
+        $('body').css('overflow', 'hidden');
+    }
+
+    // Fonction pour masquer la modale
+    function hideConfirmationModal() {
+        $('#confirmation-modal').removeClass('active');
+        $('body').css('overflow', '');
+    }
+
+    // Fermer la modale en cliquant en dehors
+    $('#confirmation-modal').on('click', function(e) {
+        if (e.target === this) {
+            hideConfirmationModal();
+            formToSubmit = null;
+        }
+    });
+
+    // Bouton annuler
+    $('#modal-cancel').on('click', function() {
+        hideConfirmationModal();
+        formToSubmit = null;
+    });
+
+    // Bouton confirmer
+    $('#modal-confirm').on('click', function() {
+        const $btn = $(this);
+        const originalText = $btn.html();
+
+        // Désactiver le bouton et afficher un loader
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Enregistrement...');
+
+        hideConfirmationModal();
+
+        if (formToSubmit) {
+            submitExpenses();
+        }
+
+        // Réactiver le bouton après un court délai
+        setTimeout(() => {
+            $btn.prop('disabled', false).html(originalText);
+        }, 1000);
+    });
+
     // Gestion de la soumission du formulaire
     $('#expense-form').on('submit', function (e) {
         e.preventDefault();
@@ -86,14 +146,24 @@ $(document).ready(function () {
             return;
         }
 
-        // Ajouter l'état de chargement
-        const form = $(this);
-        form.addClass('form-loading');
+        // Calculer le total et le nombre de dépenses
+        const expenseCount = $('.expense-item').length;
+        let totalAmount = 0;
+        $('.amount-input').each(function() {
+            totalAmount += parseFloat($(this).val()) || 0;
+        });
 
-        // Afficher la popup de confirmation
-        if (!confirm('Voulez-vous vraiment soumettre ces dépenses ?')) {
-            return;
-        }
+        // Sauvegarder le formulaire pour soumission après confirmation
+        formToSubmit = $(this);
+
+        // Afficher la modale de confirmation
+        showConfirmationModal(expenseCount, totalAmount);
+    });
+
+    // Fonction pour soumettre réellement les dépenses
+    function submitExpenses() {
+        // Ajouter l'état de chargement
+        formToSubmit.addClass('form-loading');
 
         const expense = [];
         $('.expense-item').each(function (index) {
@@ -155,7 +225,7 @@ $(document).ready(function () {
                 }
             }
         });
-    });
+    }
 
     // Ajouter une nouvelle dépense
     $('#add-expense').on('click', function () {
@@ -175,9 +245,12 @@ $(document).ready(function () {
         expenseItem.css('opacity', 0);
         expenseContainer.append(expenseItem);
 
-        // Initialiser Select2 sur le nouveau select de catégorie
+        // Initialiser Select2 sur les nouveaux selects
         expenseItem.find('.category-select').each(function() {
-            initializeSelect2(this);
+            initializeSelect2(this, 'Choisir un type');
+        });
+        expenseItem.find('select[name="status[]"]').each(function() {
+            initializeSelect2(this, 'Choisir un statut');
         });
 
         // Animer l'apparition

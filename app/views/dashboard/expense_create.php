@@ -166,3 +166,28 @@
         </div>
     </div>
 </div>
+
+<!-- Modale de confirmation -->
+<div id="confirmation-modal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <i class="fas fa-question-circle modal-icon"></i>
+            <h3>Confirmer l'enregistrement</h3>
+        </div>
+        <div class="modal-body">
+            <p>Voulez-vous vraiment enregistrer <strong id="modal-expense-count">1</strong> dépense(s) pour un montant total de <strong id="modal-total-amount">0 FCFA</strong> ?</p>
+            <div class="modal-info">
+                <i class="fas fa-info-circle"></i>
+                <span>Cette action mettra à jour votre budget restant.</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-cancel" id="modal-cancel">
+                <i class="fas fa-times"></i> Annuler
+            </button>
+            <button type="button" class="btn btn-primary" id="modal-confirm">
+                <i class="fas fa-check"></i> Confirmer
+            </button>
+        </div>
+    </div>
+</div>
