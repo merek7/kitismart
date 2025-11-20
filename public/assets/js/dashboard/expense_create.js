@@ -1,4 +1,28 @@
 $(document).ready(function () {
+    // ===================================
+    // INITIALISATION SELECT2
+    // ===================================
+
+    // Fonction pour initialiser Select2 sur un élément
+    function initializeSelect2(element) {
+        $(element).select2({
+            placeholder: 'Choisir un type',
+            allowClear: false,
+            width: '100%',
+            minimumResultsForSearch: Infinity, // Désactive la recherche (peu d'options)
+            language: {
+                noResults: function() {
+                    return "Aucune catégorie trouvée";
+                }
+            }
+        });
+    }
+
+    // Initialiser Select2 sur tous les selects existants
+    $('.category-select').each(function() {
+        initializeSelect2(this);
+    });
+
     // Fonctions utilitaires de gestion des erreurs
     function showError(input, message) {
         const formGroup = input.closest('.form-group');
@@ -124,14 +148,23 @@ $(document).ready(function () {
         const expenseItem = $('.expense-item').first().clone();
         const expenseCount = $('.expense-item').length + 1;
 
+        // Détruire les instances Select2 dans l'élément cloné
+        expenseItem.find('.select2-container').remove();
+        expenseItem.find('select').removeClass('select2-hidden-accessible');
+
         // Réinitialiser et personnaliser le nouvel élément
         expenseItem.find('input, select, textarea').val('');
         expenseItem.find('.expense-number').text(`#${expenseCount}`);
-        
+
         // Ajouter une classe pour l'animation
         expenseItem.css('opacity', 0);
         expenseContainer.append(expenseItem);
-        
+
+        // Initialiser Select2 sur le nouveau select de catégorie
+        expenseItem.find('.category-select').each(function() {
+            initializeSelect2(this);
+        });
+
         // Animer l'apparition
         expenseItem.animate({
             opacity: 1,
@@ -201,7 +234,7 @@ $(document).ready(function () {
     }
 
     // Variables pour suivre le budget
-    let initialBudget = parseFloat($('#remaining-budget').text().trim());
+    let initialBudget = parseFloat($('#remaining-budget').data('initial-budget')) || 0;
     let currentBudget = initialBudget;
 
     // Fonction pour mettre à jour le résumé du budget

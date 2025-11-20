@@ -29,13 +29,15 @@
                 <i class="fas fa-wallet"></i>
                 <div class="summary-content">
                     <span class="summary-label">Budget restant</span>
-                    <span id="remaining-budget" class="summary-value"><?= number_format($budget, 2, ',', ' ') ?> FCFA</span>
+                    <span id="remaining-budget"
+                          class="summary-value"
+                          data-initial-budget="<?= $budget ?>"><?= number_format($budget, 2, ',', ' ') ?> FCFA</span>
                     <div class="budget-progress">
                         <div class="progress-bar" style="width: 0%"></div>
                     </div>
                     <div class="budget-status">
                         <span>0%</span>
-                        <span>Budget: <?= number_format($budget, 2, ',', ' ') ?> FCFA</span>
+                        <span id="budget-total">Budget: <?= number_format($budget, 2, ',', ' ') ?> FCFA</span>
                     </div>
                 </div>
             </div>

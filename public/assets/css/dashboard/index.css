@@ -1080,6 +1080,46 @@ body {
   font-style: italic;
 }
 
+/* ================================
+   SELECT2 DANS INPUT-GROUP
+   ================================ */
+
+/* Select2 dans un input-group avec icône à gauche */
+.input-group .select2-container {
+  flex: 1;
+  width: auto !important;
+}
+
+.input-group .select2-container--default .select2-selection--single {
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding-left: 1rem;
+}
+
+/* Assurer que l'input-group-prepend reste visible */
+.input-group:has(.select2-container) {
+  display: flex;
+  align-items: stretch;
+}
+
+.input-group-prepend {
+  display: flex;
+  align-items: center;
+}
+
+/* Quand le Select2 est ouvert dans un input-group */
+.input-group:has(.select2-container--open) .input-group-prepend .input-group-text i {
+  color: var(--primary-color);
+}
+
+/* Focus sur Select2 dans input-group */
+.input-group .select2-container--default.select2-container--focus .select2-selection--single,
+.input-group .select2-container--default.select2-container--open .select2-selection--single {
+  border-color: var(--primary-color);
+  box-shadow: none;
+}
+
 /* Custom Buttons */
 .btn {
   cursor: pointer;
