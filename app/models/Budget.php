@@ -26,6 +26,8 @@ class Budget {
 
             $budget = R::dispense('budget');
             $budget->user_id = $data['user_id'];
+            $budget->name = $data['name'] ?? 'Budget';
+            $budget->description = $data['description'] ?? null;
             $budget->start_date = $data['start_date'];
             $budget->end_date = null;
             $budget->initial_amount = $data['initial_amount'];

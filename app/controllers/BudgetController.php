@@ -14,7 +14,7 @@ class BudgetController extends Controller {
         try{
             $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
             $depense= $activeBudget ? Budget::getBudgetSummary($activeBudget->id) : null;
-            $previousBudgets = Budget::getPreviousBudgets($_SESSION['user_id'], 10);
+            $previousBudgets = Budget::getPreviousBudgets($_SESSION['user_id'], 50);
 
             $this->view('dashboard/budget_create', [
                 'title' => 'Créer un budget',

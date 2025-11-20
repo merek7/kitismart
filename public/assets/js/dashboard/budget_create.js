@@ -119,6 +119,21 @@ $(document).ready(function () {
     // DUPLICATION DE BUDGET
     // ===================================
 
+    // Initialiser Select2 pour la recherche dans les budgets
+    $('#budget-select').select2({
+        placeholder: '-- Rechercher un budget --',
+        allowClear: true,
+        width: '100%',
+        language: {
+            noResults: function() {
+                return "Aucun budget trouvé";
+            },
+            searching: function() {
+                return "Recherche en cours...";
+            }
+        }
+    });
+
     // Activer/désactiver le bouton "Charger" selon la sélection
     $('#budget-select').on('change', function() {
         const selectedValue = $(this).val();
