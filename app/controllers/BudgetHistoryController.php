@@ -21,7 +21,7 @@ class BudgetHistoryController extends Controller
                 return;
             }
 
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
 
             // Récupérer les filtres
             $year = isset($_GET['year']) ? (int)$_GET['year'] : null;
@@ -70,7 +70,7 @@ class BudgetHistoryController extends Controller
                 return $this->jsonResponse(['success' => false, 'message' => 'Non authentifié'], 401);
             }
 
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
             $budget = Budget::findById((int)$id, $userId);
 
             if (!$budget) {
@@ -133,7 +133,7 @@ class BudgetHistoryController extends Controller
                 return $this->jsonResponse(['success' => false, 'message' => 'Non authentifié'], 401);
             }
 
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
             $year = isset($_GET['year']) ? (int)$_GET['year'] : null;
             $month = isset($_GET['month']) ? (int)$_GET['month'] : null;
             $status = isset($_GET['status']) ? $_GET['status'] : null;
@@ -167,7 +167,7 @@ class BudgetHistoryController extends Controller
                 return;
             }
 
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
             $year = isset($_GET['year']) ? (int)$_GET['year'] : null;
             $month = isset($_GET['month']) ? (int)$_GET['month'] : null;
             $status = isset($_GET['status']) ? $_GET['status'] : null;

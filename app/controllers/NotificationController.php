@@ -24,7 +24,7 @@ class NotificationController extends Controller
                 return;
             }
 
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
 
             // Récupérer ou créer les paramètres
             $settings = NotificationSettings::findByUser($userId);
@@ -61,7 +61,7 @@ class NotificationController extends Controller
             }
 
             $data = json_decode(file_get_contents('php://input'), true);
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
 
             // Mettre à jour les paramètres
             $settings = NotificationSettings::update($userId, $data);
