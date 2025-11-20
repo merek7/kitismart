@@ -715,6 +715,89 @@ body {
 
 /* Définitions de .form-control, .input-group et icônes déplacées plus bas dans le fichier pour éviter les conflits */
 
+/* ================================
+   INPUT WITH ICON (pour budget_create et autres formulaires)
+   ================================ */
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Icône à gauche - support de toutes les icônes FontAwesome */
+.input-with-icon > i[class*="fa-"] {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  transition: color 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.input-with-icon input,
+.input-with-icon select,
+.input-with-icon textarea {
+  width: 100%;
+  padding-left: 3rem;
+  padding-right: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Padding spécial pour les inputs avec validation-icon */
+.input-with-icon:has(.validation-icon) input,
+.input-with-icon:has(.validation-icon) select {
+  padding-right: 4rem;
+}
+
+/* Change la couleur de l'icône quand l'input a le focus */
+.input-with-icon:focus-within > i[class*="fa-"] {
+  color: var(--primary-color);
+}
+
+.input-with-icon input:focus,
+.input-with-icon select:focus,
+.input-with-icon textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+/* Validation icon - à droite */
+.validation-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.form-group.valid .validation-icon {
+  opacity: 1;
+  color: #10b981;
+}
+
+.form-group.error .validation-icon {
+  opacity: 1;
+  color: #ef4444;
+}
+
+.form-group.valid input,
+.form-group.valid select {
+  border-color: #10b981;
+}
+
+.form-group.error input,
+.form-group.error select {
+  border-color: #ef4444;
+  animation: shake 0.5s;
+}
+
 /* Custom Buttons */
 .btn {
   cursor: pointer;
