@@ -169,9 +169,17 @@ $(document).ready(function () {
      * Remplit le formulaire avec les données d'un budget
      */
     function fillFormWithBudgetData(name, amount, description) {
-        // Incrémenter intelligemment le nom du budget
-        const newName = incrementBudgetName(name);
-        $('#name').val(newName);
+        // Incrémenter intelligemment le nom du budget uniquement s'il existe
+        // (les anciens budgets n'ont pas de nom sauvegardé)
+        if (name && name.trim() !== '') {
+            const newName = incrementBudgetName(name);
+            $('#name').val(newName);
+            $('#name').closest('.form-group').addClass('valid');
+        } else {
+            // Laisser le champ nom vide pour les budgets sans nom
+            $('#name').val('');
+            $('#name').closest('.form-group').removeClass('valid');
+        }
 
         // Remplir le montant
         $('#amount').val(amount);
@@ -185,8 +193,8 @@ $(document).ready(function () {
         const suggestedDate = calculateNextMonthStart();
         $('#start_date').val(suggestedDate);
 
-        // Marquer les champs comme valides
-        $('#name, #amount, #start_date').each(function() {
+        // Marquer les champs montant et date comme valides
+        $('#amount, #start_date').each(function() {
             $(this).closest('.form-group').addClass('valid');
         });
     }
