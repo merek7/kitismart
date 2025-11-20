@@ -50,8 +50,25 @@
                         <?php
                         $monthlyTotal = 0;
                         foreach ($recurrences as $r) {
-                            if ($r->is_active && $r->frequency === 'monthly') {
-                                $monthlyTotal += $r->amount;
+                            if ($r->is_active) {
+                                // Convertir chaque fréquence en équivalent mensuel
+                                switch ($r->frequency) {
+                                    case 'daily':
+                                        $monthlyTotal += $r->amount * 30; // ~30 jours/mois
+                                        break;
+                                    case 'weekly':
+                                        $monthlyTotal += $r->amount * 4.33; // ~4.33 semaines/mois
+                                        break;
+                                    case 'bimonthly':
+                                        $monthlyTotal += $r->amount * 2; // 2x par mois
+                                        break;
+                                    case 'monthly':
+                                        $monthlyTotal += $r->amount; // 1x par mois
+                                        break;
+                                    case 'yearly':
+                                        $monthlyTotal += $r->amount / 12; // /12 mois
+                                        break;
+                                }
                             }
                         }
                         echo number_format($monthlyTotal, 2, ',', ' ');

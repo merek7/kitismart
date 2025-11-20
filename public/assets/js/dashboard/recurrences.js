@@ -268,8 +268,24 @@ $(document).ready(function () {
 
             if (isActive) {
                 activeCount++;
-                if (frequency === 'monthly') {
-                    monthlyTotal += amount;
+
+                // Convertir chaque fréquence en équivalent mensuel
+                switch (frequency) {
+                    case 'daily':
+                        monthlyTotal += amount * 30; // ~30 jours/mois
+                        break;
+                    case 'weekly':
+                        monthlyTotal += amount * 4.33; // ~4.33 semaines/mois
+                        break;
+                    case 'bimonthly':
+                        monthlyTotal += amount * 2; // 2x par mois
+                        break;
+                    case 'monthly':
+                        monthlyTotal += amount; // 1x par mois
+                        break;
+                    case 'yearly':
+                        monthlyTotal += amount / 12; // /12 mois
+                        break;
                 }
             } else {
                 inactiveCount++;
