@@ -9,15 +9,12 @@ use App\Exceptions\UserAlreadyExistsException;
 use App\Models\User;
 use App\Models\UserAudit;
 use App\Utils\Csrf;
+use App\Utils\RateLimiter;
 use App\Validators\RegisterValidator;
 use App\Utils\Mailer;
 
 class RegisterController extends Controller {
     public function showRegisterForm() {
-        if (!isset($_SESSION['register_attemps'])) {
-            $_SESSION['register_attemps'] = 0;
-        }
-        
         $csrfToken= Csrf::generateToken();
         // Affiche la vue d'inscription
         $this->view('auth/register', [
@@ -32,15 +29,30 @@ class RegisterController extends Controller {
                 return $this->jsonResponse(['success' => false, 'message' => 'Méthode non autorisée'], 405);
             }
 
+            // Rate limiting: Max 3 inscriptions / 1 heure
+            $maxAttempts = 3;
+            $timeWindow = 3600; // 1 heure en secondes
+
+            if (!RateLimiter::check('register', $maxAttempts, $timeWindow)) {
+                $retryAfter = RateLimiter::getRetryAfter('register', $timeWindow);
+                $minutes = ceil($retryAfter / 60);
+
+                return $this->jsonResponse([
+                    'success' => false,
+                    'message' => "Trop de tentatives d'inscription. Veuillez réessayer dans {$minutes} minute(s).",
+                    'retry_after' => $retryAfter
+                ], 429);
+            }
+
             $data = json_decode(file_get_contents('php://input'), true);
-            
+
             // Validation CSRF
             if (!Csrf::validateToken($data['csrf_token'] ?? '')) {
                 throw new TokenInvalidOrExpiredException();
             }
 
             $existingUser = User::findByEmail($data['email']);
-            
+
             if ($existingUser) {
                 if ($existingUser->status === 'inactif') {
                     // Mettre à jour l'utilisateur existant au lieu d'en créer un nouveau
@@ -49,25 +61,26 @@ class RegisterController extends Controller {
                     $existingUser->confirmation_token = bin2hex(random_bytes(32));
                     $existingUser->confirmation_expires = date('Y-m-d H:i:s', strtotime('+20 minutes'));
                     User::update($existingUser);
-                    
+
                     // Envoyer un nouveau mail de confirmation
                     $this->sendConfirmationEmail($existingUser);
-                    
+
+                    // Réinitialiser le compteur car action légitime
+                    RateLimiter::reset('register');
+
                     return $this->jsonResponse([
                         'success' => true,
                         'message' => 'Un nouveau lien de confirmation a été envoyé à votre adresse email'
                     ]);
                 }
-                
+
+                // Enregistrer la tentative échouée
+                RateLimiter::hit('register');
+
                 return $this->jsonResponse([
                     'success' => false,
                     'message' => 'Cette adresse email est déjà utilisée'
                 ], 400);
-            }
-
-            // Si trop de tentatives, on lève une exception dédiée
-            if ($_SESSION['register_attemps'] > 5) {
-                throw new TooManyAttemptsException();
             }
 
             error_log("Données d'inscription: " . print_r($data, true));
@@ -75,8 +88,12 @@ class RegisterController extends Controller {
             $validator = new RegisterValidator($data);
             if (!$validator->validate()) {
                 error_log("Erreurs de validation: " . print_r($validator->errors(), true));
+
+                // Enregistrer la tentative échouée
+                RateLimiter::hit('register');
+
                 return $this->jsonResponse([
-                    'success' => false, 
+                    'success' => false,
                     'message' => 'Des erreurs ont été détectées.',
                     'errors'  => $validator->errors()
                 ], 422);
@@ -95,54 +112,61 @@ class RegisterController extends Controller {
                 throw new UserAlreadyExistsException();
             }
 
+            // Inscription réussie - Réinitialiser le compteur
+            RateLimiter::reset('register');
+
             // Log de l'audit utilisateur
             $audit = UserAudit::log(
                 $user,
-                'register', 
+                'register',
                 [
-                    'source'     => 'web', 
+                    'source'     => 'web',
                     'ip'         => $_SERVER['REMOTE_ADDR'],
                     'user_agent' => $_SERVER['HTTP_USER_AGENT']
                 ]
             );
 
             return $this->jsonResponse([
-                'success' => true, 
+                'success' => true,
                 'message' => 'Inscription réussie.'
             ], 200);
 
         }catch (TooManyAttemptsException $e) {
             error_log("TooManyAttemptsException: " . $e->getMessage());
             return $this->jsonResponse([
-                'success' => false, 
+                'success' => false,
                 'message' => $e->getMessage()
             ], $e->getCode());
-        
+
         } catch (UserAlreadyExistsException $e) {
             error_log("UserAlreadyExistsException: " . $e->getMessage());
+
+            // Enregistrer la tentative échouée
+            RateLimiter::hit('register');
+
             return $this->jsonResponse([
-                'success' => false, 
+                'success' => false,
                 'message' => $e->getMessage()
             ], $e->getCode());
-        
+
         } catch (TokenInvalidOrExpiredException $e) {
             error_log("TokenInvalidOrExpiredException: " . $e->getMessage());
             return $this->jsonResponse([
-                'success' => false, 
+                'success' => false,
                 'message' => $e->getMessage()
             ], $e->getCode());
-        
+
         } catch (DataBaseException $e) {
             error_log("DataBaseException: " . $e->getMessage());
             return $this->jsonResponse([
-                'success' => false, 
+                'success' => false,
                 'message' => $e->getMessage()
             ], $e->getCode());
-        
+
         } catch (\Exception $e) {
             error_log("Exception générale: " . $e->getMessage());
             return $this->jsonResponse([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Une erreur est survenue.'
             ], 500);
         }

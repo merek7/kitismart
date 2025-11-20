@@ -1,4 +1,33 @@
 $(document).ready(function () {
+    // ===================================
+    // INITIALISATION SELECT2
+    // ===================================
+
+    // Fonction pour initialiser Select2 sur un élément
+    function initializeSelect2(element, placeholder) {
+        $(element).select2({
+            placeholder: placeholder || 'Choisir une option',
+            allowClear: false,
+            width: '100%',
+            minimumResultsForSearch: Infinity, // Désactive la recherche (peu d'options)
+            language: {
+                noResults: function() {
+                    return "Aucun résultat trouvé";
+                }
+            }
+        });
+    }
+
+    // Initialiser Select2 sur les selects de catégorie
+    $('.category-select').each(function() {
+        initializeSelect2(this, 'Choisir un type');
+    });
+
+    // Initialiser Select2 sur les selects de statut
+    $('select[name="status[]"]').each(function() {
+        initializeSelect2(this, 'Choisir un statut');
+    });
+
     // Fonctions utilitaires de gestion des erreurs
     function showError(input, message) {
         const formGroup = input.closest('.form-group');
@@ -53,6 +82,61 @@ $(document).ready(function () {
         return isValid;
     }
 
+    // ===================================
+    // MODAL DE CONFIRMATION
+    // ===================================
+
+    let formToSubmit = null;
+
+    // Fonction pour afficher la modale
+    function showConfirmationModal(expenseCount, totalAmount) {
+        $('#modal-expense-count').text(expenseCount);
+        $('#modal-total-amount').text(totalAmount.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' FCFA');
+        $('#confirmation-modal').addClass('active');
+        // Empêcher le scroll du body
+        $('body').css('overflow', 'hidden');
+    }
+
+    // Fonction pour masquer la modale
+    function hideConfirmationModal() {
+        $('#confirmation-modal').removeClass('active');
+        $('body').css('overflow', '');
+    }
+
+    // Fermer la modale en cliquant en dehors
+    $('#confirmation-modal').on('click', function(e) {
+        if (e.target === this) {
+            hideConfirmationModal();
+            formToSubmit = null;
+        }
+    });
+
+    // Bouton annuler
+    $('#modal-cancel').on('click', function() {
+        hideConfirmationModal();
+        formToSubmit = null;
+    });
+
+    // Bouton confirmer
+    $('#modal-confirm').on('click', function() {
+        const $btn = $(this);
+        const originalText = $btn.html();
+
+        // Désactiver le bouton et afficher un loader
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Enregistrement...');
+
+        hideConfirmationModal();
+
+        if (formToSubmit) {
+            submitExpenses();
+        }
+
+        // Réactiver le bouton après un court délai
+        setTimeout(() => {
+            $btn.prop('disabled', false).html(originalText);
+        }, 1000);
+    });
+
     // Gestion de la soumission du formulaire
     $('#expense-form').on('submit', function (e) {
         e.preventDefault();
@@ -62,14 +146,24 @@ $(document).ready(function () {
             return;
         }
 
-        // Ajouter l'état de chargement
-        const form = $(this);
-        form.addClass('form-loading');
+        // Calculer le total et le nombre de dépenses
+        const expenseCount = $('.expense-item').length;
+        let totalAmount = 0;
+        $('.amount-input').each(function() {
+            totalAmount += parseFloat($(this).val()) || 0;
+        });
 
-        // Afficher la popup de confirmation
-        if (!confirm('Voulez-vous vraiment soumettre ces dépenses ?')) {
-            return;
-        }
+        // Sauvegarder le formulaire pour soumission après confirmation
+        formToSubmit = $(this);
+
+        // Afficher la modale de confirmation
+        showConfirmationModal(expenseCount, totalAmount);
+    });
+
+    // Fonction pour soumettre réellement les dépenses
+    function submitExpenses() {
+        // Ajouter l'état de chargement
+        formToSubmit.addClass('form-loading');
 
         const expense = [];
         $('.expense-item').each(function (index) {
@@ -92,12 +186,27 @@ $(document).ready(function () {
             data: JSON.stringify({ expenses: expense, csrf_token: csrfToken }),
             success: function (response) {
                 if (response.success) {
-                    showGlobalMessage('Dépenses enregistrées avec succès ! Redirection...', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/expenses/list';
-                    }, 2000);
+                    // Afficher un message différent selon s'il y a des erreurs partielles
+                    if (response.errors && response.errors.length > 0) {
+                        let errorsList = response.errors.join('<br>');
+                        showGlobalMessage(
+                            `${response.created_count} dépense(s) créée(s) avec succès, mais avec des erreurs :<br>${errorsList}`,
+                            'error'
+                        );
+                    } else {
+                        showGlobalMessage('Dépenses enregistrées avec succès ! Redirection...', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/expenses/list';
+                        }, 2000);
+                    }
                 } else {
-                    showGlobalMessage(response.message || 'Une erreur est survenue');
+                    // Afficher les erreurs détaillées si disponibles
+                    if (response.errors && response.errors.length > 0) {
+                        let errorsList = response.errors.join('<br>');
+                        showGlobalMessage(`${response.message}<br>${errorsList}`, 'error');
+                    } else {
+                        showGlobalMessage(response.message || 'Une erreur est survenue', 'error');
+                    }
                 }
             },
             error: function (xhr) {
@@ -116,7 +225,7 @@ $(document).ready(function () {
                 }
             }
         });
-    });
+    }
 
     // Ajouter une nouvelle dépense
     $('#add-expense').on('click', function () {
@@ -124,14 +233,26 @@ $(document).ready(function () {
         const expenseItem = $('.expense-item').first().clone();
         const expenseCount = $('.expense-item').length + 1;
 
+        // Détruire les instances Select2 dans l'élément cloné
+        expenseItem.find('.select2-container').remove();
+        expenseItem.find('select').removeClass('select2-hidden-accessible');
+
         // Réinitialiser et personnaliser le nouvel élément
         expenseItem.find('input, select, textarea').val('');
         expenseItem.find('.expense-number').text(`#${expenseCount}`);
-        
+
         // Ajouter une classe pour l'animation
         expenseItem.css('opacity', 0);
         expenseContainer.append(expenseItem);
-        
+
+        // Initialiser Select2 sur les nouveaux selects
+        expenseItem.find('.category-select').each(function() {
+            initializeSelect2(this, 'Choisir un type');
+        });
+        expenseItem.find('select[name="status[]"]').each(function() {
+            initializeSelect2(this, 'Choisir un statut');
+        });
+
         // Animer l'apparition
         expenseItem.animate({
             opacity: 1,
@@ -188,7 +309,7 @@ $(document).ready(function () {
         $({amount: oldAmount}).animate({amount: newAmount}, {
             duration: 500,
             step: function() {
-                $('#total-amount').text(this.amount.toFixed(2) + '');
+                $('#total-amount').text(this.amount.toFixed(2) + ' FCFA');
             }
         });
     }
@@ -201,7 +322,7 @@ $(document).ready(function () {
     }
 
     // Variables pour suivre le budget
-    let initialBudget = parseFloat($('#remaining-budget').text().trim());
+    let initialBudget = parseFloat($('#remaining-budget').data('initial-budget')) || 0;
     let currentBudget = initialBudget;
 
     // Fonction pour mettre à jour le résumé du budget
@@ -214,13 +335,13 @@ $(document).ready(function () {
 
         // Calcul du budget restant
         currentBudget = initialBudget - totalExpenses;
-        
+
         // Calcul du pourcentage utilisé
         const percentageUsed = ((totalExpenses / initialBudget) * 100).toFixed(2);
-        
-        // Mise à jour des affichages
-        $('#remaining-budget').text(currentBudget.toFixed(2) + ' €');
-        $('#total-amount').text(totalExpenses.toFixed(2) + ' €');
+
+        // Mise à jour des affichages avec séparateurs de milliers
+        $('#remaining-budget').text(currentBudget.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' FCFA');
+        $('#total-amount').text(totalExpenses.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' FCFA');
         $('.progress-bar').css('width', Math.min(percentageUsed, 100) + '%');
         $('.budget-status span:first-child').text(percentageUsed + '%');
 
@@ -249,8 +370,8 @@ $(document).ready(function () {
         updateBudgetSummary();
     });
 
-    // Initialiser l'indicateur du nombre de dépenses et du montant total
-    updateExpenseSummary();
+    // Initialiser le résumé des dépenses et du budget au chargement de la page
+    updateBudgetSummary();
 });
 
 

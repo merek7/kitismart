@@ -114,5 +114,160 @@ $(document).ready(function () {
     });
 
     // Formatage du montant en temps réel
-    
+
+    // ===================================
+    // DUPLICATION DE BUDGET
+    // ===================================
+
+    // Initialiser Select2 pour la recherche dans les budgets
+    $('#budget-select').select2({
+        placeholder: '-- Rechercher un budget --',
+        allowClear: true,
+        width: '100%',
+        language: {
+            noResults: function() {
+                return "Aucun budget trouvé";
+            },
+            searching: function() {
+                return "Recherche en cours...";
+            }
+        }
+    });
+
+    // Activer/désactiver le bouton "Charger" selon la sélection
+    $('#budget-select').on('change', function() {
+        const selectedValue = $(this).val();
+        $('#load-budget-btn').prop('disabled', !selectedValue);
+    });
+
+    // Charger les données du budget sélectionné
+    $('#load-budget-btn').on('click', function() {
+        const selectedOption = $('#budget-select option:selected');
+
+        if (!selectedOption.val()) {
+            return;
+        }
+
+        // Récupérer les données depuis les attributs data-*
+        const budgetName = selectedOption.data('name');
+        const budgetAmount = selectedOption.data('amount');
+        const budgetDescription = selectedOption.data('description');
+
+        // Pré-remplir les champs
+        fillFormWithBudgetData(budgetName, budgetAmount, budgetDescription);
+
+        // Afficher un message de succès
+        showGlobalMessage('Budget chargé avec succès! Vous pouvez modifier les champs si nécessaire.', 'success');
+
+        // Scroll vers le formulaire
+        $('html, body').animate({
+            scrollTop: $('#name').offset().top - 100
+        }, 500);
+    });
+
+    /**
+     * Remplit le formulaire avec les données d'un budget
+     */
+    function fillFormWithBudgetData(name, amount, description) {
+        // Incrémenter intelligemment le nom du budget uniquement s'il existe
+        // (les anciens budgets n'ont pas de nom sauvegardé)
+        if (name && name.trim() !== '') {
+            const newName = incrementBudgetName(name);
+            $('#name').val(newName);
+            $('#name').closest('.form-group').addClass('valid');
+        } else {
+            // Laisser le champ nom vide pour les budgets sans nom
+            $('#name').val('');
+            $('#name').closest('.form-group').removeClass('valid');
+        }
+
+        // Remplir le montant
+        $('#amount').val(amount);
+
+        // Remplir la description si elle existe
+        if (description) {
+            $('#description').val(description);
+        }
+
+        // Calculer automatiquement la date de début (mois suivant)
+        const suggestedDate = calculateNextMonthStart();
+        $('#start_date').val(suggestedDate);
+
+        // Marquer les champs montant et date comme valides
+        $('#amount, #start_date').each(function() {
+            $(this).closest('.form-group').addClass('valid');
+        });
+    }
+
+    /**
+     * Incrémente intelligemment le nom du budget
+     * Ex: "Salaire Janvier" -> "Salaire Février"
+     *     "Budget Mars 2024" -> "Budget Avril 2024"
+     *     "Budget 1" -> "Budget 2"
+     */
+    function incrementBudgetName(name) {
+        // Mapping des mois français
+        const months = {
+            'janvier': 'février', 'février': 'mars', 'mars': 'avril',
+            'avril': 'mai', 'mai': 'juin', 'juin': 'juillet',
+            'juillet': 'août', 'août': 'septembre', 'septembre': 'octobre',
+            'octobre': 'novembre', 'novembre': 'décembre', 'décembre': 'janvier'
+        };
+
+        // Chercher un mois dans le nom (insensible à la casse)
+        let newName = name;
+        for (const [current, next] of Object.entries(months)) {
+            const regex = new RegExp(current, 'gi');
+            if (regex.test(name)) {
+                newName = name.replace(regex, next.charAt(0).toUpperCase() + next.slice(1));
+                return newName;
+            }
+        }
+
+        // Chercher un numéro à la fin (ex: "Budget 1" -> "Budget 2")
+        const numberMatch = name.match(/(\d+)$/);
+        if (numberMatch) {
+            const currentNumber = parseInt(numberMatch[1]);
+            const newNumber = currentNumber + 1;
+            return name.replace(/\d+$/, newNumber);
+        }
+
+        // Si aucun pattern détecté, ajouter "(copie)" ou incrémenter le numéro de copie
+        if (name.includes('(copie')) {
+            const copyMatch = name.match(/\(copie\s*(\d*)\)/);
+            if (copyMatch) {
+                const copyNumber = copyMatch[1] ? parseInt(copyMatch[1]) + 1 : 2;
+                return name.replace(/\(copie\s*\d*\)/, `(copie ${copyNumber})`);
+            }
+        }
+
+        return name + ' (copie)';
+    }
+
+    /**
+     * Calcule le premier jour du mois suivant
+     */
+    function calculateNextMonthStart() {
+        const today = new Date();
+        const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+
+        // Format YYYY-MM-DD pour input type="date"
+        const year = nextMonth.getFullYear();
+        const month = String(nextMonth.getMonth() + 1).padStart(2, '0');
+        const day = '01';
+
+        return `${year}-${month}-${day}`;
+    }
+
+    // Validation en temps réel
+    $('#name, #amount, #start_date').on('input change', function() {
+        const formGroup = $(this).closest('.form-group');
+        const value = $(this).val();
+
+        if (value && value.trim() !== '') {
+            formGroup.addClass('valid').removeClass('error');
+        } else {
+            formGroup.removeClass('valid');
+        }
+    });
 });

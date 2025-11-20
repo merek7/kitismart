@@ -26,6 +26,8 @@ class Budget {
 
             $budget = R::dispense('budget');
             $budget->user_id = $data['user_id'];
+            $budget->name = $data['name'] ?? 'Budget';
+            $budget->description = $data['description'] ?? null;
             $budget->start_date = $data['start_date'];
             $budget->end_date = null;
             $budget->initial_amount = $data['initial_amount'];
@@ -136,5 +138,18 @@ class Budget {
         'expenses_categories' => $expenses,
         'montant_restant' => $budget->remaining_amount,
        ];
+    }
+
+    /**
+     * Récupère les budgets précédents d'un utilisateur
+     * @param int $userId ID de l'utilisateur
+     * @param int $limit Nombre maximum de budgets à retourner (défaut: 10)
+     * @return array Liste des budgets triés par date de début décroissante
+     */
+    public static function getPreviousBudgets($userId, $limit = 10) {
+        return R::find('budget',
+            'user_id = ? ORDER BY start_date DESC LIMIT ?',
+            [$userId, $limit]
+        );
     }
 } 

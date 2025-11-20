@@ -69,12 +69,16 @@ class ExpenseController extends Controller
                     try {
                         // Validation pour chaque dépense
                         $this->validateExpenseData($expenseData);
-                        
+
                         // Création de la dépense
                         $expense = Expense::create($expenseData);
                         $createdExpenses[] = $expense;
+                        error_log("✅ Dépense #{$index} créée avec succès (ID: {$expense->id})");
                     } catch (\Exception $e) {
-                        $errors[] = "Erreur à l'index $index: " . $e->getMessage();
+                        $errorMessage = "Erreur à l'index $index: " . $e->getMessage();
+                        $errors[] = $errorMessage;
+                        error_log("❌ " . $errorMessage);
+                        error_log("Stack trace: " . $e->getTraceAsString());
                     }
                 }
                 return $this->jsonResponse([

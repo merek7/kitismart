@@ -68,11 +68,38 @@ class Categorie {
         }
     }
 
+    /**
+     * Trouve une catégorie par son type, la crée si elle n'existe pas
+     * @param string $type Le type de catégorie (fixe, diver, epargne)
+     * @return object La catégorie trouvée ou créée
+     * @throws \Exception Si le type est invalide
+     */
     public static function findByType($type) {
         if (!in_array($type, self::getDefaultCategories())) {
-            throw new \Exception('Type de catégorie invalide');
+            throw new \Exception('Type de catégorie invalide: ' . $type);
         }
-        return R::findOne('categorie', 'type = ?', [$type]);
+
+        // Chercher la catégorie existante
+        $categorie = R::findOne('categorie', 'type = ?', [$type]);
+
+        // Si elle n'existe pas, la créer automatiquement
+        if (!$categorie) {
+            error_log("Catégorie '$type' non trouvée, création automatique...");
+
+            $categorie = R::dispense('categorie');
+            $categorie->import([
+                'type' => $type,
+                'name' => ucfirst($type),  // Fixe, Diver, Epargne
+                'description' => 'Catégorie ' . $type,
+                'budget_id' => null,  // Catégorie globale
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+
+            R::store($categorie);
+            error_log("Catégorie '$type' créée avec l'ID: " . $categorie->id);
+        }
+
+        return $categorie;
     }
 
     public static function findByBudget($budgetId) {
