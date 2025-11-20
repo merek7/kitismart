@@ -44,6 +44,13 @@
         <!-- Section de filtrage -->
         <div class="filter-card">
             <div class="filter-controls">
+                <div class="filter-group filter-search">
+                    <label for="filter-search">Rechercher</label>
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="filter-search" name="search" class="form-control" placeholder="Rechercher une dépense...">
+                    </div>
+                </div>
                 <div class="filter-group">
                     <label for="filter-category">Catégorie</label>
                     <select id="filter-category" class="filter-select" name="category">
@@ -96,7 +103,8 @@
                          data-category="<?= $categoryName ?>"
                          data-status="<?= $expense->status ?>"
                          data-date="<?= $expense->payment_date ?>"
-                         data-amount="<?= $expense->amount ?>">
+                         data-amount="<?= $expense->amount ?>"
+                         data-description="<?= htmlspecialchars($expense->description) ?>">
 
                         <div class="expense-icon">
                             <i class="fas fa-wallet"></i>

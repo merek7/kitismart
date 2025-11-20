@@ -33,11 +33,20 @@ $(document).ready(function () {
         const selectedCategory = $('#filter-category').val();
         const selectedStatus = $('#filter-status').val();
         const selectedDate = $('#filter-date').val();
+        const searchText = $('#filter-search').val().toLowerCase().trim();
         let visibleCards = 0;
 
         $('.expense-card').each(function () {
             const card = $(this);
             let showCard = true;
+
+            // Filtre par recherche texte
+            if (searchText) {
+                const description = (card.data('description') || '').toString().toLowerCase();
+                if (!description.includes(searchText)) {
+                    showCard = false;
+                }
+            }
 
             // Filtre par catégorie
             if (selectedCategory && card.data('category') !== selectedCategory) {
@@ -86,6 +95,7 @@ $(document).ready(function () {
 
     // Réinitialiser les filtres
     $('#reset-filters').on('click', function() {
+        $('#filter-search').val('');
         $('#filter-category').val('').trigger('change');
         $('#filter-status').val('').trigger('change');
         $('#filter-date').val('');
@@ -94,6 +104,15 @@ $(document).ready(function () {
 
     // Événements de filtrage
     $('#filter-category, #filter-status, #filter-date').on('change', filterExpenses);
+
+    // Recherche en temps réel avec debouncing
+    let searchTimeout;
+    $('#filter-search').on('keyup', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+            filterExpenses();
+        }, 300); // Délai de 300ms pour éviter trop de filtres
+    });
 
     // ===================================
     // STATISTIQUES

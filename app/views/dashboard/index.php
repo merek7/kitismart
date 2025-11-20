@@ -10,6 +10,9 @@ $title = 'Dashboard - KitiSmart';
     <title>Dashboard - KitiSmart</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
 </head>
 <body>
     <div class="dashboard-container">
@@ -119,8 +122,66 @@ $title = 'Dashboard - KitiSmart';
                     </a>
                 </div>
 
+                <!-- Section Graphiques -->
+                <div class="charts-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-line"></i> Visualisation des données
+                    </h2>
+
+                    <div class="charts-grid">
+                        <!-- Graphique 1: Répartition par catégorie (Donut) -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3><i class="fas fa-chart-pie"></i> Répartition par catégorie</h3>
+                                <span class="chart-subtitle">Dépenses par type</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Graphique 2: Budget vs Dépensé (Bar) -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3><i class="fas fa-chart-bar"></i> Budget vs Dépensé</h3>
+                                <span class="chart-subtitle">Comparaison mensuelle</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="budgetComparisonChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Graphique 3: Statut des dépenses (Doughnut) -->
+                        <div class="chart-card chart-card-full">
+                            <div class="chart-header">
+                                <h3><i class="fas fa-tasks"></i> Statut des dépenses</h3>
+                                <span class="chart-subtitle">Payées vs En attente</span>
+                            </div>
+                            <div class="chart-container chart-container-horizontal">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         <?php endif; ?>
     </div>
+
+    <!-- Données pour Chart.js -->
+    <script>
+        const chartData = {
+            categories: <?= json_encode($budgetSummary ?? []) ?>,
+            budget: {
+                initial: <?= $activeBudget->initial_amount ?? 0 ?>,
+                remaining: <?= $activeBudget->remaining_amount ?? 0 ?>,
+                spent: <?= ($activeBudget->initial_amount ?? 0) - ($activeBudget->remaining_amount ?? 0) ?>,
+                pending: <?= $depenseEnAttente ?? 0 ?>
+            }
+        };
+    </script>
+
+    <!-- Script Chart.js personnalisé -->
+    <script src="/assets/js/dashboard/charts.js" defer></script>
 </body>
 </html>

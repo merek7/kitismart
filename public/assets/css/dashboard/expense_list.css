@@ -70,6 +70,10 @@
     min-width: 150px;
 }
 
+.filter-group.filter-search {
+    flex: 2 1 300px;
+}
+
 .filter-group label {
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
@@ -77,8 +81,29 @@
     font-weight: 500;
 }
 
+/* Search input avec icône */
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-wrapper i {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.search-input-wrapper input {
+    padding-left: 2.75rem !important;
+    width: 100%;
+}
+
 .filter-select,
-.filter-group input[type="date"] {
+.filter-group input[type="date"],
+.filter-group input[type="text"] {
     padding: 0.75rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -89,7 +114,8 @@
 }
 
 .filter-select:focus,
-.filter-group input[type="date"]:focus {
+.filter-group input[type="date"]:focus,
+.filter-group input[type="text"]:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
     outline: none;
