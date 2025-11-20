@@ -250,6 +250,8 @@ class ExpenseController extends Controller
                 'categories' => $categories,
                 'customCategories' => $customCategories,
                 'stats' => $stats,
+                'styles' => ['dashboard/expense_list.css'],
+                'pageScripts' => ['dashboard/expense_list.js'],
                 'layout' => 'dashboard'
             ]);
 

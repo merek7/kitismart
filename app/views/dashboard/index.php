@@ -50,8 +50,8 @@ $title = 'Dashboard - KitiSmart';
                             </div>
                         </div>
                         <div class="progress-footer">
-                            <span><?= number_format($activeBudget->initial_amount - $activeBudget->remaining_amount, 2) ?> € utilisés</span>
-                            <span><?= number_format($activeBudget->initial_amount, 2) ?> € total</span>
+                            <span><?= number_format($activeBudget->initial_amount - $activeBudget->remaining_amount, 0, ',', ' ') ?> FCFA utilisés</span>
+                            <span><?= number_format($activeBudget->initial_amount, 0, ',', ' ') ?> FCFA total</span>
                         </div>
                     </div>
                 </div>
@@ -63,8 +63,8 @@ $title = 'Dashboard - KitiSmart';
                         </div>
                         <div class="stat-content">
                             <h3>Budget Initial</h3>
-                            <p class="stat-value" data-value="<?= $activeBudget->initial_amount ?>">
-                                0 €
+                            <p class="stat-value">
+                                <?= number_format($activeBudget->initial_amount, 0, ',', ' ') ?> FCFA
                             </p>
                         </div>
                     </div>
@@ -75,8 +75,8 @@ $title = 'Dashboard - KitiSmart';
                         </div>
                         <div class="stat-content">
                             <h3>Dépenses du mois</h3>
-                            <p class="stat-value" data-value="<?= $activeBudget->initial_amount - $activeBudget->remaining_amount ?>">
-                                0 €
+                            <p class="stat-value">
+                                <?= number_format($activeBudget->initial_amount - $activeBudget->remaining_amount, 0, ',', ' ') ?> FCFA
                             </p>
                         </div>
                     </div>
@@ -87,8 +87,8 @@ $title = 'Dashboard - KitiSmart';
                         </div>
                         <div class="stat-content">
                             <h3>Dépenses en attente</h3>
-                            <p class="stat-value" data-value="<?= $depenseEnAttente ?>">
-                                0 FCFA
+                            <p class="stat-value">
+                                <?= number_format($depenseEnAttente, 0, ',', ' ') ?> FCFA
                             </p>
                         </div>
                     </div>
@@ -99,9 +99,8 @@ $title = 'Dashboard - KitiSmart';
                         </div>
                         <div class="stat-content">
                             <h3>Budget restant</h3>
-                            <p class="stat-value <?= $activeBudget->remaining_amount < 0 ? 'text-danger' : 'text-success' ?>"
-                               data-value="<?= $activeBudget->remaining_amount ?>">
-                                0 FCFA
+                            <p class="stat-value <?= $activeBudget->remaining_amount < 0 ? 'text-danger' : 'text-success' ?>">
+                                <?= number_format($activeBudget->remaining_amount, 0, ',', ' ') ?> FCFA
                             </p>
                         </div>
                     </div>
