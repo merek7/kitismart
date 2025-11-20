@@ -29,16 +29,22 @@ class BudgetHistoryController extends Controller
             $status = isset($_GET['status']) ? $_GET['status'] : null;
 
             // Récupérer l'historique des budgets
+            error_log("Budget History: Fetching history for user $userId");
             $budgets = Budget::getHistory($userId, $year, $month, $status);
+            error_log("Budget History: Found " . count($budgets) . " budgets");
 
             // Calculer les statistiques globales
+            error_log("Budget History: Calculating stats");
             $stats = Budget::getHistoryStats($userId, $year, $month);
 
             // Récupérer les données pour le graphique d'évolution
+            error_log("Budget History: Fetching evolution data");
             $chartData = Budget::getEvolutionData($userId);
 
             // Récupérer les années disponibles pour le filtre
+            error_log("Budget History: Fetching available years");
             $availableYears = Budget::getAvailableYears($userId);
+            error_log("Budget History: All data fetched successfully");
 
             $this->view('dashboard/budget_history', [
                 'title' => 'Historique des Budgets',
@@ -56,8 +62,14 @@ class BudgetHistoryController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            error_log("Erreur lors de l'affichage de l'historique des budgets: " . $e->getMessage());
-            $_SESSION['error'] = "Une erreur est survenue lors du chargement de l'historique";
+            // Log détaillé de l'erreur avec stack trace
+            error_log("=== ERREUR Budget History ===");
+            error_log("Message: " . $e->getMessage());
+            error_log("File: " . $e->getFile() . " (line " . $e->getLine() . ")");
+            error_log("Stack trace: " . $e->getTraceAsString());
+            error_log("=============================");
+
+            $_SESSION['error'] = "Erreur historique: " . $e->getMessage();
             $this->redirect('/dashboard');
         }
     }
