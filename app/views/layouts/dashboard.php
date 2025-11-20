@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Dashboard - KitiSmart' ?></title>
 
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Application de gestion de budget personnel intelligente">
+    <meta name="theme-color" content="#0d9488">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="KitiSmart">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/assets/img/icons/icon-192x192.png">
+
     <!-- Charger le mode sombre immédiatement (éviter le flash) -->
     <script>
         (function() {
@@ -143,5 +152,45 @@
     <?php else: ?>
         <?php error_log("Aucun script spécifique à charger"); ?>
     <?php endif; ?>
+
+    <!-- PWA Install Script -->
+    <script src="/assets/js/pwa-install.js"></script>
+
+    <!-- ================================
+         PWA Service Worker Registration
+         ================================ -->
+    <script>
+        // Enregistrer le Service Worker pour PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker enregistré avec succès:', registration.scope);
+
+                        // Vérifier les mises à jour toutes les heures
+                        setInterval(() => {
+                            registration.update();
+                        }, 60 * 60 * 1000);
+                    })
+                    .catch((error) => {
+                        console.error('❌ Erreur d\'enregistrement du Service Worker:', error);
+                    });
+            });
+
+            // Écouter les mises à jour du Service Worker
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                console.log('🔄 Nouveau Service Worker activé');
+            });
+        }
+
+        // Détecter le mode offline/online
+        window.addEventListener('online', () => {
+            console.log('🌐 Connexion rétablie');
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('📡 Mode hors ligne activé');
+        });
+    </script>
 </body>
 </html> 
