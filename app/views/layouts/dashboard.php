@@ -34,11 +34,20 @@
                 <a href="/budget/create" class="nav-link <?= $currentPage === 'budget' ? 'active' : '' ?>">
                     <i class="fas fa-wallet"></i> Budget
                 </a>
+                <a href="/budgets/history" class="nav-link <?= $currentPage === 'budgets' ? 'active' : '' ?>">
+                    <i class="fas fa-history"></i> Historique
+                </a>
                 <a href="/expenses/create" class="nav-link <?= $currentPage === 'expenses' ? 'active' : '' ?>">
                     <i class="fas fa-receipt"></i> Dépenses
                 </a>
+                <a href="/categories" class="nav-link <?= $currentPage === 'categories' ? 'active' : '' ?>">
+                    <i class="fas fa-tags"></i> Catégories
+                </a>
                 <a href="/expenses/recurrences" class="nav-link <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
                     <i class="fas fa-sync-alt"></i> Récurrences
+                </a>
+                <a href="/notifications/settings" class="nav-link <?= $currentPage === 'settings' ? 'active' : '' ?>">
+                    <i class="fas fa-bell"></i> Notifications
                 </a>
             </div>
             <div class="nav-user">
