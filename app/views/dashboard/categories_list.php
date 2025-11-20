@@ -38,10 +38,10 @@
   </section>
 
   <section class="categories-section">
-    <div class="containers">
+    <div class="container">
       <div class="categories-grid">
         <?php if (empty($categories)): ?>
-          <div class="alert-infos" role="alert">
+          <div class="alert-info" role="alert">
             Aucune catégorie trouvée. Créez votre première catégorie personnalisée en cliquant sur "Nouvelle Catégorie".
           </div>
         <?php else: ?>
@@ -68,11 +68,11 @@
                 </div>
 
                 <div class="category-actions">
-                  <a href="/categories/<?= $category->id ?>/edit" class="btns btn-sms btn-primarys">
+                  <a href="/categories/<?= $category->id ?>/edit" class="btn btn-sm btn-primary">
                     <i class="fas fa-edit"></i> Modifier
                   </a>
 
-                  <button type="button" class="btns btn-sms btn-dangers delete-category-btn" data-id="<?= $category->id ?>" data-name="<?= htmlspecialchars($category->name) ?>">
+                  <button type="button" class="btn btn-sm btn-danger delete-category-btn" data-id="<?= $category->id ?>" data-name="<?= htmlspecialchars($category->name) ?>">
                     <i class="fas fa-trash"></i> Supprimer
                   </button>
                 </div>
