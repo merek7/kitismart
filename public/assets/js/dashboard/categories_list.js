@@ -9,8 +9,9 @@ $(document).ready(function () {
     // Mettre à jour le modal avec le nom de la catégorie
     $('#category-name-to-delete').text(categoryName);
 
-    // Afficher le modal de confirmation
-    $('#deleteModal').modal('show');
+    // Afficher le modal de confirmation (Bootstrap 5)
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    deleteModal.show();
   });
 
   // Gestion de la confirmation de suppression
@@ -30,8 +31,9 @@ $(document).ready(function () {
       contentType: 'application/json',
       success: function (response) {
         if (response.success) {
-          // Fermer le modal
-          $('#deleteModal').modal('hide');
+          // Fermer le modal (Bootstrap 5)
+          const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+          deleteModal.hide();
 
           // Retirer la carte de la catégorie avec animation
           $(`.category-card[data-id="${categoryToDelete}"]`)
@@ -41,7 +43,7 @@ $(document).ready(function () {
               // Vérifier s'il reste des catégories
               if ($('.category-card').length === 0) {
                 $('.categories-grid').html(
-                  '<div class="alert-infos" role="alert">' +
+                  '<div class="alert-info" role="alert">' +
                   'Aucune catégorie trouvée. Créez votre première catégorie personnalisée en cliquant sur "Nouvelle Catégorie".' +
                   '</div>'
                 );
@@ -83,9 +85,7 @@ $(document).ready(function () {
     const alertHtml = `
       <div class="alert ${alertClass} alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
         ${message}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     `;
 
