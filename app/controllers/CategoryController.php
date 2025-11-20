@@ -31,6 +31,8 @@ class CategoryController extends Controller
                 'currentPage' => 'categories',
                 'categories' => $categories,
                 'categoriesCount' => $categoriesCount,
+                'styles' => ['dashboard/categories_list.css'],
+                'pageScripts' => ['dashboard/categories_list.js'],
                 'layout' => 'dashboard'
             ]);
 
