@@ -64,6 +64,8 @@ class CategoryController extends Controller
                 'csrfToken' => $csrfToken,
                 'availableIcons' => $availableIcons,
                 'availableColors' => $availableColors,
+                'styles' => ['dashboard/category_create.css'],
+                'pageScripts' => ['dashboard/category_create.js'],
                 'layout' => 'dashboard'
             ]);
 
@@ -165,6 +167,8 @@ class CategoryController extends Controller
                 'csrfToken' => $csrfToken,
                 'availableIcons' => $availableIcons,
                 'availableColors' => $availableColors,
+                'styles' => ['dashboard/category_edit.css'],
+                'pageScripts' => ['dashboard/category_edit.js'],
                 'layout' => 'dashboard'
             ]);
 

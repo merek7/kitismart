@@ -36,6 +36,8 @@ class NotificationController extends Controller
                 'title' => 'Paramètres de Notifications',
                 'currentPage' => 'settings',
                 'settings' => $settings,
+                'styles' => ['dashboard/notification_settings.css'],
+                'pageScripts' => ['dashboard/notification_settings.js'],
                 'layout' => 'dashboard'
             ]);
 
