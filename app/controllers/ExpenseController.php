@@ -306,14 +306,17 @@ class ExpenseController extends Controller
             // Afficher la vue avec les données
             $this->view('dashboard/expense_list', [
                 'title' => 'Liste des dépenses',
+                'currentPage' => 'expenses',
                 'categories' => $categories,
                 'customCategories' => $customCategories,
-                'currentPage' => $paginatedExpenses['current_page'],
+                'page' => $paginatedExpenses['current_page'],
                 'lastPage' => $paginatedExpenses['last_page'],
                 'nextPage' => $paginatedExpenses['next_page'],
                 'previousPage' => $paginatedExpenses['previous_page'],
                 'expenses' => $paginatedExpenses['expenses'],
                 'stats' => $stats,
+                'styles' => ['dashboard/expense_list.css'],
+                'pageScripts' => ['dashboard/expense_list.js'],
                 'layout' => 'dashboard'
             ]);
 
