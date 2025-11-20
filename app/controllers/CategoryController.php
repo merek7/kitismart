@@ -22,7 +22,7 @@ class CategoryController extends Controller
                 return;
             }
 
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
             $categories = CustomCategory::findByUser($userId);
             $categoriesCount = CustomCategory::countByUser($userId);
 
@@ -96,8 +96,10 @@ class CategoryController extends Controller
             // Validation des données
             $this->validateCategoryData($data);
 
+            $userId = (int)$_SESSION['user_id'];
+
             // Vérifier que le nom n'existe pas déjà
-            if (CustomCategory::existsByName($data['name'], $_SESSION['user_id'])) {
+            if (CustomCategory::existsByName($data['name'], $userId)) {
                 return $this->jsonResponse([
                     'success' => false,
                     'message' => 'Une catégorie avec ce nom existe déjà'
@@ -105,7 +107,7 @@ class CategoryController extends Controller
             }
 
             // Ajouter l'ID utilisateur
-            $data['user_id'] = $_SESSION['user_id'];
+            $data['user_id'] = $userId;
 
             // Créer la catégorie
             $category = CustomCategory::create($data);
@@ -141,7 +143,7 @@ class CategoryController extends Controller
                 return;
             }
 
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
             $category = CustomCategory::findById((int)$id, $userId);
 
             if (!$category) {
@@ -186,7 +188,7 @@ class CategoryController extends Controller
             }
 
             $data = json_decode(file_get_contents('php://input'), true);
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
 
             // Validation des données
             $this->validateCategoryData($data, false);
@@ -231,7 +233,7 @@ class CategoryController extends Controller
                 return $this->jsonResponse(['success' => false, 'message' => 'Non authentifié'], 401);
             }
 
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
             CustomCategory::delete((int)$id, $userId);
 
             return $this->jsonResponse([
@@ -258,7 +260,7 @@ class CategoryController extends Controller
                 return $this->jsonResponse(['success' => false, 'message' => 'Non authentifié'], 401);
             }
 
-            $userId = $_SESSION['user_id'];
+            $userId = (int)$_SESSION['user_id'];
             $categories = CustomCategory::findByUser($userId);
 
             return $this->jsonResponse([
