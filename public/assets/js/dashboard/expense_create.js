@@ -188,7 +188,7 @@ $(document).ready(function () {
         $({amount: oldAmount}).animate({amount: newAmount}, {
             duration: 500,
             step: function() {
-                $('#total-amount').text(this.amount.toFixed(2) + '');
+                $('#total-amount').text(this.amount.toFixed(2) + ' FCFA');
             }
         });
     }
@@ -214,13 +214,13 @@ $(document).ready(function () {
 
         // Calcul du budget restant
         currentBudget = initialBudget - totalExpenses;
-        
+
         // Calcul du pourcentage utilisé
         const percentageUsed = ((totalExpenses / initialBudget) * 100).toFixed(2);
-        
-        // Mise à jour des affichages
-        $('#remaining-budget').text(currentBudget.toFixed(2) + ' €');
-        $('#total-amount').text(totalExpenses.toFixed(2) + ' €');
+
+        // Mise à jour des affichages avec séparateurs de milliers
+        $('#remaining-budget').text(currentBudget.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' FCFA');
+        $('#total-amount').text(totalExpenses.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' FCFA');
         $('.progress-bar').css('width', Math.min(percentageUsed, 100) + '%');
         $('.budget-status span:first-child').text(percentageUsed + '%');
 
@@ -249,8 +249,8 @@ $(document).ready(function () {
         updateBudgetSummary();
     });
 
-    // Initialiser l'indicateur du nombre de dépenses et du montant total
-    updateExpenseSummary();
+    // Initialiser le résumé des dépenses et du budget au chargement de la page
+    updateBudgetSummary();
 });
 
 
