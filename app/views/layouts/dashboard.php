@@ -65,8 +65,11 @@
                 <a href="/expenses/recurrences" class="nav-link <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
                     <i class="fas fa-sync-alt"></i> Récurrences
                 </a>
-                <a href="/notifications/settings" class="nav-link <?= $currentPage === 'settings' ? 'active' : '' ?>">
+                <a href="/notifications/settings" class="nav-link <?= $currentPage === 'notifications' ? 'active' : '' ?>">
                     <i class="fas fa-bell"></i> Notifications
+                </a>
+                <a href="/settings" class="nav-link <?= $currentPage === 'settings' ? 'active' : '' ?>">
+                    <i class="fas fa-cog"></i> Paramètres
                 </a>
             </div>
             <div class="nav-user">

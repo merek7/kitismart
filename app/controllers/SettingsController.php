@@ -27,7 +27,8 @@ class SettingsController extends Controller
 
         $this->render('dashboard/settings', [
             'user' => $user,
-            'csrf_token' => Csrf::generateToken()
+            'csrf_token' => Csrf::generateToken(),
+            'currentPage' => 'settings'
         ]);
     }
 
