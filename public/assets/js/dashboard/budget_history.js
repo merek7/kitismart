@@ -208,28 +208,88 @@ $(document).ready(function () {
           </div>
         </div>
 
-        <h5 class="mt-4">
-          <i class="fas fa-list"></i> Dépenses (${budget.expense_count})
-        </h5>
+        <div class="expenses-header mt-4">
+          <h5>
+            <i class="fas fa-receipt"></i> Dépenses détaillées
+            <span class="expense-count-badge">${budget.expense_count}</span>
+          </h5>
+          ${expenses.length > 3 ? `
+            <div class="expense-search-box">
+              <input type="text" class="form-control form-control-sm" id="expenseSearch" placeholder="Rechercher...">
+            </div>
+          ` : ''}
+        </div>
 
         ${expenses.length > 0 ? `
-          <div class="expenses-list">
-            ${expenses.map(expense => `
-              <div class="expense-item">
-                <div class="expense-info">
-                  <strong>${escapeHtml(expense.description)}</strong>
-                  <span class="expense-date">${formatDate(expense.payment_date)}</span>
+          <div class="expenses-list" id="expensesList">
+            ${expenses.map(expense => {
+              // Définir l'icône et la couleur selon la catégorie
+              let categoryIcon = 'fa-wallet';
+              let categoryColor = '#6b7280';
+              let categoryName = 'Autre';
+
+              // Logique simplifiée pour les catégories
+              if (expense.category) {
+                categoryName = expense.category;
+                if (expense.category === 'fixe') {
+                  categoryIcon = 'fa-calendar-check';
+                  categoryColor = '#3b82f6';
+                } else if (expense.category === 'diver') {
+                  categoryIcon = 'fa-shopping-cart';
+                  categoryColor = '#8b5cf6';
+                } else if (expense.category === 'epargne') {
+                  categoryIcon = 'fa-piggy-bank';
+                  categoryColor = '#10b981';
+                }
+              }
+
+              return `
+                <div class="expense-item" data-description="${escapeHtml(expense.description).toLowerCase()}">
+                  <div class="expense-left">
+                    <div class="expense-category-icon" style="background-color: ${categoryColor}20; color: ${categoryColor}">
+                      <i class="fas ${categoryIcon}"></i>
+                    </div>
+                    <div class="expense-info">
+                      <div class="expense-title">
+                        <strong>${escapeHtml(expense.description)}</strong>
+                        <span class="expense-category-badge" style="background-color: ${categoryColor}20; color: ${categoryColor}">
+                          ${categoryName}
+                        </span>
+                      </div>
+                      <span class="expense-date">
+                        <i class="far fa-calendar"></i> ${formatDate(expense.payment_date)}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="expense-right">
+                    <span class="expense-amount">${formatCurrency(expense.amount)}</span>
+                    <span class="expense-status status-${expense.status}">
+                      <i class="fas ${expense.status === 'paid' ? 'fa-check-circle' : 'fa-clock'}"></i>
+                      ${expense.status === 'paid' ? 'Payé' : 'En attente'}
+                    </span>
+                  </div>
                 </div>
-                <div class="expense-right">
-                  <span class="expense-amount">${formatCurrency(expense.amount)}</span>
-                  <span class="expense-status status-${expense.status}">
-                    ${expense.status === 'paid' ? 'Payé' : 'En attente'}
-                  </span>
-                </div>
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
-        ` : '<p class="text-muted">Aucune dépense enregistrée</p>'}
+
+          ${expenses.length > 3 ? `
+            <script>
+              document.getElementById('expenseSearch')?.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const expenseItems = document.querySelectorAll('#expensesList .expense-item');
+                expenseItems.forEach(item => {
+                  const description = item.getAttribute('data-description');
+                  if (description.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                  } else {
+                    item.style.display = 'none';
+                  }
+                });
+              });
+            </script>
+          ` : ''}
+        ` : '<div class="no-expenses"><i class="fas fa-inbox"></i><p>Aucune dépense enregistrée pour ce budget</p></div>'}
       </div>
     `;
 

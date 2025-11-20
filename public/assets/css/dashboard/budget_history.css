@@ -534,13 +534,51 @@
   background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
 }
 
+/* Header des dépenses dans le modal */
+.expenses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.expenses-header h5 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.expense-count-badge {
+  background: linear-gradient(135deg, var(--primary-color, #0d9488) 0%, var(--secondary-color, #14b8a6) 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.expense-search-box {
+  flex: 1;
+  max-width: 300px;
+}
+
+.expense-search-box input {
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+}
+
 /* Liste des dépenses dans le modal */
 .expenses-list {
-  max-height: 400px;
+  max-height: 500px;
   overflow-y: auto;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 0.5rem;
+  background-color: #f9fafb;
 }
 
 .expenses-list::-webkit-scrollbar {
@@ -567,53 +605,95 @@
   align-items: center;
   padding: 1rem;
   background-color: #fff;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  transition: all 0.2s ease;
-  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .expense-item:hover {
-  background-color: #f9fafb;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transform: translateX(4px);
+  border-color: var(--primary-color, #0d9488);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15);
+  transform: translateY(-2px);
+}
+
+.expense-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.expense-category-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
 }
 
 .expense-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
   flex: 1;
 }
 
-.expense-info strong {
+.expense-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.expense-title strong {
   color: #2c3e50;
-  font-size: 0.95rem;
+  font-size: 1rem;
+}
+
+.expense-category-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
 .expense-date {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .expense-right {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .expense-amount {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: #2c3e50;
 }
 
 .expense-status {
-  padding: 0.25rem 0.75rem;
+  padding: 0.3rem 0.85rem;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .expense-status.status-paid {
@@ -624,6 +704,24 @@
 .expense-status.status-pending {
   background-color: #fef3c7;
   color: #92400e;
+}
+
+/* État vide */
+.no-expenses {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6b7280;
+}
+
+.no-expenses i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.no-expenses p {
+  margin: 0;
+  font-size: 1rem;
 }
 
 .modal-footer.bg-light {

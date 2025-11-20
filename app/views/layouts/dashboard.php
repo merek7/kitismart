@@ -30,7 +30,13 @@
             <div class="nav-brand">
                 <img src="/assets/img/logo.svg" alt="KitiSmart" class="nav-logo">
             </div>
-            <div class="nav-menu">
+
+            <!-- Bouton hamburger pour mobile -->
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span class="nav-toggle-icon"></span>
+            </button>
+
+            <div class="nav-menu" id="navMenu">
                 <a href="/dashboard" class="nav-link <?= $currentPage === 'dashboard' ? 'active' : '' ?>">
                     <i class="fas fa-home"></i> Accueil
                 </a>
@@ -77,6 +83,41 @@
 
     <!-- Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- Script pour le toggle du navbar mobile -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('nav-menu-active');
+                    navToggle.classList.toggle('active');
+                    document.body.classList.toggle('nav-open');
+                });
+
+                // Fermer le menu quand on clique sur un lien
+                const navLinks = navMenu.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navMenu.classList.remove('nav-menu-active');
+                        navToggle.classList.remove('active');
+                        document.body.classList.remove('nav-open');
+                    });
+                });
+
+                // Fermer le menu si on clique en dehors
+                document.addEventListener('click', function(event) {
+                    if (!navMenu.contains(event.target) && !navToggle.contains(event.target)) {
+                        navMenu.classList.remove('nav-menu-active');
+                        navToggle.classList.remove('active');
+                        document.body.classList.remove('nav-open');
+                    }
+                });
+            }
+        });
+    </script>
 
     <?php
     error_log("Scripts disponibles dans le layout: " . print_r($pageScripts ?? [], true));
