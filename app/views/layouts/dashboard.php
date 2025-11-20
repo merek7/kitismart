@@ -37,6 +37,9 @@
                 <a href="/expenses/create" class="nav-link <?= $currentPage === 'expenses' ? 'active' : '' ?>">
                     <i class="fas fa-receipt"></i> Dépenses
                 </a>
+                <a href="/expenses/recurrences" class="nav-link <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
+                    <i class="fas fa-sync-alt"></i> Récurrences
+                </a>
             </div>
             <div class="nav-user">
                 <div class="user-menu">
