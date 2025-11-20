@@ -78,7 +78,7 @@
   background-color: #f8f9fa;
 }
 
-.containers {
+.container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
@@ -159,7 +159,7 @@
   margin-top: 0.5rem;
 }
 
-.btns {
+.btn {
   padding: 0.5rem 1rem;
   border-radius: 6px;
   border: none;
@@ -173,32 +173,32 @@
   text-decoration: none;
 }
 
-.btn-sms {
+.btn-sm {
   padding: 0.4rem 0.85rem;
   font-size: 0.8rem;
 }
 
-.btn-primarys {
+.btn-primary {
   background-color: var(--primary-color, #0d9488);
   color: white;
 }
 
-.btn-primarys:hover {
+.btn-primary:hover {
   background-color: var(--secondary-color, #14b8a6);
   transform: translateY(-1px);
 }
 
-.btn-dangers {
+.btn-danger {
   background-color: #dc3545;
   color: white;
 }
 
-.btn-dangers:hover {
+.btn-danger:hover {
   background-color: #c82333;
   transform: translateY(-1px);
 }
 
-.alert-infos {
+.alert-info {
   background-color: #d1ecf1;
   border: 1px solid #bee5eb;
   border-radius: 8px;
