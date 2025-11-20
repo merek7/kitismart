@@ -18,7 +18,7 @@ class SettingsController extends Controller
 
     public function index()
     {
-        $user = User::find($_SESSION['user_id']);
+        $user = User::findById($_SESSION['user_id']);
 
         if (!$user) {
             $_SESSION['error'] = "Utilisateur non trouvé";
@@ -58,7 +58,7 @@ class SettingsController extends Controller
             return $this->redirect('/settings');
         }
 
-        $user = User::find($_SESSION['user_id']);
+        $user = User::findById($_SESSION['user_id']);
 
         if (!$user) {
             $_SESSION['error'] = "Utilisateur non trouvé";
@@ -122,7 +122,7 @@ class SettingsController extends Controller
             return $this->redirect('/settings');
         }
 
-        $user = User::find($_SESSION['user_id']);
+        $user = User::findById($_SESSION['user_id']);
 
         if (!$user) {
             $_SESSION['error'] = "Utilisateur non trouvé";
@@ -169,7 +169,7 @@ class SettingsController extends Controller
             return $this->redirect('/settings');
         }
 
-        $user = User::find($_SESSION['user_id']);
+        $user = User::findById($_SESSION['user_id']);
 
         if (!$user) {
             $_SESSION['error'] = "Utilisateur non trouvé";
