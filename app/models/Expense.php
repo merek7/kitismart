@@ -183,6 +183,9 @@ class Expense
 
     public static function getPaginatedExpensesByUser($budgetId, $userId, $page = 1)
     {
+        // Valider et normaliser le numéro de page
+        $page = max(1, (int)$page);
+
         $limit = 6;
         $offset = ($page - 1) * $limit;
 

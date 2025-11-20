@@ -278,7 +278,8 @@ class ExpenseController extends Controller
             }
 
             // Récupérer le numéro de page depuis la requête
-            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            // S'assurer que $page est toujours un entier positif (minimum 1)
+            $page = max(1, (int)($_GET['page'] ?? 1));
 
             // Récupérer les dépenses paginées
             $paginatedExpenses = Expense::getPaginatedExpensesByUser($activeBudget->id, $userId, $page);
