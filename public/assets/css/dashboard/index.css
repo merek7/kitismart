@@ -713,26 +713,7 @@ body {
   font-size: 0.95rem;
 }
 
-.form-control {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 0.95rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  transition: var(--transition);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-.form-control::placeholder {
-  color: #94a3b8;
-}
-
-/* Input group with icons - voir définition complète plus bas dans le fichier */
+/* Définitions de .form-control, .input-group et icônes déplacées plus bas dans le fichier pour éviter les conflits */
 
 /* Custom Buttons */
 .btn {
@@ -1252,7 +1233,7 @@ body {
 
 .form-control {
   width: 100%;
-  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  padding: 0.75rem;
   font-size: 1rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -1260,10 +1241,18 @@ body {
   background-color: white;
 }
 
+.input-group .form-control {
+  padding-left: 2.5rem;
+}
+
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+}
+
+.form-control::placeholder {
+  color: #94a3b8;
 }
 .btn-remove {
   display: flex;
