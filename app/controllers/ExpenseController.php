@@ -8,6 +8,7 @@ use App\Utils\Csrf;
 use App\Exceptions\TokenInvalidOrExpiredException;
 use App\Models\Budget;
 use App\Models\Categorie;
+use App\Models\CustomCategory;
 
 
 
@@ -22,11 +23,19 @@ class ExpenseController extends Controller
     {
         $csrfToken = Csrf::generateToken();
         $categories = Categorie::getDefaultCategories();
+        $customCategories = [];
+
+        // Charger les catégories personnalisées de l'utilisateur
+        if (isset($_SESSION['user_id'])) {
+            $customCategories = CustomCategory::findByUser($_SESSION['user_id']);
+        }
+
         try {
             $this->view('dashboard/expense_create', [
                 'title' => 'Nouvelle Dépense',
                 'currentPage' => 'expenses',
                 'categories' => $categories,
+                'customCategories' => $customCategories,
                 'layout' => 'dashboard',
                 'budget' => BUDGET->remaining_amount,
                 'csrfToken' => $csrfToken
@@ -208,6 +217,7 @@ class ExpenseController extends Controller
 
             // Récupérer les catégories pour le filtre
             $categories = Categorie::getDefaultCategories();
+            $customCategories = CustomCategory::findByUser($userId);
             error_log(print_r($categories, true));
 
             // Calculer les statistiques
@@ -238,6 +248,7 @@ class ExpenseController extends Controller
                 'currentPage' => 'expenses',
                 'expenses' => $expenses,
                 'categories' => $categories,
+                'customCategories' => $customCategories,
                 'stats' => $stats,
                 'layout' => 'dashboard'
             ]);
@@ -271,6 +282,7 @@ class ExpenseController extends Controller
             $paginatedExpenses = Expense::getPaginatedExpensesByUser($activeBudget->id, $userId, $page);
 
             $categories = Categorie::getDefaultCategories();
+            $customCategories = CustomCategory::findByUser($userId);
             // Calculer les statistiques pour les dépenses de la page
             $stats = [
                 'total' => 0,
@@ -293,6 +305,7 @@ class ExpenseController extends Controller
             $this->view('dashboard/expense_list', [
                 'title' => 'Liste des dépenses',
                 'categories' => $categories,
+                'customCategories' => $customCategories,
                 'currentPage' => $paginatedExpenses['current_page'],
                 'lastPage' => $paginatedExpenses['last_page'],
                 'nextPage' => $paginatedExpenses['next_page'],

@@ -152,4 +152,119 @@ class Budget {
             [$userId, $limit]
         );
     }
+
+    /**
+     * Récupérer l'historique des budgets avec filtres
+     */
+    public static function getHistory(int $userId, ?int $year = null, ?int $month = null, ?string $status = null) {
+        $sql = 'user_id = ?';
+        $params = [$userId];
+
+        if ($year) {
+            $sql .= ' AND YEAR(start_date) = ?';
+            $params[] = $year;
+        }
+
+        if ($month) {
+            $sql .= ' AND MONTH(start_date) = ?';
+            $params[] = $month;
+        }
+
+        if ($status && in_array($status, [self::STATUS_ACTIVE, self::STATUS_CLOSED])) {
+            $sql .= ' AND status = ?';
+            $params[] = $status;
+        }
+
+        $sql .= ' ORDER BY start_date DESC';
+
+        return R::find('budget', $sql, $params);
+    }
+
+    /**
+     * Récupérer les statistiques de l'historique
+     */
+    public static function getHistoryStats(int $userId, ?int $year = null, ?int $month = null) {
+        $budgets = self::getHistory($userId, $year, $month);
+
+        $stats = [
+            'total_budgets' => count($budgets),
+            'active_budgets' => 0,
+            'closed_budgets' => 0,
+            'total_initial' => 0,
+            'total_spent' => 0,
+            'total_remaining' => 0,
+            'average_usage' => 0
+        ];
+
+        foreach ($budgets as $budget) {
+            if ($budget->status === self::STATUS_ACTIVE) {
+                $stats['active_budgets']++;
+            } else {
+                $stats['closed_budgets']++;
+            }
+
+            $stats['total_initial'] += $budget->initial_amount;
+            $stats['total_remaining'] += $budget->remaining_amount;
+            $spent = $budget->initial_amount - $budget->remaining_amount;
+            $stats['total_spent'] += $spent;
+        }
+
+        if ($stats['total_budgets'] > 0 && $stats['total_initial'] > 0) {
+            $stats['average_usage'] = round(($stats['total_spent'] / $stats['total_initial']) * 100, 2);
+        }
+
+        return $stats;
+    }
+
+    /**
+     * Récupérer les données d'évolution pour le graphique
+     */
+    public static function getEvolutionData(int $userId, int $months = 12) {
+        $budgets = R::find('budget',
+            'user_id = ? ORDER BY start_date DESC LIMIT ?',
+            [$userId, $months]
+        );
+
+        $data = [
+            'labels' => [],
+            'initial' => [],
+            'spent' => [],
+            'remaining' => []
+        ];
+
+        // Inverser pour avoir l'ordre chronologique
+        $budgets = array_reverse($budgets);
+
+        foreach ($budgets as $budget) {
+            $date = new DateTime($budget->start_date);
+            $data['labels'][] = $date->format('M Y');
+            $data['initial'][] = $budget->initial_amount;
+            $spent = $budget->initial_amount - $budget->remaining_amount;
+            $data['spent'][] = $spent;
+            $data['remaining'][] = $budget->remaining_amount;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Récupérer les années disponibles pour le filtre
+     */
+    public static function getAvailableYears(int $userId) {
+        $years = R::getCol(
+            'SELECT DISTINCT YEAR(start_date) as year FROM budget
+            WHERE user_id = ?
+            ORDER BY year DESC',
+            [$userId]
+        );
+
+        return $years;
+    }
+
+    /**
+     * Trouver un budget par ID et user ID
+     */
+    public static function findById(int $id, int $userId) {
+        return R::findOne('budget', 'id = ? AND user_id = ?', [$id, $userId]);
+    }
 } 

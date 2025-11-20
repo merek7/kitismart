@@ -1,0 +1,361 @@
+/* Formulaire de catégorie */
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.card-header {
+  background-color: var(--primary-color, #0d9488);
+  color: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-tools {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-tool {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-tool:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: white;
+  text-decoration: none;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.input-group {
+  display: flex;
+  align-items: stretch;
+}
+
+.input-group-prepend {
+  display: flex;
+  margin-right: -1px;
+}
+
+.input-group-text {
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  border-radius: 6px 0 0 6px;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #495057;
+}
+
+.form-control {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 0 6px 6px 0;
+  font-size: 1rem;
+  transition: border-color 0.15s ease;
+}
+
+.input-group .form-control {
+  border-left: none;
+}
+
+.form-control:not(.input-group .form-control) {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color, #0d9488);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-text {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* Sélecteur d'icônes */
+.icon-selector {
+  margin-top: 0.5rem;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.icon-option {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #f8f9fa;
+  font-size: 1.5rem;
+  color: #495057;
+}
+
+.icon-option:hover {
+  border-color: var(--primary-color, #0d9488);
+  background-color: rgba(13, 148, 136, 0.1);
+  transform: scale(1.05);
+}
+
+.icon-option.selected {
+  border-color: var(--primary-color, #0d9488);
+  background-color: var(--primary-color, #0d9488);
+  color: white;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
+}
+
+/* Sélecteur de couleurs */
+.color-selector {
+  margin-top: 0.5rem;
+}
+
+.color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.color-option {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.color-option i {
+  color: white;
+  font-size: 1.2rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.color-option.selected {
+  border-color: #2c3e50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.color-option.selected i {
+  opacity: 1;
+}
+
+/* Aperçu de la catégorie */
+.category-preview {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.category-preview h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.preview-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.preview-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: white;
+  flex-shrink: 0;
+  background-color: var(--primary-color, #0d9488);
+  transition: all 0.3s ease;
+}
+
+.preview-content {
+  flex: 1;
+}
+
+.preview-content h6 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+}
+
+.preview-content p {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+/* Footer de la carte */
+.card-footer {
+  padding: 1.25rem 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.65rem 1.5rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-color, #0d9488);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color, #14b8a6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  text-decoration: none;
+  color: white;
+}
+
+/* Messages */
+.message {
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  margin: 0 1.5rem 1rem;
+  display: none;
+}
+
+.message.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  display: block;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  display: block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .icon-grid {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  }
+
+  .icon-option {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+
+  .color-option {
+    width: 45px;
+    height: 45px;
+  }
+
+  .card-body {
+    padding: 1.5rem 1rem;
+  }
+
+  .card-footer {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

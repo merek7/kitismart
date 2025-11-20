@@ -28,14 +28,30 @@ class Expense
             if (!$budget) {
                 throw new BudgetNotFoundException("Budget non trouvé ou inactif");
             }
-            $isFixed = $data['category_type'] === Categorie::TYPE_FIXE;
 
-            $categorie = Categorie::findByType($data['category_type']);
-            
+            // Vérifier si c'est une catégorie personnalisée
+            $isCustomCategory = str_starts_with($data['category_type'], 'custom_');
+            $customCategoryId = null;
+            $categorieId = null;
+            $isFixed = false;
+
+            if ($isCustomCategory) {
+                // Extraire l'ID de la catégorie personnalisée
+                $customCategoryId = (int)str_replace('custom_', '', $data['category_type']);
+                // Pour les catégories personnalisées, mettre categorie_id à null
+                $categorieId = null;
+            } else {
+                // Catégorie par défaut
+                $isFixed = $data['category_type'] === Categorie::TYPE_FIXE;
+                $categorie = Categorie::findByType($data['category_type']);
+                $categorieId = $categorie->id;
+            }
+
             $expense = R::dispense('expense');
             $expense->import([
                 'budget_id' => $data['budget_id'],
-                'categorie_id' => $categorie->id,
+                'categorie_id' => $categorieId,
+                'custom_category_id' => $customCategoryId,
                 'amount' => $data['amount'],
                 'payment_date' => $data['payment_date'],
                 'description' => $data['description'],
