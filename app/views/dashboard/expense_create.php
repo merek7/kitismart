@@ -1,21 +1,14 @@
 <div class="content-wrapper">
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <h1><i class="fas fa-receipt"></i> Nouvelle Dépense</h1>
-                </div>
-                <div class="col-md-6 d-flex justify-content-end align-items-center">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a></li>
-                        <li class="breadcrumb-item active">Nouvelle Dépense</li>
-                    </ol>
-                </div>
-            </div>
+    <div class="page-header">
+        <h1><i class="fas fa-receipt"></i> Nouvelle Dépense</h1>
+        <div class="breadcrumb">
+            <a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a>
+            <span>/</span>
+            <span>Nouvelle Dépense</span>
         </div>
-    </section>
+    </div>
 
-    <section class="content">
+    <div class="page-content">
         <div class="container">
             <!-- Résumé des dépenses -->
             <div class="row mb-4">
@@ -32,20 +25,20 @@
                                 <i class="fas fa-coins"></i>
                                 <div class="summary-content">
                                     <span class="summary-label">Montant total</span>
-                                    <span id="total-amount" class="summary-value">0 €</span>
+                                    <span id="total-amount" class="summary-value">0 FCFA</span>
                                 </div>
                             </div>
                             <div class="summary-item">
                                 <i class="fas fa-wallet"></i>
                                 <div class="summary-content">
                                     <span class="summary-label">Budget restant</span>
-                                    <span id="remaining-budget" class="summary-value"><?= htmlspecialchars($budget) ?> </span>
+                                    <span id="remaining-budget" class="summary-value" data-initial-budget="<?= htmlspecialchars($budget) ?>"><?= htmlspecialchars($budget) ?> FCFA</span>
                                     <div class="budget-progress">
                                         <div class="progress-bar" style="width: 0%"></div>
                                     </div>
                                     <div class="budget-status">
                                         <span>0%</span>
-                                        <span>Budget:<?= htmlspecialchars($budget) ?> </span>
+                                        <span>Budget: <?= htmlspecialchars($budget) ?> FCFA</span>
                                     </div>
                                 </div>
                             </div>
@@ -199,5 +192,42 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div id="confirmation-modal" class="modal-overlay">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle"></i> Confirmer l'enregistrement
+                </h5>
+            </div>
+            <div class="modal-body">
+                <p>Vous êtes sur le point d'enregistrer :</p>
+                <ul class="confirmation-list">
+                    <li>
+                        <i class="fas fa-list"></i>
+                        <strong id="modal-expense-count">0</strong> dépense(s)
+                    </li>
+                    <li>
+                        <i class="fas fa-coins"></i>
+                        Pour un montant total de <strong id="modal-total-amount">0 FCFA</strong>
+                    </li>
+                </ul>
+                <p class="text-muted">
+                    <i class="fas fa-info-circle"></i> Cette action mettra à jour votre budget.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-cancel" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+                <button type="button" id="modal-confirm" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Confirmer
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
