@@ -161,12 +161,14 @@ class Budget {
         $params = [$userId];
 
         if ($year) {
-            $sql .= ' AND YEAR(start_date) = ?';
+            // PostgreSQL: utiliser EXTRACT au lieu de YEAR()
+            $sql .= ' AND EXTRACT(YEAR FROM start_date) = ?';
             $params[] = $year;
         }
 
         if ($month) {
-            $sql .= ' AND MONTH(start_date) = ?';
+            // PostgreSQL: utiliser EXTRACT au lieu de MONTH()
+            $sql .= ' AND EXTRACT(MONTH FROM start_date) = ?';
             $params[] = $month;
         }
 
@@ -236,7 +238,7 @@ class Budget {
         $budgets = array_reverse($budgets);
 
         foreach ($budgets as $budget) {
-            $date = new DateTime($budget->start_date);
+            $date = new \DateTime($budget->start_date);
             $data['labels'][] = $date->format('M Y');
             $data['initial'][] = $budget->initial_amount;
             $spent = $budget->initial_amount - $budget->remaining_amount;
@@ -251,8 +253,9 @@ class Budget {
      * Récupérer les années disponibles pour le filtre
      */
     public static function getAvailableYears(int $userId) {
+        // PostgreSQL: utiliser EXTRACT au lieu de YEAR()
         $years = R::getCol(
-            'SELECT DISTINCT YEAR(start_date) as year FROM budget
+            'SELECT DISTINCT EXTRACT(YEAR FROM start_date) as year FROM budget
             WHERE user_id = ?
             ORDER BY year DESC',
             [$userId]

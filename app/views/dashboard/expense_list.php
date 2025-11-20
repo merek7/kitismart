@@ -94,10 +94,25 @@
                         $statusClass = $expense->status === 'paid' ? 'success' : 'warning';
                         $statusText = $expense->status === 'paid' ? 'Payé' : 'En attente';
 
-                        // Récupérer la catégorie depuis la BD
-                        // CRITICAL: Vérifier que categorie_id n'est pas vide avant d'appeler findById
+                        // Récupérer la catégorie (personnalisée ou par défaut)
                         $categoryName = 'Autre';
-                        if (!empty($expense->categorie_id)) {
+                        $categoryIcon = 'fa-wallet';
+                        $categoryColor = '#6b7280';
+
+                        // Vérifier d'abord si c'est une catégorie personnalisée
+                        if (!empty($expense->custom_category_id)) {
+                            $customCat = \App\Models\CustomCategory::findById(
+                                (int)$expense->custom_category_id,
+                                (int)$_SESSION['user_id']
+                            );
+                            if ($customCat && $customCat->id) {
+                                $categoryName = $customCat->name;
+                                $categoryIcon = $customCat->icon;
+                                $categoryColor = $customCat->color;
+                            }
+                        }
+                        // Sinon, récupérer la catégorie par défaut
+                        elseif (!empty($expense->categorie_id)) {
                             $categorie = \App\Models\Categorie::findById((int)$expense->categorie_id);
                             $categoryName = $categorie && $categorie->id ? $categorie->type : 'Autre';
                         }
@@ -111,7 +126,7 @@
                          data-description="<?= htmlspecialchars($expense->description) ?>">
 
                         <div class="expense-icon">
-                            <i class="fas fa-wallet"></i>
+                            <i class="fas <?= $categoryIcon ?>" style="color: <?= $categoryColor ?>"></i>
                         </div>
 
                         <div class="expense-content">
@@ -189,9 +204,20 @@
                         <div class="input-with-icon">
                             <i class="fas fa-tag"></i>
                             <select class="form-control" id="edit-category" required>
-                                <?php foreach ($categories as $category): ?>
-                                    <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
-                                <?php endforeach; ?>
+                                <optgroup label="Catégories par défaut">
+                                    <?php foreach ($categories as $category): ?>
+                                        <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                                <?php if (!empty($customCategories)): ?>
+                                    <optgroup label="Mes catégories personnalisées">
+                                        <?php foreach ($customCategories as $customCat): ?>
+                                            <option value="custom_<?= $customCat->id ?>">
+                                                <?= htmlspecialchars($customCat->name) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
+                                <?php endif; ?>
                             </select>
                         </div>
                     </div>
