@@ -95,8 +95,12 @@
                         $statusText = $expense->status === 'paid' ? 'Payé' : 'En attente';
 
                         // Récupérer la catégorie depuis la BD
-                        $categorie = \App\Models\Categorie::findById($expense->categorie_id);
-                        $categoryName = $categorie ? $categorie->type : 'Autre';
+                        // CRITICAL: Vérifier que categorie_id n'est pas vide avant d'appeler findById
+                        $categoryName = 'Autre';
+                        if (!empty($expense->categorie_id)) {
+                            $categorie = \App\Models\Categorie::findById((int)$expense->categorie_id);
+                            $categoryName = $categorie && $categorie->id ? $categorie->type : 'Autre';
+                        }
                     ?>
                     <div class="expense-card"
                          data-id="<?= $expense->id ?>"

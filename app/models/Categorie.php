@@ -107,6 +107,11 @@ class Categorie {
     }
 
     public static function findById($id) {
+        // Validation: s'assurer que $id est un entier valide
+        $id = (int)$id;
+        if ($id <= 0) {
+            return null;
+        }
         return R::load('categorie', $id);
     }
 
