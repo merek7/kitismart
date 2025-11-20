@@ -116,12 +116,27 @@ $(document).ready(function () {
             data: JSON.stringify({ expenses: expense, csrf_token: csrfToken }),
             success: function (response) {
                 if (response.success) {
-                    showGlobalMessage('Dépenses enregistrées avec succès ! Redirection...', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/expenses/list';
-                    }, 2000);
+                    // Afficher un message différent selon s'il y a des erreurs partielles
+                    if (response.errors && response.errors.length > 0) {
+                        let errorsList = response.errors.join('<br>');
+                        showGlobalMessage(
+                            `${response.created_count} dépense(s) créée(s) avec succès, mais avec des erreurs :<br>${errorsList}`,
+                            'error'
+                        );
+                    } else {
+                        showGlobalMessage('Dépenses enregistrées avec succès ! Redirection...', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/expenses/list';
+                        }, 2000);
+                    }
                 } else {
-                    showGlobalMessage(response.message || 'Une erreur est survenue');
+                    // Afficher les erreurs détaillées si disponibles
+                    if (response.errors && response.errors.length > 0) {
+                        let errorsList = response.errors.join('<br>');
+                        showGlobalMessage(`${response.message}<br>${errorsList}`, 'error');
+                    } else {
+                        showGlobalMessage(response.message || 'Une erreur est survenue', 'error');
+                    }
                 }
             },
             error: function (xhr) {
