@@ -200,17 +200,21 @@ class Expense
         error_log("After validation: budgetId=$budgetId, userId=$userId, page=$page, limit=$limit, offset=$offset");
         error_log("SQL params array: " . var_export([$budgetId, $userId, $limit, $offset], true));
 
+        error_log("BEFORE R::find() query");
         $expenses = R::find(
             'expense',
             'budget_id = ? AND budget_id IN (SELECT id FROM budget WHERE user_id = ?) ORDER BY created_at DESC LIMIT ? OFFSET ?',
             [$budgetId, $userId, $limit, $offset]
         );
+        error_log("AFTER R::find() query - Found " . count($expenses) . " expenses");
 
+        error_log("BEFORE R::count() query");
         $total = R::count(
             'expense',
             'budget_id = ? AND budget_id IN (SELECT id FROM budget WHERE user_id = ?)',
             [$budgetId, $userId]
         );
+        error_log("AFTER R::count() query - Total: $total");
 
         return [
             'expenses' => $expenses,

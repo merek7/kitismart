@@ -274,8 +274,10 @@ class ExpenseController extends Controller
     public function listPaginated()
     {
         try {
-            // Récupérer l'ID de l'utilisateur connecté
-            $userId = $_SESSION['user_id'];
+            // Récupérer l'ID de l'utilisateur connecté et le CASTER en int
+            $userId = (int)$_SESSION['user_id'];
+            error_log("=== ExpenseController::listPaginated ===");
+            error_log("userId from session: $userId (type: " . gettype($userId) . ")");
 
             // Récupérer le budget actif
             $activeBudget = Budget::getActiveBudget($userId);
@@ -294,10 +296,17 @@ class ExpenseController extends Controller
             $page = max(1, (int)($_GET['page'] ?? 1));
 
             // Récupérer les dépenses paginées
+            error_log("BEFORE getPaginatedExpensesByUser()");
             $paginatedExpenses = Expense::getPaginatedExpensesByUser($budgetId, $userId, $page);
+            error_log("AFTER getPaginatedExpensesByUser()");
 
+            error_log("BEFORE getDefaultCategories()");
             $categories = Categorie::getDefaultCategories();
+            error_log("AFTER getDefaultCategories() - Got " . count($categories) . " categories");
+
+            error_log("BEFORE CustomCategory::findByUser() with userId=$userId");
             $customCategories = CustomCategory::findByUser($userId);
+            error_log("AFTER CustomCategory::findByUser() - Got " . count($customCategories) . " custom categories");
             // Calculer les statistiques pour les dépenses de la page
             $stats = [
                 'total' => 0,
