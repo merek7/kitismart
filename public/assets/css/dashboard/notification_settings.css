@@ -35,6 +35,57 @@
     margin: 0 auto;
 }
 
+/* Settings Summary */
+.settings-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.settings-summary .summary-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.settings-summary .summary-header i {
+    font-size: 1.25rem;
+}
+
+.settings-summary .summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.settings-summary .summary-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.settings-summary .summary-item.inactive {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.settings-summary .summary-item i {
+    font-size: 1.25rem;
+}
+
+.settings-summary .summary-item strong {
+    font-weight: 700;
+}
+
 /* Feedback message */
 #feedback-message {
     border-radius: 12px;

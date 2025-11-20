@@ -16,6 +16,35 @@
                 </div>
             </div>
 
+            <!-- Résumé des paramètres actifs -->
+            <div class="settings-summary">
+                <div class="summary-header">
+                    <i class="fas fa-info-circle"></i>
+                    <span>État actuel</span>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-item <?= $settings->email_enabled ? 'active' : 'inactive' ?>">
+                        <i class="fas fa-<?= $settings->email_enabled ? 'check-circle' : 'times-circle' ?>"></i>
+                        <span>Notifications email: <strong><?= $settings->email_enabled ? 'Activées' : 'Désactivées' ?></strong></span>
+                    </div>
+                    <?php if ($settings->email_enabled): ?>
+                        <div class="summary-item active">
+                            <i class="fas fa-bell"></i>
+                            <span>
+                                <?php
+                                $activeAlerts = 0;
+                                if ($settings->budget_alert_80) $activeAlerts++;
+                                if ($settings->budget_alert_100) $activeAlerts++;
+                                if ($settings->expense_alert_enabled) $activeAlerts++;
+                                if ($settings->monthly_summary) $activeAlerts++;
+                                ?>
+                                <strong><?= $activeAlerts ?></strong> type(s) d'alerte activé(s)
+                            </span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
             <!-- Message de feedback -->
             <div id="feedback-message" class="alert" style="display: none;"></div>
 
