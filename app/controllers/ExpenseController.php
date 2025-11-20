@@ -212,8 +212,14 @@ class ExpenseController extends Controller
                 throw new \Exception("Aucun budget actif trouvé");
             }
 
+            // Valider que le budget a un ID valide
+            $budgetId = (int)($activeBudget->id ?? 0);
+            if ($budgetId <= 0) {
+                throw new \Exception("Budget actif invalide (ID manquant ou incorrect)");
+            }
+
             // Récupérer les dépenses de l'utilisateur pour le budget actif
-            $expenses = Expense::getExpensesByUser($activeBudget->id, $userId);
+            $expenses = Expense::getExpensesByUser($budgetId, $userId);
 
             // Récupérer les catégories pour le filtre
             $categories = Categorie::getDefaultCategories();
@@ -277,12 +283,18 @@ class ExpenseController extends Controller
                 throw new \Exception("Aucun budget actif trouvé");
             }
 
+            // Valider que le budget a un ID valide
+            $budgetId = (int)($activeBudget->id ?? 0);
+            if ($budgetId <= 0) {
+                throw new \Exception("Budget actif invalide (ID manquant ou incorrect)");
+            }
+
             // Récupérer le numéro de page depuis la requête
             // S'assurer que $page est toujours un entier positif (minimum 1)
             $page = max(1, (int)($_GET['page'] ?? 1));
 
             // Récupérer les dépenses paginées
-            $paginatedExpenses = Expense::getPaginatedExpensesByUser($activeBudget->id, $userId, $page);
+            $paginatedExpenses = Expense::getPaginatedExpensesByUser($budgetId, $userId, $page);
 
             $categories = Categorie::getDefaultCategories();
             $customCategories = CustomCategory::findByUser($userId);
