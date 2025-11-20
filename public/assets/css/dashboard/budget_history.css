@@ -357,7 +357,7 @@
   background-color: var(--secondary-color, #14b8a6);
 }
 
-.alert-infos {
+.alert-info {
   background-color: #d1ecf1;
   border: 1px solid #bee5eb;
   border-radius: 8px;

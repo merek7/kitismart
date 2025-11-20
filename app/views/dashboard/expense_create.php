@@ -5,8 +5,8 @@
                 <div class="col-md-6">
                     <h1><i class="fas fa-receipt"></i> Nouvelle Dépense</h1>
                 </div>
-                <div class="col-md-6">
-                    <ol class="breadcrumb">
+                <div class="col-md-6 d-flex justify-content-end align-items-center">
+                    <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a></li>
                         <li class="breadcrumb-item active">Nouvelle Dépense</li>
                     </ol>

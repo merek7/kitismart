@@ -50,6 +50,8 @@ class BudgetHistoryController extends Controller
                 'selectedYear' => $year,
                 'selectedMonth' => $month,
                 'selectedStatus' => $status,
+                'styles' => ['dashboard/budget_history.css'],
+                'pageScripts' => ['dashboard/budget_history.js'],
                 'layout' => 'dashboard'
             ]);
 

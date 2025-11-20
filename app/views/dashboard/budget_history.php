@@ -8,8 +8,8 @@
         <div class="col-md-6">
           <h1><i class="fas fa-history"></i> Historique des Budgets</h1>
         </div>
-        <div class="col-md-6">
-          <ol class="breadcrumb">
+        <div class="col-md-6 d-flex justify-content-end align-items-center">
+          <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a></li>
             <li class="breadcrumb-item active">Historique</li>
           </ol>
@@ -138,7 +138,7 @@
 
       <div class="budgets-grid">
         <?php if (empty($budgets)): ?>
-          <div class="alert-infos">
+          <div class="alert-info">
             Aucun budget trouvé avec les filtres sélectionnés.
           </div>
         <?php else: ?>
