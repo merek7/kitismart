@@ -183,11 +183,22 @@ class Expense
 
     public static function getPaginatedExpensesByUser($budgetId, $userId, $page = 1)
     {
-        // Valider et normaliser le numéro de page
+        // LOG DE DÉBOGAGE
+        error_log("=== getPaginatedExpensesByUser DEBUG ===");
+        error_log("budgetId received: " . var_export($budgetId, true) . " (type: " . gettype($budgetId) . ")");
+        error_log("userId received: " . var_export($userId, true) . " (type: " . gettype($userId) . ")");
+        error_log("page received: " . var_export($page, true) . " (type: " . gettype($page) . ")");
+
+        // Valider TOUS les paramètres
+        $budgetId = (int)$budgetId;
+        $userId = (int)$userId;
         $page = max(1, (int)$page);
 
         $limit = 6;
         $offset = ($page - 1) * $limit;
+
+        error_log("After validation: budgetId=$budgetId, userId=$userId, page=$page, limit=$limit, offset=$offset");
+        error_log("SQL params array: " . var_export([$budgetId, $userId, $limit, $offset], true));
 
         $expenses = R::find(
             'expense',
