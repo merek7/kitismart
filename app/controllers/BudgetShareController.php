@@ -366,7 +366,7 @@ class BudgetShareController extends Controller
     /**
      * Révoquer un partage
      */
-    public function revokeShare($shareId)
+    public function revokeShare($id)
     {
         try {
             if (!$this->isPostRequest()) {
@@ -387,7 +387,7 @@ class BudgetShareController extends Controller
 
             $userId = (int)$_SESSION['user_id'];
 
-            BudgetShare::revoke($shareId, $userId);
+            BudgetShare::revoke($id, $userId);
 
             return $this->jsonResponse([
                 'success' => true,
