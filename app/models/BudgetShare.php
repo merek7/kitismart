@@ -350,6 +350,17 @@ class BudgetShare
     }
 
     /**
+     * Obtenir tous les partages d'un utilisateur (actifs et inactifs)
+     */
+    public static function getAllSharesByUser(int $userId)
+    {
+        return R::find('budgetshare',
+            'created_by_user_id = ? ORDER BY is_active DESC, created_at DESC',
+            [$userId]
+        );
+    }
+
+    /**
      * Obtenir les partages d'un budget
      */
     public static function getSharesByBudget(int $budgetId, int $userId)

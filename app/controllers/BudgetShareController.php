@@ -141,6 +141,20 @@ class BudgetShareController extends Controller
      */
     public function showGuestAccess($token)
     {
+        // Vérifier si le partage existe et est valide
+        $share = BudgetShare::findByToken($token);
+        if (!$share || !BudgetShare::isValid($share)) {
+            $this->view('budget/shared_access', [
+                'title' => 'Lien Invalide',
+                'token' => $token,
+                'error' => 'Ce lien de partage est invalide, expiré ou a été désactivé.',
+                'invalid' => true,
+                'csrfToken' => '',
+                'layout' => 'guest'
+            ]);
+            return;
+        }
+
         // Si déjà authentifié comme invité avec ce token, rediriger vers le dashboard
         if (isset($_SESSION['guest_share_token']) && $_SESSION['guest_share_token'] === $token) {
             header('Location: /budget/shared/dashboard');
@@ -422,8 +436,8 @@ class BudgetShareController extends Controller
 
         $userId = (int)$_SESSION['user_id'];
 
-        // Récupérer tous les partages actifs
-        $shares = BudgetShare::getActiveSharesByUser($userId);
+        // Récupérer tous les partages (actifs et inactifs)
+        $shares = BudgetShare::getAllSharesByUser($userId);
 
         // Enrichir avec les informations du budget
         $sharesData = [];

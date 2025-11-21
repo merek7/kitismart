@@ -270,51 +270,69 @@
             </div>
 
             <div class="card-body">
-                <div class="welcome-text">
-                    <p>Entrez le mot de passe pour accéder au budget partagé</p>
-                </div>
-
-                <div id="message-container"></div>
-
-                <form id="access-form">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
-                    <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
-
-                    <div class="form-group">
-                        <label for="password">
-                            <i class="fas fa-key"></i> Mot de passe
-                        </label>
-                        <div class="password-input-group">
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                required
-                                placeholder="Entrez le mot de passe"
-                                autocomplete="off">
-                            <button type="button" class="toggle-password" id="togglePassword">
-                                <i class="fas fa-eye" id="passwordIcon"></i>
-                            </button>
+                <?php if (isset($invalid) && $invalid): ?>
+                    <!-- Partage invalide ou désactivé -->
+                    <div class="text-center">
+                        <div style="font-size: 4rem; color: #dc3545; margin-bottom: 20px;">
+                            <i class="fas fa-unlink"></i>
+                        </div>
+                        <h3 style="color: #dc3545; margin-bottom: 15px;">Lien Invalide</h3>
+                        <p style="color: #666; margin-bottom: 25px;">
+                            <?= htmlspecialchars($error ?? 'Ce lien de partage n\'est plus valide.') ?>
+                        </p>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Le propriétaire du budget a peut-être révoqué ce partage ou le lien a expiré.</span>
                         </div>
                     </div>
+                <?php else: ?>
+                    <!-- Formulaire d'accès normal -->
+                    <div class="welcome-text">
+                        <p>Entrez le mot de passe pour accéder au budget partagé</p>
+                    </div>
 
-                    <button type="submit" class="btn-access" id="submitBtn">
-                        <div class="spinner"></div>
-                        <span class="btn-text">
-                            <i class="fas fa-sign-in-alt"></i>
-                            Accéder au budget
-                        </span>
-                    </button>
-                </form>
+                    <div id="message-container"></div>
 
-                <div class="security-info">
-                    <i class="fas fa-shield-alt"></i>
-                    <p>
-                        <strong>Connexion sécurisée</strong><br>
-                        Vos données sont protégées et votre accès est limité<br>
-                        aux permissions définies par le propriétaire du budget
-                    </p>
-                </div>
+                    <form id="access-form">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                        <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
+
+                        <div class="form-group">
+                            <label for="password">
+                                <i class="fas fa-key"></i> Mot de passe
+                            </label>
+                            <div class="password-input-group">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    required
+                                    placeholder="Entrez le mot de passe"
+                                    autocomplete="off">
+                                <button type="button" class="toggle-password" id="togglePassword">
+                                    <i class="fas fa-eye" id="passwordIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-access" id="submitBtn">
+                            <div class="spinner"></div>
+                            <span class="btn-text">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Accéder au budget
+                            </span>
+                        </button>
+                    </form>
+
+                    <div class="security-info">
+                        <i class="fas fa-shield-alt"></i>
+                        <p>
+                            <strong>Connexion sécurisée</strong><br>
+                            Vos données sont protégées et votre accès est limité<br>
+                            aux permissions définies par le propriétaire du budget
+                        </p>
+                    </div>
+                <?php endif; ?>
 
                 <div class="back-home">
                     <a href="/">
@@ -326,6 +344,7 @@
     </div>
 
     <script>
+        <?php if (!isset($invalid) || !$invalid): ?>
         // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
@@ -412,6 +431,7 @@
         window.addEventListener('load', function() {
             document.getElementById('password').focus();
         });
+        <?php endif; ?>
     </script>
 </body>
 </html>
