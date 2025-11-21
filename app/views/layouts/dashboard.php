@@ -223,19 +223,160 @@
     </script>
 
     <!-- Badge de synchronisation -->
-    <div id="sync-badge" style="display: none;" title="Cliquez pour synchroniser"></div>
+    <div id="sync-badge" style="display: none;">
+        <i class="fas fa-sync-alt"></i>
+        <span class="sync-text">Synchroniser</span>
+        <span class="sync-count">0</span>
+    </div>
 
     <!-- Listener pour le badge -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const syncBadge = document.getElementById('sync-badge');
             if (syncBadge && window.syncManager) {
-                syncBadge.addEventListener('click', function() {
+                // Mettre à jour l'affichage du badge
+                const updateBadgeDisplay = async () => {
+                    if (window.offlineStorage) {
+                        const counts = await window.offlineStorage.getPendingCount();
+                        const syncCount = syncBadge.querySelector('.sync-count');
+                        const syncText = syncBadge.querySelector('.sync-text');
+
+                        if (counts.total > 0) {
+                            syncBadge.style.display = 'flex';
+                            syncCount.textContent = counts.total;
+
+                            // Texte dynamique selon le nombre
+                            if (counts.total === 1) {
+                                syncText.textContent = 'Synchroniser';
+                            } else {
+                                syncText.textContent = 'Synchroniser';
+                            }
+                        } else {
+                            syncBadge.style.display = 'none';
+                        }
+                    }
+                };
+
+                // Clic sur le badge
+                syncBadge.addEventListener('click', async function() {
                     console.log('[Badge] Synchronisation manuelle déclenchée');
-                    window.syncManager.syncAll();
+
+                    // Animation de synchronisation
+                    this.classList.add('syncing');
+                    const syncText = this.querySelector('.sync-text');
+                    const originalText = syncText.textContent;
+                    syncText.textContent = 'Synchronisation...';
+
+                    if (window.syncManager) {
+                        await window.syncManager.syncAll();
+                    }
+
+                    // Remettre le texte original et supprimer l'animation
+                    this.classList.remove('syncing');
+                    syncText.textContent = originalText;
+                    await updateBadgeDisplay();
                 });
+
+                // Mettre à jour au chargement
+                setTimeout(updateBadgeDisplay, 500);
+
+                // Mettre à jour périodiquement
+                setInterval(updateBadgeDisplay, 3000);
             }
+
+            // Forcer la vérification de la connexion et la synchronisation au chargement
+            setTimeout(async () => {
+                if (window.syncManager && window.offlineStorage) {
+                    console.log('[Dashboard] Vérification des données en attente...');
+                    const counts = await window.offlineStorage.getPendingCount();
+                    console.log('[Dashboard] Éléments en attente:', counts);
+
+                    if (navigator.onLine && counts.total > 0) {
+                        console.log('[Dashboard] Connexion active + données en attente -> Synchronisation');
+                        await window.syncManager.syncAll();
+                    }
+                }
+            }, 1000);
         });
     </script>
+
+    <!-- Style pour le badge de synchronisation amélioré -->
+    <style>
+        #sync-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(13, 148, 136, 0.4);
+            z-index: 9999;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        #sync-badge:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(13, 148, 136, 0.5);
+        }
+
+        #sync-badge i {
+            font-size: 1.2rem;
+        }
+
+        #sync-badge.syncing i {
+            animation: fa-spin 1s infinite linear;
+        }
+
+        #sync-badge .sync-count {
+            background: white;
+            color: var(--primary-color);
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        #sync-badge .sync-text {
+            font-size: 0.9rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 8px 24px rgba(13, 148, 136, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 24px rgba(13, 148, 136, 0.6), 0 0 0 8px rgba(13, 148, 136, 0.1);
+            }
+        }
+
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sync-badge {
+                padding: 0.75rem 1rem;
+                font-size: 0.85rem;
+                bottom: 15px;
+                right: 15px;
+            }
+
+            #sync-badge .sync-text {
+                display: none;
+            }
+        }
+    </style>
 </body>
 </html> 

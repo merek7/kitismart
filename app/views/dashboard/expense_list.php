@@ -179,6 +179,28 @@
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
+
+        <!-- Pagination -->
+        <?php if (isset($lastPage) && $lastPage > 1): ?>
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Page <?= $page ?? 1 ?> sur <?= $lastPage ?>
+                </div>
+                <div class="pagination-buttons">
+                    <?php if (isset($previousPage) && $previousPage >= 1): ?>
+                        <a href="/expenses/list?page=<?= $previousPage ?>" class="btn btn-secondary">
+                            <i class="fas fa-chevron-left"></i> Précédent
+                        </a>
+                    <?php endif; ?>
+
+                    <?php if (isset($nextPage) && $nextPage <= $lastPage): ?>
+                        <a href="/expenses/list?page=<?= $nextPage ?>" class="btn btn-primary">
+                            Suivant <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 

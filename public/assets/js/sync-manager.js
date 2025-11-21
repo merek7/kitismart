@@ -88,15 +88,28 @@ class SyncManager {
     }
 
     this.syncing = true;
-    console.log('[SyncManager] Début de la synchronisation...');
 
     try {
       let successCount = 0;
       let errorCount = 0;
 
-      // NOTE: On ignore pendingRequests car il utilise un format différent
-      // On se concentre uniquement sur offlineExpenses et offlineBudgets
-      // qui sont sauvegardés directement par offline-forms.js
+      console.log('[SyncManager] Début de la synchronisation...');
+
+      // Synchroniser les requêtes en attente (interceptées par le Service Worker)
+      const pendingRequests = await window.offlineStorage.getPendingRequests();
+      console.log(`[SyncManager] ${pendingRequests.length} requête(s) en attente à synchroniser`);
+
+      for (const requestData of pendingRequests) {
+        try {
+          await this.syncPendingRequest(requestData);
+          await window.offlineStorage.deleteSynced('pendingRequests', requestData.id);
+          successCount++;
+          console.log('[SyncManager] Requête synchronisée avec succès');
+        } catch (error) {
+          console.error('[SyncManager] Erreur de synchronisation de requête:', error);
+          errorCount++;
+        }
+      }
 
       // Synchroniser les dépenses
       const pendingExpenses = await window.offlineStorage.getPendingExpenses();
@@ -190,21 +203,232 @@ class SyncManager {
   }
 
   /**
-   * Synchroniser une dépense
+   * Normaliser les données d'une dépense avant synchronisation
+   * Gère à la fois l'ancien format (avec category[], amount[], etc.) et le nouveau format
    */
-  async syncExpense(expense) {
-    console.log('[DEBUG] Données brutes de l\'expense:', expense);
+  normalizeExpenseData(expense) {
+    const normalized = {};
 
-    // Préparer les données en excluant id, timestamp, synced
-    const expenseData = {};
+    // Copier les métadonnées importantes (csrf_token, etc.)
     Object.keys(expense).forEach(key => {
-      if (key !== 'id' && key !== 'timestamp' && key !== 'synced') {
-        console.log(`[DEBUG] Ajout à expenseData: ${key} = ${expense[key]}`);
-        expenseData[key] = expense[key];
+      if (key !== 'id' && key !== 'timestamp' && key !== 'synced' && !key.includes('[]')) {
+        normalized[key] = expense[key];
       }
     });
 
-    console.log('[DEBUG] JSON à envoyer:', JSON.stringify(expenseData));
+    // Vérifier si on a un format avec des tableaux (category[], amount[], etc.)
+    const hasArrayFormat = Object.keys(expense).some(key => key.endsWith('[]'));
+
+    if (hasArrayFormat) {
+      console.log('[SyncManager] Détection format tableau - conversion en cours');
+
+      // Collecter tous les champs en tableau
+      const arrays = {};
+      Object.keys(expense).forEach(key => {
+        if (key.endsWith('[]')) {
+          const baseKey = key.replace('[]', '');
+          // Si c'est une chaîne, la convertir en tableau
+          arrays[baseKey] = typeof expense[key] === 'string' ? [expense[key]] : expense[key];
+        }
+      });
+
+      // Créer le tableau d'expenses
+      if (Object.keys(arrays).length > 0) {
+        const arrayKeys = Object.keys(arrays);
+        const itemCount = Math.max(...arrayKeys.map(key => arrays[key]?.length || 0));
+
+        normalized.expenses = [];
+
+        for (let i = 0; i < itemCount; i++) {
+          const expenseItem = {};
+          arrayKeys.forEach(key => {
+            if (arrays[key][i] !== undefined && arrays[key][i] !== '') {
+              // Mapper les noms de champs
+              const mappedKey = this.mapFieldName(key);
+              expenseItem[mappedKey] = arrays[key][i];
+            }
+          });
+
+          // Ne garder que les dépenses complètes
+          if (expenseItem.description && expenseItem.amount) {
+            normalized.expenses.push(expenseItem);
+          }
+        }
+      }
+    } else if (expense.expenses && Array.isArray(expense.expenses)) {
+      // Format déjà correct avec un tableau d'expenses
+      normalized.expenses = expense.expenses;
+    } else {
+      // Format objet simple - peut-être une dépense unique
+      // Vérifier si on a les champs d'une dépense
+      if (expense.description || expense.amount || expense.category_type) {
+        const singleExpense = {};
+        ['description', 'amount', 'category_type', 'payment_date', 'status'].forEach(field => {
+          if (expense[field] !== undefined) {
+            singleExpense[field] = expense[field];
+          }
+        });
+
+        if (singleExpense.description && singleExpense.amount) {
+          normalized.expenses = [singleExpense];
+        }
+      }
+    }
+
+    return normalized;
+  }
+
+  /**
+   * Mapper les noms de champs
+   */
+  mapFieldName(fieldName) {
+    const mapping = {
+      'category': 'category_type',
+      'date': 'payment_date',
+      'status': 'status',
+      'amount': 'amount',
+      'description': 'description'
+    };
+    return mapping[fieldName] || fieldName;
+  }
+
+  /**
+   * Synchroniser une requête en attente (interceptée par le Service Worker)
+   */
+  async syncPendingRequest(requestData) {
+    console.log('[SyncManager] Synchronisation de la requête:', requestData);
+
+    // Parser le body multipart/form-data en FormData
+    let bodyToSend = requestData.body;
+    let headersToSend = { ...requestData.headers };
+
+    // Si le body est en multipart/form-data, le parser
+    if (requestData.body && headersToSend['content-type']?.includes('multipart/form-data')) {
+      console.log('[SyncManager] Parsing multipart/form-data body...');
+
+      try {
+        const formData = this.parseMultipartFormData(requestData.body, headersToSend['content-type']);
+
+        // Convertir FormData en objet JSON pour expenses/create
+        if (requestData.url.includes('/expenses/create')) {
+          const expenseData = this.formDataToExpenseJSON(formData);
+          bodyToSend = JSON.stringify(expenseData);
+          headersToSend['content-type'] = 'application/json';
+          console.log('[SyncManager] Body converti en JSON:', expenseData);
+        } else {
+          // Pour autres requêtes, recréer le FormData
+          bodyToSend = formData;
+          delete headersToSend['content-type']; // Laissez le navigateur définir la boundary
+        }
+      } catch (error) {
+        console.error('[SyncManager] Erreur de parsing multipart:', error);
+        // Fallback: essayer d'envoyer tel quel
+      }
+    }
+
+    const options = {
+      method: requestData.method,
+      headers: headersToSend,
+      body: bodyToSend
+    };
+
+    console.log('[SyncManager] Envoi de la requête:', requestData.url, options);
+
+    const response = await fetch(requestData.url, options);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Parser un body multipart/form-data en FormData
+   */
+  parseMultipartFormData(body, contentType) {
+    const formData = new FormData();
+
+    // Extraire la boundary
+    const boundaryMatch = contentType.match(/boundary=(.+?)(?:;|$)/);
+    if (!boundaryMatch) {
+      throw new Error('Boundary non trouvé dans content-type');
+    }
+
+    const boundary = '--' + boundaryMatch[1];
+    const parts = body.split(boundary).filter(part => part.trim() && !part.includes('--'));
+
+    for (const part of parts) {
+      // Extraire le nom du champ
+      const nameMatch = part.match(/name="([^"]+)"/);
+      if (!nameMatch) continue;
+
+      const fieldName = nameMatch[1];
+
+      // Extraire la valeur (après les headers, séparés par \r\n\r\n)
+      const valueMatch = part.split('\r\n\r\n')[1];
+      if (!valueMatch) continue;
+
+      const value = valueMatch.trim();
+      formData.append(fieldName, value);
+    }
+
+    return formData;
+  }
+
+  /**
+   * Convertir FormData en objet JSON pour expenses/create
+   */
+  formDataToExpenseJSON(formData) {
+    const data = {};
+    const arrays = {};
+
+    for (const [key, value] of formData.entries()) {
+      if (key.endsWith('[]')) {
+        const baseKey = key.replace('[]', '');
+        if (!arrays[baseKey]) arrays[baseKey] = [];
+        arrays[baseKey].push(value);
+      } else {
+        data[key] = value;
+      }
+    }
+
+    // Créer le tableau d'expenses
+    if (Object.keys(arrays).length > 0) {
+      const arrayKeys = Object.keys(arrays);
+      const itemCount = arrays[arrayKeys[0]]?.length || 0;
+
+      data.expenses = [];
+
+      for (let i = 0; i < itemCount; i++) {
+        const expense = {};
+        arrayKeys.forEach(key => {
+          if (arrays[key][i] !== undefined && arrays[key][i] !== '') {
+            const mappedKey = this.mapFieldName(key);
+            expense[mappedKey] = arrays[key][i];
+          }
+        });
+
+        if (expense.description && expense.amount) {
+          data.expenses.push(expense);
+        }
+      }
+    }
+
+    return data;
+  }
+
+  /**
+   * Synchroniser une dépense
+   */
+  async syncExpense(expense) {
+    console.log('[SyncManager] Données brutes de l\'expense:', expense);
+
+    // Normaliser les données au cas où elles viennent de l'ancien format
+    const normalizedExpense = this.normalizeExpenseData(expense);
+
+    console.log('[SyncManager] Données normalisées à envoyer:', normalizedExpense);
 
     // Le serveur attend du JSON, pas du FormData
     const response = await fetch('/expenses/create', {
@@ -212,7 +436,7 @@ class SyncManager {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(expenseData)
+      body: JSON.stringify(normalizedExpense)
     });
 
     if (!response.ok) {
@@ -294,12 +518,47 @@ class SyncManager {
    * Démarrer la synchronisation périodique
    */
   startPeriodicSync() {
-    // Synchroniser toutes les 5 minutes si en ligne
-    this.syncInterval = setInterval(() => {
-      if (navigator.onLine && !this.syncing) {
-        this.syncAll();
+    // Vérifier la connectivité au serveur toutes les 10 secondes
+    this.syncInterval = setInterval(async () => {
+      // Vérifier s'il y a des données en attente
+      const counts = await window.offlineStorage.getPendingCount();
+
+      if (counts.total > 0 && !this.syncing) {
+        console.log('[SyncManager] Données en attente - Vérification de la connectivité...');
+
+        // Tester si le serveur répond
+        const isServerReachable = await this.checkServerConnection();
+
+        if (isServerReachable) {
+          console.log('[SyncManager] ✅ Serveur accessible - Lancement de la synchronisation');
+          this.syncAll();
+        } else {
+          console.log('[SyncManager] ❌ Serveur inaccessible - Nouvelle tentative dans 10s');
+        }
       }
-    }, 5 * 60 * 1000);
+    }, 10 * 1000); // 10 secondes
+  }
+
+  /**
+   * Vérifier si le serveur est accessible
+   */
+  async checkServerConnection() {
+    try {
+      // Faire une requête légère vers une route qui existe toujours
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // Timeout 3s
+
+      const response = await fetch('/dashboard', {
+        method: 'HEAD', // Requête légère qui ne charge pas tout le contenu
+        signal: controller.signal,
+        cache: 'no-cache'
+      });
+
+      clearTimeout(timeoutId);
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
   }
 
   /**

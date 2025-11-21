@@ -27,6 +27,75 @@ class OfflineForms {
   }
 
   /**
+   * Normaliser les données du formulaire de dépenses
+   * Transforme les tableaux (category[], amount[], etc.) en objets individuels
+   */
+  normalizeExpenseFormData(formData) {
+    const data = {};
+    const arrays = {};
+
+    // Collecter toutes les données
+    formData.forEach((value, key) => {
+      // Si le champ se termine par [], c'est un tableau
+      if (key.endsWith('[]')) {
+        const baseKey = key.replace('[]', '');
+        if (!arrays[baseKey]) {
+          arrays[baseKey] = [];
+        }
+        arrays[baseKey].push(value);
+      } else {
+        // Champ simple (comme csrf_token)
+        data[key] = value;
+      }
+    });
+
+    // Si on a des tableaux, créer un tableau d'objets expenses
+    if (Object.keys(arrays).length > 0) {
+      // Vérifier qu'on a au moins un élément
+      const arrayKeys = Object.keys(arrays);
+      const itemCount = arrays[arrayKeys[0]]?.length || 0;
+
+      if (itemCount > 0) {
+        data.expenses = [];
+
+        // Créer un objet pour chaque dépense
+        for (let i = 0; i < itemCount; i++) {
+          const expense = {};
+          arrayKeys.forEach(key => {
+            if (arrays[key][i] !== undefined && arrays[key][i] !== '') {
+              // Mapper les noms de champs
+              const mappedKey = this.mapFieldName(key);
+              expense[mappedKey] = arrays[key][i];
+            }
+          });
+
+          // Ne garder que les dépenses complètes
+          if (expense.description && expense.amount) {
+            data.expenses.push(expense);
+          }
+        }
+      }
+    }
+
+    console.log('[OfflineForms] Données normalisées:', data);
+    return data;
+  }
+
+  /**
+   * Mapper les noms de champs du formulaire vers les noms attendus par le serveur
+   */
+  mapFieldName(fieldName) {
+    const mapping = {
+      'category': 'category_type',
+      'date': 'payment_date',
+      'status': 'status',
+      'amount': 'amount',
+      'description': 'description'
+    };
+    return mapping[fieldName] || fieldName;
+  }
+
+  /**
    * Intercepter le formulaire de dépenses
    */
   interceptExpenseForm() {
@@ -39,11 +108,9 @@ class OfflineForms {
       e.preventDefault();
 
       const formData = new FormData(expenseForm);
-      const expenseData = {};
 
-      formData.forEach((value, key) => {
-        expenseData[key] = value;
-      });
+      // Transformer les données du formulaire en structure correcte
+      const expenseData = this.normalizeExpenseFormData(formData);
 
       // Si hors ligne, sauvegarder localement
       if (!navigator.onLine) {
@@ -83,11 +150,17 @@ class OfflineForms {
         return;
       }
 
-      // Si en ligne, soumettre normalement
+      // Si en ligne, soumettre normalement en JSON
       try {
+        console.log('[OfflineForms] En ligne - Envoi au serveur en JSON');
+        console.log('[OfflineForms] Données à envoyer:', expenseData);
+
         const response = await fetch(expenseForm.action, {
           method: 'POST',
-          body: formData
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(expenseData)
         });
 
         if (response.ok) {
@@ -113,7 +186,9 @@ class OfflineForms {
             );
           }
         } else {
-          throw new Error('Erreur serveur');
+          const errorText = await response.text();
+          console.error('[OfflineForms] Erreur serveur:', response.status, errorText);
+          throw new Error(`Erreur serveur: ${response.status}`);
         }
 
       } catch (error) {
