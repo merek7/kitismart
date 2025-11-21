@@ -88,8 +88,9 @@
                                 <div class="no-shares">
                                     <i class="fas fa-info-circle"></i>
                                     <p>Vous n'avez pas encore créé de partage</p>
+                                    <p class="text-muted mt-2">Pour partager un budget, allez sur la page Budget et cliquez sur "Partager"</p>
                                     <a href="/budget/create" class="btn btn-primary mt-3">
-                                        <i class="fas fa-plus-circle"></i> Créer un partage
+                                        <i class="fas fa-wallet"></i> Aller à mes Budgets
                                     </a>
                                 </div>
                             <?php else: ?>
