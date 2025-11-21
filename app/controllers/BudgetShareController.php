@@ -299,7 +299,7 @@ class BudgetShareController extends Controller
         $categories = [];
         $customCategories = [];
         if (BudgetShare::hasPermission($permissions, 'add')) {
-            $categories = Categorie::getAll();
+            $categories = Categorie::getDefaultCategories();
             // Récupérer les catégories personnalisées du propriétaire du budget
             $share = \RedBeanPHP\R::load('budgetshare', $_SESSION['guest_share_id']);
             if ($share->created_by_user_id) {
