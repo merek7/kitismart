@@ -234,7 +234,7 @@ class BudgetShareController extends Controller
             // Logger l'accès avec le nom de l'invité
             BudgetShare::logAccess(
                 (int)$share->id,
-                BudgetShare::ACTION_LOGIN,
+                BudgetShare::ACTION_ACCESS_SUCCESS,
                 $ipAddress,
                 ['guest_name' => $guestName]
             );
