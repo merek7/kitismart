@@ -352,9 +352,15 @@ class BudgetShareController extends Controller
                 throw new TokenInvalidOrExpiredException();
             }
 
-            // Ajouter le budget_id
+            // Récupérer le share pour obtenir le user_id du propriétaire
+            $share = \RedBeanPHP\R::load('budgetshare', $shareId);
+            if (!$share || !$share->id) {
+                return $this->jsonResponse(['success' => false, 'message' => 'Partage non trouvé'], 404);
+            }
+
+            // Ajouter le budget_id et le user_id du propriétaire (requis pour la validation)
             $data['budget_id'] = $budgetId;
-            $data['user_id'] = null; // Dépense créée par un invité
+            $data['user_id'] = (int)$share->created_by_user_id;
 
             // Créer la dépense
             $expense = Expense::create($data);
