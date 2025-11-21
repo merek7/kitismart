@@ -303,7 +303,7 @@ class BudgetShareController extends Controller
             // Récupérer les catégories personnalisées du propriétaire du budget
             $share = \RedBeanPHP\R::load('budgetshare', $_SESSION['guest_share_id']);
             if ($share->created_by_user_id) {
-                $customCategories = CustomCategory::getAllByUser((int)$share->created_by_user_id);
+                $customCategories = CustomCategory::findByUser((int)$share->created_by_user_id);
             }
         }
 
