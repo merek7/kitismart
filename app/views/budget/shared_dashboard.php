@@ -1,6 +1,10 @@
 <div class="content-wrapper">
     <div class="page-header">
         <h1><i class="fas fa-eye"></i> Budget Partagé</h1>
+        <div class="welcome-guest">
+            <i class="fas fa-user-circle"></i>
+            <span>Bienvenue, <strong><?= htmlspecialchars($guestName) ?></strong></span>
+        </div>
     </div>
 
     <div class="page-content">

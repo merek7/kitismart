@@ -49,6 +49,27 @@
     transition: all 0.2s ease;
 }
 
+/* Welcome Guest */
+.welcome-guest {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--gray-100);
+    border-radius: 50px;
+    color: var(--gray-700);
+    font-size: 0.9rem;
+}
+
+.welcome-guest i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.welcome-guest strong {
+    color: var(--primary-color);
+}
+
 /* Permissions Overview Card */
 .permissions-overview-card {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));

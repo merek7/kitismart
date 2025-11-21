@@ -30,7 +30,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -288,7 +288,7 @@
                 <?php else: ?>
                     <!-- Formulaire d'accès normal -->
                     <div class="welcome-text">
-                        <p>Entrez le mot de passe pour accéder au budget partagé</p>
+                        <p>Identifiez-vous pour accéder au budget partagé</p>
                     </div>
 
                     <div id="message-container"></div>
@@ -296,6 +296,23 @@
                     <form id="access-form">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                         <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
+
+                        <div class="form-group">
+                            <label for="guest_name">
+                                <i class="fas fa-user"></i> Votre nom
+                            </label>
+                            <div class="password-input-group">
+                                <input
+                                    type="text"
+                                    id="guest_name"
+                                    name="guest_name"
+                                    required
+                                    placeholder="Entrez votre nom"
+                                    autocomplete="name"
+                                    minlength="2"
+                                    maxlength="100">
+                            </div>
+                        </div>
 
                         <div class="form-group">
                             <label for="password">
@@ -367,7 +384,20 @@
 
             const submitBtn = document.getElementById('submitBtn');
             const messageContainer = document.getElementById('message-container');
+            const guestNameInput = document.getElementById('guest_name');
             const passwordInput = document.getElementById('password');
+
+            // Validation du nom
+            if (guestNameInput.value.trim().length < 2) {
+                messageContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Veuillez entrer votre nom (minimum 2 caractères)</span>
+                    </div>
+                `;
+                guestNameInput.focus();
+                return;
+            }
 
             // Disable button and show loading
             submitBtn.disabled = true;
@@ -376,6 +406,7 @@
 
             const formData = {
                 csrf_token: document.querySelector('input[name="csrf_token"]').value,
+                guest_name: guestNameInput.value.trim(),
                 password: passwordInput.value
             };
 
@@ -427,9 +458,9 @@
             }
         });
 
-        // Focus on password field on load
+        // Focus on guest name field on load
         window.addEventListener('load', function() {
-            document.getElementById('password').focus();
+            document.getElementById('guest_name').focus();
         });
         <?php endif; ?>
     </script>

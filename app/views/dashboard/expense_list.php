@@ -148,6 +148,13 @@
 
                             <h4 class="expense-title"><?= htmlspecialchars($expense->description) ?></h4>
 
+                            <?php if (!empty($expense->guest_name)): ?>
+                                <div class="guest-indicator">
+                                    <i class="fas fa-user-friends"></i>
+                                    <span>Ajouté par <?= htmlspecialchars($expense->guest_name) ?></span>
+                                </div>
+                            <?php endif; ?>
+
                             <div class="expense-details">
                                 <span class="category-badge"><?= ucfirst(htmlspecialchars($categoryName)) ?></span>
                                 <p class="expense-amount"><?= number_format($expense->amount, 2, ',', ' ') ?> FCFA</p>

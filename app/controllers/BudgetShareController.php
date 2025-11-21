@@ -197,6 +197,15 @@ class BudgetShareController extends Controller
                 throw new TokenInvalidOrExpiredException();
             }
 
+            // Validation du nom de l'invité
+            $guestName = trim($data['guest_name'] ?? '');
+            if (strlen($guestName) < 2 || strlen($guestName) > 100) {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'message' => 'Veuillez entrer un nom valide (2-100 caractères)'
+                ], 400);
+            }
+
             $password = $data['password'] ?? '';
             $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
@@ -220,6 +229,15 @@ class BudgetShareController extends Controller
             $_SESSION['guest_budget_id'] = (int)$share->budget_id;
             $_SESSION['guest_permissions'] = $permissions;
             $_SESSION['guest_authenticated_at'] = time();
+            $_SESSION['guest_name'] = $guestName;
+
+            // Logger l'accès avec le nom de l'invité
+            BudgetShare::logAccess(
+                (int)$share->id,
+                BudgetShare::ACTION_LOGIN,
+                $ipAddress,
+                ['guest_name' => $guestName]
+            );
 
             return $this->jsonResponse([
                 'success' => true,
@@ -317,6 +335,7 @@ class BudgetShareController extends Controller
             'categories' => $categories,
             'customCategories' => $customCategories,
             'csrfToken' => $csrfToken,
+            'guestName' => $_SESSION['guest_name'] ?? 'Invité',
             'layout' => 'guest'
         ]);
     }
@@ -362,6 +381,10 @@ class BudgetShareController extends Controller
             $data['budget_id'] = $budgetId;
             $data['user_id'] = (int)$share->created_by_user_id;
 
+            // Ajouter les informations de l'invité pour traçabilité
+            $data['guest_name'] = $_SESSION['guest_name'] ?? 'Invité';
+            $data['guest_share_id'] = $shareId;
+
             // Créer la dépense
             $expense = Expense::create($data);
 
@@ -370,7 +393,11 @@ class BudgetShareController extends Controller
                 $shareId,
                 BudgetShare::ACTION_EXPENSE_CREATED,
                 $_SERVER['REMOTE_ADDR'] ?? null,
-                ['expense_id' => (int)$expense->id, 'amount' => (float)$expense->amount]
+                [
+                    'expense_id' => (int)$expense->id,
+                    'amount' => (float)$expense->amount,
+                    'guest_name' => $_SESSION['guest_name'] ?? 'Invité'
+                ]
             );
 
             return $this->jsonResponse([

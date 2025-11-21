@@ -59,7 +59,10 @@ class Expense
                 'status' => $data['status'] ?? self::STATUS_PENDING,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => null,
-                'paid_at' => null
+                'paid_at' => null,
+                // Champs pour les dépenses créées par un invité
+                'guest_name' => $data['guest_name'] ?? null,
+                'guest_share_id' => $data['guest_share_id'] ?? null
             ]);
 
             $budget->remaining_amount -= $data['amount'];
