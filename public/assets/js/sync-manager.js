@@ -17,6 +17,9 @@ class SyncManager {
     // Initialiser le stockage hors ligne
     await window.offlineStorage.init();
 
+    // Nettoyer les anciennes requêtes HEAD (vérifications de connectivité) qui ne doivent pas être synchronisées
+    await this.cleanupHeadRequests();
+
     // Écouter les messages du Service Worker
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       navigator.serviceWorker.addEventListener('message', (event) => {
@@ -61,9 +64,44 @@ class SyncManager {
   }
 
   /**
+   * Nettoyer les requêtes HEAD inutiles de IndexedDB
+   */
+  async cleanupHeadRequests() {
+    try {
+      const db = window.offlineStorage.db;
+      if (!db) return;
+
+      const transaction = db.transaction(['pendingRequests'], 'readwrite');
+      const store = transaction.objectStore('pendingRequests');
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const allRequests = request.result;
+        const headRequests = allRequests.filter(item => item.method === 'HEAD');
+
+        if (headRequests.length > 0) {
+          console.log(`[SyncManager] Nettoyage de ${headRequests.length} requête(s) HEAD inutile(s)`);
+
+          headRequests.forEach(req => {
+            store.delete(req.id);
+          });
+        }
+      };
+    } catch (error) {
+      console.error('[SyncManager] Erreur lors du nettoyage des requêtes HEAD:', error);
+    }
+  }
+
+  /**
    * Gérer une requête hors ligne
    */
   async handleOfflineRequest(requestData) {
+    // Ne pas sauvegarder les requêtes HEAD
+    if (requestData.method === 'HEAD') {
+      console.log('[SyncManager] Requête HEAD ignorée (vérification de connectivité)');
+      return;
+    }
+
     await window.offlineStorage.saveRequest(requestData);
     this.showNotification(
       'Enregistré hors ligne',
@@ -76,7 +114,7 @@ class SyncManager {
   /**
    * Synchroniser toutes les données
    */
-  async syncAll() {
+  async syncAll(showNotifications = true) {
     if (this.syncing) {
       console.log('[SyncManager] Synchronisation déjà en cours');
       return;
@@ -143,21 +181,23 @@ class SyncManager {
         }
       }
 
-      // Afficher le résultat
-      if (successCount > 0) {
-        this.showNotification(
-          'Synchronisation réussie',
-          `${successCount} élément(s) synchronisé(s)`,
-          'success'
-        );
-      }
+      // Afficher le résultat seulement si demandé
+      if (showNotifications) {
+        if (successCount > 0) {
+          this.showNotification(
+            'Synchronisation réussie',
+            `${successCount} élément(s) synchronisé(s)`,
+            'success'
+          );
+        }
 
-      if (errorCount > 0) {
-        this.showNotification(
-          'Erreurs de synchronisation',
-          `${errorCount} élément(s) n'ont pas pu être synchronisés`,
-          'error'
-        );
+        if (errorCount > 0) {
+          this.showNotification(
+            'Erreurs de synchronisation',
+            `${errorCount} élément(s) n'ont pas pu être synchronisés`,
+            'error'
+          );
+        }
       }
 
       this.updateSyncBadge();
@@ -328,7 +368,10 @@ class SyncManager {
 
     const options = {
       method: requestData.method,
-      headers: headersToSend,
+      headers: {
+        ...headersToSend,
+        'X-Sync-Request': 'true' // Marquer cette requête comme une synchronisation
+      },
       body: bodyToSend
     };
 
@@ -428,13 +471,15 @@ class SyncManager {
     // Normaliser les données au cas où elles viennent de l'ancien format
     const normalizedExpense = this.normalizeExpenseData(expense);
 
-    console.log('[SyncManager] Données normalisées à envoyer:', normalizedExpense);
+    console.log('[SyncManager] Données normalisées:', normalizedExpense);
+    console.log('[DEBUG] JSON à envoyer:', JSON.stringify(normalizedExpense));
 
     // Le serveur attend du JSON, pas du FormData
     const response = await fetch('/expenses/create', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Sync-Request': 'true' // Marquer cette requête comme une synchronisation
       },
       body: JSON.stringify(normalizedExpense)
     });
@@ -476,7 +521,8 @@ class SyncManager {
     const response = await fetch('/budget/create', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Sync-Request': 'true' // Marquer cette requête comme une synchronisation
       },
       body: JSON.stringify(budgetData)
     });
@@ -531,7 +577,7 @@ class SyncManager {
 
         if (isServerReachable) {
           console.log('[SyncManager] ✅ Serveur accessible - Lancement de la synchronisation');
-          this.syncAll();
+          this.syncAll(true); // Afficher les notifications pour la synchronisation automatique
         } else {
           console.log('[SyncManager] ❌ Serveur inaccessible - Nouvelle tentative dans 10s');
         }

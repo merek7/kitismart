@@ -167,7 +167,10 @@ class OfflineStorage {
 
       request.onsuccess = () => {
         // Filtrer pour ne garder que les éléments non synchronisés
-        const pending = request.result.filter(item => item.synced === false);
+        // ET exclure les requêtes HEAD (vérifications de connectivité)
+        const pending = request.result.filter(item =>
+          item.synced === false && item.method !== 'HEAD'
+        );
         resolve(pending);
       };
 

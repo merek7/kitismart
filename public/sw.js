@@ -2,7 +2,7 @@
 // SERVICE WORKER - KitiSmart PWA
 // ===================================
 
-const CACHE_VERSION = 'kitismart-v1.0.8';
+const CACHE_VERSION = 'kitismart-v1.1.0';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -78,7 +78,14 @@ self.addEventListener('fetch', (event) => {
   // ===================================
   // Gestion des requêtes non-GET (POST, PUT, DELETE) pour mode hors ligne
   // ===================================
-  if (request.method !== 'GET') {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    // Ignorer les requêtes HEAD (vérifications de connectivité)
+    // Ignorer aussi les requêtes de synchronisation (marquées avec X-Sync-Request)
+    if (request.headers.get('X-Sync-Request') === 'true') {
+      console.log('[SW] Requête de synchronisation détectée - pas d\'interception');
+      return; // Laisser passer la requête normalement
+    }
+
     // Cloner la requête AVANT de l'utiliser dans fetch (pour pouvoir lire le body après)
     const requestClone = request.clone();
 

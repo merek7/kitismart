@@ -102,6 +102,12 @@ class OfflineForms {
     const expenseForm = document.querySelector('form[action*="/expenses"]');
     if (!expenseForm) return;
 
+    // NE PAS intercepter si on est sur la page expense_create qui a déjà son propre gestionnaire AJAX
+    if (window.location.pathname.includes('/expenses/create')) {
+      console.log('[OfflineForms] Page expense_create détectée - interception désactivée (gestion AJAX native)');
+      return;
+    }
+
     console.log('[OfflineForms] Formulaire de dépenses trouvé');
 
     expenseForm.addEventListener('submit', async (e) => {
@@ -133,10 +139,10 @@ class OfflineForms {
           // Optionnel : réinitialiser le formulaire
           expenseForm.reset();
 
-          // Rediriger ou afficher un message
-          setTimeout(() => {
-            window.location.href = '/dashboard';
-          }, 2000);
+          // NE PAS rediriger automatiquement - laisser l'utilisateur sur la page
+          // setTimeout(() => {
+          //   window.location.href = '/dashboard';
+          // }, 2000);
 
         } catch (error) {
           console.error('[OfflineForms] Erreur:', error);
@@ -210,9 +216,10 @@ class OfflineForms {
 
         expenseForm.reset();
 
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 2000);
+        // NE PAS rediriger automatiquement - laisser l'utilisateur sur la page
+        // setTimeout(() => {
+        //   window.location.href = '/dashboard';
+        // }, 2000);
       }
     });
   }

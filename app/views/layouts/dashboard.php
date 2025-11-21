@@ -107,9 +107,9 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- PWA Offline Scripts -->
-    <script src="/assets/js/offline-storage.js"></script>
-    <script src="/assets/js/sync-manager.js"></script>
-    <script src="/assets/js/offline-forms.js"></script>
+    <script src="/assets/js/offline-storage.js?v=<?= time() ?>"></script>
+    <script src="/assets/js/sync-manager.js?v=<?= time() ?>"></script>
+    <script src="/assets/js/offline-forms.js?v=<?= time() ?>"></script>
 
     <!-- Script pour le toggle du navbar mobile -->
     <script>
@@ -241,6 +241,12 @@
                         const syncCount = syncBadge.querySelector('.sync-count');
                         const syncText = syncBadge.querySelector('.sync-text');
 
+                        // Vérifier que les éléments existent
+                        if (!syncCount || !syncText) {
+                            console.warn('[Badge] Éléments du badge introuvables');
+                            return;
+                        }
+
                         if (counts.total > 0) {
                             syncBadge.style.display = 'flex';
                             syncCount.textContent = counts.total;
@@ -264,6 +270,13 @@
                     // Animation de synchronisation
                     this.classList.add('syncing');
                     const syncText = this.querySelector('.sync-text');
+
+                    // Vérifier que l'élément existe
+                    if (!syncText) {
+                        console.warn('[Badge] Élément sync-text introuvable');
+                        return;
+                    }
+
                     const originalText = syncText.textContent;
                     syncText.textContent = 'Synchronisation...';
 
