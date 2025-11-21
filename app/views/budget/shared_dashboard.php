@@ -408,15 +408,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Récupérer les données
             const formData = {
                 csrf_token: form.querySelector('[name="csrf_token"]').value,
-                category: form.querySelector('[name="category"]').value,
+                category_type: form.querySelector('[name="category"]').value,
                 amount: parseFloat(form.querySelector('[name="amount"]').value),
                 payment_date: form.querySelector('[name="payment_date"]').value,
                 status: form.querySelector('[name="status"]').value,
-                description: form.querySelector('[name="description"]').value
+                description: form.querySelector('[name="description"]').value || ''
             };
 
             // Validation
-            if (!formData.category || !formData.amount || !formData.payment_date) {
+            if (!formData.category_type || !formData.amount || !formData.payment_date) {
                 messageContainer.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Veuillez remplir tous les champs obligatoires.</div>';
                 return;
             }

@@ -22,7 +22,7 @@
     <style>
         /* Guest-specific styles */
         .guest-navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
             padding: 15px 0;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
