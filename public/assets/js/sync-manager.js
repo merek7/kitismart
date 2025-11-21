@@ -168,10 +168,21 @@ class SyncManager {
    * Synchroniser une requête générique
    */
   async syncRequest(request) {
+    // Parser le body pour reconstruire un FormData
+    const formData = new FormData();
+
+    if (request.body) {
+      // Le body est une chaîne URLencoded, il faut la parser
+      const params = new URLSearchParams(request.body);
+      for (const [key, value] of params.entries()) {
+        formData.append(key, value);
+      }
+    }
+
     const response = await fetch(request.url, {
       method: request.method,
-      headers: request.headers,
-      body: request.body
+      body: formData
+      // Ne pas envoyer les headers originaux, FormData gère ça automatiquement
     });
 
     if (!response.ok) {
