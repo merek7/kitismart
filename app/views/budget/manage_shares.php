@@ -175,15 +175,19 @@
 
                                                 <!-- URL du partage -->
                                                 <?php if ($isActive): ?>
+                                                    <?php
+                                                        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+                                                        $shareUrl = $protocol . '://' . $_SERVER['HTTP_HOST'] . '/budget/shared/' . $share->share_token;
+                                                    ?>
                                                     <div class="share-url-container">
                                                         <label>Lien de partage:</label>
                                                         <div class="input-group">
                                                             <input type="text"
                                                                    class="form-control share-url"
-                                                                   value="<?= htmlspecialchars($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/budget/shared/' . $share->share_token) ?>"
+                                                                   value="<?= htmlspecialchars($shareUrl) ?>"
                                                                    readonly>
                                                             <button class="btn btn-outline-secondary copy-link-btn"
-                                                                    data-url="<?= htmlspecialchars($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/budget/shared/' . $share->share_token) ?>">
+                                                                    data-url="<?= htmlspecialchars($shareUrl) ?>">
                                                                 <i class="fas fa-copy"></i>
                                                             </button>
                                                         </div>
