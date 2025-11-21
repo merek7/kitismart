@@ -54,10 +54,10 @@ return [
     ['GET', '/budget/shares/manage', 'BudgetShareController#manageShares', 'budget_shares_manage'],
     ['POST', '/budget/shares/[i:id]/revoke', 'BudgetShareController#revokeShare', 'budget_share_revoke'],
 
-    // Guest Access Routes
-    ['GET', '/budget/shared/[*:token]', 'BudgetShareController#showGuestAccess', 'budget_guest_access'],
-    ['POST', '/budget/shared/[*:token]/authenticate', 'BudgetShareController#authenticateGuest', 'budget_guest_auth'],
+    // Guest Access Routes - IMPORTANT: routes spécifiques AVANT les wildcards
     ['GET', '/budget/shared/dashboard', 'BudgetShareController#guestDashboard', 'budget_guest_dashboard'],
     ['POST', '/budget/shared/expense/create', 'BudgetShareController#guestCreateExpense', 'budget_guest_expense_create'],
-    ['GET', '/budget/shared/logout', 'BudgetShareController#guestLogout', 'budget_guest_logout']
+    ['GET', '/budget/shared/logout', 'BudgetShareController#guestLogout', 'budget_guest_logout'],
+    ['GET', '/budget/shared/[*:token]', 'BudgetShareController#showGuestAccess', 'budget_guest_access'],
+    ['POST', '/budget/shared/[*:token]/authenticate', 'BudgetShareController#authenticateGuest', 'budget_guest_auth']
 ];
