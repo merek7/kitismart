@@ -161,7 +161,7 @@ $(document).ready(function () {
     });
 
     // Fonction pour soumettre réellement les dépenses
-    function submitExpenses() {
+    async function submitExpenses() {
         // Ajouter l'état de chargement
         formToSubmit.addClass('form-loading');
 
@@ -173,31 +173,64 @@ $(document).ready(function () {
                 status: $(this).find('select[name="status[]"]').val(),
                 category_type: $(this).find('select[name="category[]"]').val(),
                 description: $(this).find('textarea[name="description[]"]').val().trim(),
-                
+
             });
         });
 
         const csrfToken = $('input[name="csrf_token"]').val();
+        const dataToSend = { expenses: expense, csrf_token: csrfToken };
 
+        // Vérifier si on est hors ligne
+        if (!navigator.onLine) {
+            console.log('[ExpenseCreate] Mode hors ligne détecté');
+
+            try {
+                // Sauvegarder dans IndexedDB
+                await window.offlineStorage.saveOfflineExpense(dataToSend);
+
+                // Mettre à jour le badge
+                if (window.syncManager) {
+                    await window.syncManager.updateSyncBadge();
+                }
+
+                showGlobalMessage('Dépense enregistrée hors ligne. Elle sera synchronisée dès que vous serez en ligne.', 'success');
+                formToSubmit.trigger('reset');
+                formToSubmit.removeClass('form-loading');
+                return;
+            } catch (error) {
+                console.error('[ExpenseCreate] Erreur lors de la sauvegarde hors ligne:', error);
+                showGlobalMessage('Erreur lors de l\'enregistrement hors ligne', 'error');
+                formToSubmit.removeClass('form-loading');
+                return;
+            }
+        }
+
+        // Si en ligne, envoyer au serveur
         $.ajax({
             url: '/expenses/create',
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ expenses: expense, csrf_token: csrfToken }),
+            data: JSON.stringify(dataToSend),
             success: function (response) {
+                formToSubmit.removeClass('form-loading');
+
                 if (response.success) {
                     // Afficher un message différent selon s'il y a des erreurs partielles
                     if (response.errors && response.errors.length > 0) {
                         let errorsList = response.errors.join('<br>');
                         showGlobalMessage(
                             `${response.created_count} dépense(s) créée(s) avec succès, mais avec des erreurs :<br>${errorsList}`,
-                            'error'
+                            'warning'
                         );
+                        // Rediriger quand même après un succès partiel
+                        setTimeout(() => {
+                            window.location.href = '/expenses/list';
+                        }, 3000);
                     } else {
                         showGlobalMessage('Dépenses enregistrées avec succès ! Redirection...', 'success');
                         setTimeout(() => {
                             window.location.href = '/expenses/list';
-                        }, 2000);
+                        }, 1500);
                     }
                 } else {
                     // Afficher les erreurs détaillées si disponibles
@@ -210,18 +243,20 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr) {
+                formToSubmit.removeClass('form-loading');
+
                 try {
                     const response = JSON.parse(xhr.responseText);
                     if (response.errors) {
                         Object.keys(response.errors).forEach(field => {
                             showError($('#' + field), response.errors[field]);
                         });
-                        showGlobalMessage(response.message || 'Des erreurs ont été détectées');
+                        showGlobalMessage(response.message || 'Des erreurs ont été détectées', 'error');
                     } else {
-                        showGlobalMessage(response.message || 'Une erreur est survenue');
+                        showGlobalMessage(response.message || 'Une erreur est survenue', 'error');
                     }
                 } catch (e) {
-                    showGlobalMessage('Une erreur inattendue est survenue');
+                    showGlobalMessage('Une erreur inattendue est survenue', 'error');
                 }
             }
         });

@@ -28,14 +28,30 @@ class Expense
             if (!$budget) {
                 throw new BudgetNotFoundException("Budget non trouvé ou inactif");
             }
-            $isFixed = $data['category_type'] === Categorie::TYPE_FIXE;
 
-            $categorie = Categorie::findByType($data['category_type']);
-            
+            // Vérifier si c'est une catégorie personnalisée
+            $isCustomCategory = str_starts_with($data['category_type'], 'custom_');
+            $customCategoryId = null;
+            $categorieId = null;
+            $isFixed = false;
+
+            if ($isCustomCategory) {
+                // Extraire l'ID de la catégorie personnalisée
+                $customCategoryId = (int)str_replace('custom_', '', $data['category_type']);
+                // Pour les catégories personnalisées, mettre categorie_id à null
+                $categorieId = null;
+            } else {
+                // Catégorie par défaut
+                $isFixed = $data['category_type'] === Categorie::TYPE_FIXE;
+                $categorie = Categorie::findByType($data['category_type']);
+                $categorieId = $categorie->id;
+            }
+
             $expense = R::dispense('expense');
             $expense->import([
                 'budget_id' => $data['budget_id'],
-                'categorie_id' => $categorie->id,
+                'categorie_id' => $categorieId,
+                'custom_category_id' => $customCategoryId,
                 'amount' => $data['amount'],
                 'payment_date' => $data['payment_date'],
                 'description' => $data['description'],
@@ -51,6 +67,30 @@ class Expense
             R::store($expense);
             R::store($budget);
             R::commit();
+
+            // Déclencher les notifications après le commit
+            // DÉSACTIVÉ: Ne pas envoyer d'emails quand l'utilisateur est dans l'application
+            // Les notifications email devraient être envoyées via un cron job quotidien
+            // TODO: Implémenter un système de notifications in-app (toast/badge) au lieu d'emails
+            // TODO: Créer un cron job pour envoyer un résumé quotidien par email
+            /*
+            try {
+                // Notification pour dépense importante
+                \App\Controllers\NotificationController::sendExpenseAlert($data['user_id'], $expense);
+
+                // Notification pour seuil de budget (80% ou 100%)
+                $usagePercentage = $budget->initial_amount > 0 ?
+                    (($budget->initial_amount - $budget->remaining_amount) / $budget->initial_amount) * 100 : 0;
+
+                if ($usagePercentage >= 80) {
+                    \App\Controllers\NotificationController::sendBudgetAlert($data['user_id'], $usagePercentage, $budget);
+                }
+            } catch (\Exception $e) {
+                error_log("Erreur lors de l'envoi des notifications: " . $e->getMessage());
+                // Ne pas faire échouer la création de la dépense si les notifications échouent
+            }
+            */
+
             return $expense;
         } catch (\Exception $e) {
             R::rollback();
@@ -99,9 +139,11 @@ class Expense
                 throw new BudgetNotFoundException();
             }
 
+            $budgetChanged = false;
             if($expense->is_replicated == true){
                 $budget->remaining_amount -= $expense->amount;
                 R::store($budget);
+                $budgetChanged = true;
             }
 
 
@@ -111,6 +153,22 @@ class Expense
 
             R::store($expense);
             R::commit();
+
+            // Déclencher les notifications si le budget a changé
+            if ($budgetChanged) {
+                try {
+                    // Notification pour seuil de budget (80% ou 100%)
+                    $usagePercentage = $budget->initial_amount > 0 ?
+                        (($budget->initial_amount - $budget->remaining_amount) / $budget->initial_amount) * 100 : 0;
+
+                    if ($usagePercentage >= 80) {
+                        \App\Controllers\NotificationController::sendBudgetAlert($userId, $usagePercentage, $budget);
+                    }
+                } catch (\Exception $e) {
+                    error_log("Erreur lors de l'envoi des notifications: " . $e->getMessage());
+                }
+            }
+
             return $expense;
         } catch (\Exception $e) {
             R::rollback();
@@ -131,20 +189,38 @@ class Expense
 
     public static function getPaginatedExpensesByUser($budgetId, $userId, $page = 1)
     {
+        // LOG DE DÉBOGAGE
+        error_log("=== getPaginatedExpensesByUser DEBUG ===");
+        error_log("budgetId received: " . var_export($budgetId, true) . " (type: " . gettype($budgetId) . ")");
+        error_log("userId received: " . var_export($userId, true) . " (type: " . gettype($userId) . ")");
+        error_log("page received: " . var_export($page, true) . " (type: " . gettype($page) . ")");
+
+        // Valider TOUS les paramètres
+        $budgetId = (int)$budgetId;
+        $userId = (int)$userId;
+        $page = max(1, (int)$page);
+
         $limit = 6;
         $offset = ($page - 1) * $limit;
 
+        error_log("After validation: budgetId=$budgetId, userId=$userId, page=$page, limit=$limit, offset=$offset");
+        error_log("SQL params array: " . var_export([$budgetId, $userId, $limit, $offset], true));
+
+        error_log("BEFORE R::find() query");
         $expenses = R::find(
             'expense',
             'budget_id = ? AND budget_id IN (SELECT id FROM budget WHERE user_id = ?) ORDER BY created_at DESC LIMIT ? OFFSET ?',
             [$budgetId, $userId, $limit, $offset]
         );
+        error_log("AFTER R::find() query - Found " . count($expenses) . " expenses");
 
+        error_log("BEFORE R::count() query");
         $total = R::count(
             'expense',
             'budget_id = ? AND budget_id IN (SELECT id FROM budget WHERE user_id = ?)',
             [$budgetId, $userId]
         );
+        error_log("AFTER R::count() query - Total: $total");
 
         return [
             'expenses' => $expenses,

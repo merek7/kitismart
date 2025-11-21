@@ -55,9 +55,20 @@
                     <label for="filter-category">Catégorie</label>
                     <select id="filter-category" class="filter-select" name="category">
                         <option value="">Toutes les catégories</option>
-                        <?php foreach ($categories as $category): ?>
-                            <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
-                        <?php endforeach; ?>
+                        <optgroup label="Catégories par défaut">
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <?php if (!empty($customCategories)): ?>
+                            <optgroup label="Mes catégories personnalisées">
+                                <?php foreach ($customCategories as $customCat): ?>
+                                    <option value="custom_<?= $customCat->id ?>">
+                                        <?= htmlspecialchars($customCat->name) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        <?php endif; ?>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -94,9 +105,28 @@
                         $statusClass = $expense->status === 'paid' ? 'success' : 'warning';
                         $statusText = $expense->status === 'paid' ? 'Payé' : 'En attente';
 
-                        // Récupérer la catégorie depuis la BD
-                        $categorie = \App\Models\Categorie::findById($expense->categorie_id);
-                        $categoryName = $categorie ? $categorie->type : 'Autre';
+                        // Récupérer la catégorie (personnalisée ou par défaut)
+                        $categoryName = 'Autre';
+                        $categoryIcon = 'fa-wallet';
+                        $categoryColor = '#6b7280';
+
+                        // Vérifier d'abord si c'est une catégorie personnalisée
+                        if (!empty($expense->custom_category_id)) {
+                            $customCat = \App\Models\CustomCategory::findById(
+                                (int)$expense->custom_category_id,
+                                (int)$_SESSION['user_id']
+                            );
+                            if ($customCat && $customCat->id) {
+                                $categoryName = $customCat->name;
+                                $categoryIcon = $customCat->icon;
+                                $categoryColor = $customCat->color;
+                            }
+                        }
+                        // Sinon, récupérer la catégorie par défaut
+                        elseif (!empty($expense->categorie_id)) {
+                            $categorie = \App\Models\Categorie::findById((int)$expense->categorie_id);
+                            $categoryName = $categorie && $categorie->id ? $categorie->type : 'Autre';
+                        }
                     ?>
                     <div class="expense-card"
                          data-id="<?= $expense->id ?>"
@@ -107,7 +137,7 @@
                          data-description="<?= htmlspecialchars($expense->description) ?>">
 
                         <div class="expense-icon">
-                            <i class="fas fa-wallet"></i>
+                            <i class="fas <?= $categoryIcon ?>" style="color: <?= $categoryColor ?>"></i>
                         </div>
 
                         <div class="expense-content">
@@ -149,6 +179,28 @@
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
+
+        <!-- Pagination -->
+        <?php if (isset($lastPage) && $lastPage > 1): ?>
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Page <?= $page ?? 1 ?> sur <?= $lastPage ?>
+                </div>
+                <div class="pagination-buttons">
+                    <?php if (isset($previousPage) && $previousPage >= 1): ?>
+                        <a href="/expenses/list?page=<?= $previousPage ?>" class="btn btn-secondary">
+                            <i class="fas fa-chevron-left"></i> Précédent
+                        </a>
+                    <?php endif; ?>
+
+                    <?php if (isset($nextPage) && $nextPage <= $lastPage): ?>
+                        <a href="/expenses/list?page=<?= $nextPage ?>" class="btn btn-primary">
+                            Suivant <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -185,9 +237,20 @@
                         <div class="input-with-icon">
                             <i class="fas fa-tag"></i>
                             <select class="form-control" id="edit-category" required>
-                                <?php foreach ($categories as $category): ?>
-                                    <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
-                                <?php endforeach; ?>
+                                <optgroup label="Catégories par défaut">
+                                    <?php foreach ($categories as $category): ?>
+                                        <option value="<?= $category ?>"><?= ucfirst(htmlspecialchars($category)) ?></option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                                <?php if (!empty($customCategories)): ?>
+                                    <optgroup label="Mes catégories personnalisées">
+                                        <?php foreach ($customCategories as $customCat): ?>
+                                            <option value="custom_<?= $customCat->id ?>">
+                                                <?= htmlspecialchars($customCat->name) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
+                                <?php endif; ?>
                             </select>
                         </div>
                     </div>

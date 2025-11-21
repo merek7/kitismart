@@ -27,11 +27,86 @@ class OfflineForms {
   }
 
   /**
+   * Normaliser les données du formulaire de dépenses
+   * Transforme les tableaux (category[], amount[], etc.) en objets individuels
+   */
+  normalizeExpenseFormData(formData) {
+    const data = {};
+    const arrays = {};
+
+    // Collecter toutes les données
+    formData.forEach((value, key) => {
+      // Si le champ se termine par [], c'est un tableau
+      if (key.endsWith('[]')) {
+        const baseKey = key.replace('[]', '');
+        if (!arrays[baseKey]) {
+          arrays[baseKey] = [];
+        }
+        arrays[baseKey].push(value);
+      } else {
+        // Champ simple (comme csrf_token)
+        data[key] = value;
+      }
+    });
+
+    // Si on a des tableaux, créer un tableau d'objets expenses
+    if (Object.keys(arrays).length > 0) {
+      // Vérifier qu'on a au moins un élément
+      const arrayKeys = Object.keys(arrays);
+      const itemCount = arrays[arrayKeys[0]]?.length || 0;
+
+      if (itemCount > 0) {
+        data.expenses = [];
+
+        // Créer un objet pour chaque dépense
+        for (let i = 0; i < itemCount; i++) {
+          const expense = {};
+          arrayKeys.forEach(key => {
+            if (arrays[key][i] !== undefined && arrays[key][i] !== '') {
+              // Mapper les noms de champs
+              const mappedKey = this.mapFieldName(key);
+              expense[mappedKey] = arrays[key][i];
+            }
+          });
+
+          // Ne garder que les dépenses complètes
+          if (expense.description && expense.amount) {
+            data.expenses.push(expense);
+          }
+        }
+      }
+    }
+
+    console.log('[OfflineForms] Données normalisées:', data);
+    return data;
+  }
+
+  /**
+   * Mapper les noms de champs du formulaire vers les noms attendus par le serveur
+   */
+  mapFieldName(fieldName) {
+    const mapping = {
+      'category': 'category_type',
+      'date': 'payment_date',
+      'status': 'status',
+      'amount': 'amount',
+      'description': 'description'
+    };
+    return mapping[fieldName] || fieldName;
+  }
+
+  /**
    * Intercepter le formulaire de dépenses
    */
   interceptExpenseForm() {
     const expenseForm = document.querySelector('form[action*="/expenses"]');
     if (!expenseForm) return;
+
+    // NE PAS intercepter si on est sur la page expense_create qui a déjà son propre gestionnaire AJAX
+    if (window.location.pathname.includes('/expenses/create')) {
+      console.log('[OfflineForms] Page expense_create détectée - interception désactivée (gestion AJAX native)');
+      return;
+    }
 
     console.log('[OfflineForms] Formulaire de dépenses trouvé');
 
@@ -39,11 +114,9 @@ class OfflineForms {
       e.preventDefault();
 
       const formData = new FormData(expenseForm);
-      const expenseData = {};
 
-      formData.forEach((value, key) => {
-        expenseData[key] = value;
-      });
+      // Transformer les données du formulaire en structure correcte
+      const expenseData = this.normalizeExpenseFormData(formData);
 
       // Si hors ligne, sauvegarder localement
       if (!navigator.onLine) {
@@ -51,6 +124,11 @@ class OfflineForms {
 
         try {
           await window.offlineStorage.saveOfflineExpense(expenseData);
+
+          // Mettre à jour le badge
+          if (window.syncManager) {
+            await window.syncManager.updateSyncBadge();
+          }
 
           window.syncManager.showNotification(
             'Dépense enregistrée hors ligne',
@@ -61,10 +139,10 @@ class OfflineForms {
           // Optionnel : réinitialiser le formulaire
           expenseForm.reset();
 
-          // Rediriger ou afficher un message
-          setTimeout(() => {
-            window.location.href = '/dashboard';
-          }, 2000);
+          // NE PAS rediriger automatiquement - laisser l'utilisateur sur la page
+          // setTimeout(() => {
+          //   window.location.href = '/dashboard';
+          // }, 2000);
 
         } catch (error) {
           console.error('[OfflineForms] Erreur:', error);
@@ -78,11 +156,17 @@ class OfflineForms {
         return;
       }
 
-      // Si en ligne, soumettre normalement
+      // Si en ligne, soumettre normalement en JSON
       try {
+        console.log('[OfflineForms] En ligne - Envoi au serveur en JSON');
+        console.log('[OfflineForms] Données à envoyer:', expenseData);
+
         const response = await fetch(expenseForm.action, {
           method: 'POST',
-          body: formData
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(expenseData)
         });
 
         if (response.ok) {
@@ -108,7 +192,9 @@ class OfflineForms {
             );
           }
         } else {
-          throw new Error('Erreur serveur');
+          const errorText = await response.text();
+          console.error('[OfflineForms] Erreur serveur:', response.status, errorText);
+          throw new Error(`Erreur serveur: ${response.status}`);
         }
 
       } catch (error) {
@@ -116,6 +202,11 @@ class OfflineForms {
 
         // En cas d'erreur réseau, sauvegarder hors ligne
         await window.offlineStorage.saveOfflineExpense(expenseData);
+
+        // Mettre à jour le badge
+        if (window.syncManager) {
+          await window.syncManager.updateSyncBadge();
+        }
 
         window.syncManager.showNotification(
           'Dépense enregistrée hors ligne',
@@ -125,9 +216,10 @@ class OfflineForms {
 
         expenseForm.reset();
 
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 2000);
+        // NE PAS rediriger automatiquement - laisser l'utilisateur sur la page
+        // setTimeout(() => {
+        //   window.location.href = '/dashboard';
+        // }, 2000);
       }
     });
   }
@@ -157,6 +249,11 @@ class OfflineForms {
 
         try {
           await window.offlineStorage.saveOfflineBudget(budgetData);
+
+          // Mettre à jour le badge
+          if (window.syncManager) {
+            await window.syncManager.updateSyncBadge();
+          }
 
           window.syncManager.showNotification(
             'Budget enregistré hors ligne',
@@ -221,6 +318,11 @@ class OfflineForms {
         // En cas d'erreur réseau, sauvegarder hors ligne
         await window.offlineStorage.saveOfflineBudget(budgetData);
 
+        // Mettre à jour le badge
+        if (window.syncManager) {
+          await window.syncManager.updateSyncBadge();
+        }
+
         window.syncManager.showNotification(
           'Budget enregistré hors ligne',
           'Il sera synchronisé dès que possible',
@@ -273,22 +375,21 @@ class OfflineForms {
 window.offlineForms = new OfflineForms();
 
 // CSS pour le statut de connexion
-const style = document.createElement('style');
-style.textContent = `
+const offlineFormsStyle = document.createElement('style');
+offlineFormsStyle.textContent = `
   #connection-status {
     position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
+    bottom: 80px;
+    right: 20px;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     z-index: 9998;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
   }
 
@@ -310,7 +411,7 @@ style.textContent = `
     font-size: 0.875rem;
   }
 `;
-document.head.appendChild(style);
+document.head.appendChild(offlineFormsStyle);
 
 // Initialiser au chargement de la page
 if (document.readyState === 'loading') {

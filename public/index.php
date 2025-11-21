@@ -4,6 +4,7 @@ session_start();
 session_regenerate_id(true); 
 
 require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../app/Exceptions/Exception.php';
 
 use App\Core\Config;
 use App\Core\Database;

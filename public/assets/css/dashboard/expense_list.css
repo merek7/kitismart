@@ -329,6 +329,58 @@
     }
 }
 
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.pagination-info {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.pagination-buttons .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.pagination-buttons .btn-secondary {
+    background: #e5e7eb;
+    color: var(--text-primary);
+}
+
+.pagination-buttons .btn-secondary:hover {
+    background: #d1d5db;
+}
+
+.pagination-buttons .btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.pagination-buttons .btn-primary:hover {
+    background: var(--secondary-color);
+}
+
 /* Animations */
 @keyframes fadeIn {
     from {

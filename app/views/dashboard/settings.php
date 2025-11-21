@@ -113,6 +113,31 @@
                 </div>
             </div>
 
+            <!-- Préférences d'affichage -->
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-palette"></i> Préférences d'affichage</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6><i class="fas fa-moon"></i> Mode sombre</h6>
+                                    <p class="text-muted mb-0 small">
+                                        Réduisez la fatigue visuelle avec un thème sombre
+                                    </p>
+                                </div>
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="darkModeToggle">
+                                    <label class="custom-control-label" for="darkModeToggle"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Zone de danger -->
             <div class="row">
                 <div class="col-md-12">
@@ -255,4 +280,45 @@
     font-weight: 600;
     color: #333;
 }
+
+.custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
 </style>
+
+<script>
+// ================================
+// Mode sombre - Toggle et persistence
+// ================================
+document.addEventListener('DOMContentLoaded', function() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+    // Charger la préférence sauvegardée
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        darkModeToggle.checked = true;
+    }
+
+    // Gérer le changement
+    darkModeToggle.addEventListener('change', function() {
+        const isDark = this.checked;
+
+        // Sauvegarder la préférence
+        localStorage.setItem('darkMode', isDark);
+
+        // Appliquer le mode
+        if (isDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+
+        // Animation de transition douce
+        document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+        setTimeout(() => {
+            document.body.style.transition = '';
+        }, 300);
+    });
+});
+</script>

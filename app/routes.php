@@ -17,6 +17,10 @@ return [
     ['POST', '/budget/create', 'BudgetController#create', 'create_budget'],
     ['GET', '/budget/active', 'BudgetController#getActiveBudget', 'get_active_budget'],
     ['GET', '/budget/[i:id]/summary', 'BudgetController#getBudgetSummary', 'budget_summary'],
+    ['GET', '/budgets/history', 'BudgetHistoryController#index', 'budget_history'],
+    ['GET', '/budgets/[i:id]', 'BudgetHistoryController#show', 'budget_show'],
+    ['GET', '/budgets/history/data', 'BudgetHistoryController#getData', 'budget_history_data'],
+    ['GET', '/budgets/history/export', 'BudgetHistoryController#exportCsv', 'budget_history_export'],
     ['GET','/expenses/create','ExpenseController#showCreateExpenseForm','expense_form'],
     ['POST','/expenses/create','ExpenseController#create','expense_submit'],
     ['GET', '/expenses/list', 'ExpenseController#listPaginated', 'expense_list'],
@@ -30,8 +34,30 @@ return [
     ['POST', '/expenses/recurrences/toggle/[i:id]', 'RecurrenceController#toggle', 'recurrence_toggle'],
     ['POST', '/expenses/recurrences/update/[i:id]', 'RecurrenceController#update', 'recurrence_update'],
     ['POST', '/expenses/recurrences/delete/[i:id]', 'RecurrenceController#delete', 'recurrence_delete'],
+    ['GET', '/categories', 'CategoryController#index', 'categories_list'],
+    ['GET', '/categories/create', 'CategoryController#showCreateForm', 'category_create_form'],
+    ['POST', '/categories/create', 'CategoryController#create', 'category_create'],
+    ['GET', '/categories/[i:id]/edit', 'CategoryController#edit', 'category_edit'],
+    ['PUT', '/categories/[i:id]', 'CategoryController#update', 'category_update'],
+    ['DELETE', '/categories/[i:id]', 'CategoryController#delete', 'category_delete'],
+    ['GET', '/categories/all', 'CategoryController#getAll', 'categories_get_all'],
+    ['GET', '/notifications/settings', 'NotificationController#index', 'notifications_settings'],
+    ['POST', '/notifications/settings', 'NotificationController#update', 'notifications_update'],
     ['GET', '/settings', 'SettingsController#index', 'settings'],
     ['POST', '/settings/update-profile', 'SettingsController#updateProfile', 'settings_update_profile'],
     ['POST', '/settings/update-password', 'SettingsController#updatePassword', 'settings_update_password'],
-    ['POST', '/settings/delete-account', 'SettingsController#deleteAccount', 'settings_delete_account']
+    ['POST', '/settings/delete-account', 'SettingsController#deleteAccount', 'settings_delete_account'],
+
+    // Budget Sharing Routes
+    ['GET', '/budget/[i:id]/share', 'BudgetShareController#showShareForm', 'budget_share_form'],
+    ['POST', '/budget/[i:id]/share', 'BudgetShareController#createShare', 'budget_share_create'],
+    ['GET', '/budget/shares/manage', 'BudgetShareController#manageShares', 'budget_shares_manage'],
+    ['POST', '/budget/shares/[i:id]/revoke', 'BudgetShareController#revokeShare', 'budget_share_revoke'],
+
+    // Guest Access Routes
+    ['GET', '/budget/shared/[*:token]', 'BudgetShareController#showGuestAccess', 'budget_guest_access'],
+    ['POST', '/budget/shared/[*:token]/authenticate', 'BudgetShareController#authenticateGuest', 'budget_guest_auth'],
+    ['GET', '/budget/shared/dashboard', 'BudgetShareController#guestDashboard', 'budget_guest_dashboard'],
+    ['POST', '/budget/shared/expense/create', 'BudgetShareController#guestCreateExpense', 'budget_guest_expense_create'],
+    ['GET', '/budget/shared/logout', 'BudgetShareController#guestLogout', 'budget_guest_logout']
 ];

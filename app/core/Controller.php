@@ -76,17 +76,30 @@ class Controller {
             //$this->addScript($jsFile);
         }
 
-        if(file_exists($fullCssPath)) { 
+        if(file_exists($fullCssPath)) {
             error_log("Fichier css trouvé: " . $cssFile);
            $this->styles[] = $cssFile;
            error_log("Styles: " . print_r($this->styles, true));
         }
+    }
 
-}
     protected function jsonResponse(array $data, int $status = 200) {
         header('Content-Type: application/json');
         http_response_code($status);
-        echo json_encode($data);
+
+        $json = json_encode($data);
+
+        if ($json === false) {
+            error_log("Erreur JSON encode: " . json_last_error_msg());
+            error_log("Données: " . print_r($data, true));
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erreur de sérialisation JSON: ' . json_last_error_msg()
+            ]);
+        } else {
+            echo $json;
+        }
+
         exit;
     }
     

@@ -6,6 +6,7 @@ use App\Core\Controller;
 use App\Exceptions\BudgetNotFoundException;
 use App\Models\Budget;
 use App\Models\Expense;
+use App\Models\ExpenseRecurrence;
 
 class HomeController extends Controller
 {
@@ -39,8 +40,13 @@ class HomeController extends Controller
             // Récupérer le résumé du budget pour l'affichage
             $budgetSummary = Budget::getBudgetSummary($activeBudget->id);
             $depenseEnAttente = Expense::getPendingExpensesByUser($activeBudget->id, $_SESSION['user_id']);
+
+            // Récupérer les 3 prochaines récurrences actives
+            $recurrences = ExpenseRecurrence::getActiveByBudget($activeBudget->id);
+            $upcomingRecurrences = array_slice($recurrences, 0, 3);
+
             error_log("Budget summary: " . print_r($budgetSummary, true));
-            
+
             return $this->view('dashboard/index', [
                 'title' => 'Dashboard - KitiSmart',
                 'userName' => $_SESSION['user_name'] ?? 'Utilisateur',
@@ -48,7 +54,8 @@ class HomeController extends Controller
                 'depenseEnAttente' => $depenseEnAttente,
                 'layout' => 'dashboard',
                 'activeBudget' => $activeBudget,
-                'budgetSummary' => $budgetSummary
+                'budgetSummary' => $budgetSummary,
+                'upcomingRecurrences' => $upcomingRecurrences
             ]);
 
         } catch (BudgetNotFoundException $e) {

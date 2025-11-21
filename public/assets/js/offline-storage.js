@@ -163,11 +163,15 @@ class OfflineStorage {
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction(['pendingRequests'], 'readonly');
       const store = transaction.objectStore('pendingRequests');
-      const index = store.index('synced');
-      const request = index.getAll(false);
+      const request = store.getAll();
 
       request.onsuccess = () => {
-        resolve(request.result);
+        // Filtrer pour ne garder que les éléments non synchronisés
+        // ET exclure les requêtes HEAD (vérifications de connectivité)
+        const pending = request.result.filter(item =>
+          item.synced === false && item.method !== 'HEAD'
+        );
+        resolve(pending);
       };
 
       request.onerror = () => {
@@ -185,11 +189,12 @@ class OfflineStorage {
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction(['offlineExpenses'], 'readonly');
       const store = transaction.objectStore('offlineExpenses');
-      const index = store.index('synced');
-      const request = index.getAll(false);
+      const request = store.getAll();
 
       request.onsuccess = () => {
-        resolve(request.result);
+        // Filtrer pour ne garder que les éléments non synchronisés
+        const pending = request.result.filter(item => item.synced === false);
+        resolve(pending);
       };
 
       request.onerror = () => {
@@ -207,11 +212,12 @@ class OfflineStorage {
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction(['offlineBudgets'], 'readonly');
       const store = transaction.objectStore('offlineBudgets');
-      const index = store.index('synced');
-      const request = index.getAll(false);
+      const request = store.getAll();
 
       request.onsuccess = () => {
-        resolve(request.result);
+        // Filtrer pour ne garder que les éléments non synchronisés
+        const pending = request.result.filter(item => item.synced === false);
+        resolve(pending);
       };
 
       request.onerror = () => {
@@ -284,6 +290,7 @@ class OfflineStorage {
   async getPendingCount() {
     if (!this.db) await this.init();
 
+    // Compter tous les éléments en attente (y compris pendingRequests)
     const [requests, expenses, budgets] = await Promise.all([
       this.getPendingRequests(),
       this.getPendingExpenses(),
