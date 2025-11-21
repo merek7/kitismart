@@ -1,11 +1,6 @@
 <div class="content-wrapper">
     <div class="page-header">
         <h1><i class="fas fa-eye"></i> Budget Partagé</h1>
-        <div class="header-actions">
-            <a href="/budget/shared/logout" class="btn btn-outline-danger btn-sm">
-                <i class="fas fa-sign-out-alt"></i> Déconnexion
-            </a>
-        </div>
     </div>
 
     <div class="page-content">
@@ -408,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             const messageContainer = document.getElementById('expense-message');
-            const submitBtn = form.querySelector('button[type="submit"]');
+            const submitBtn = document.querySelector('button[form="add-expense-form"]');
 
             // Récupérer les données
             const formData = {
