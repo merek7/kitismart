@@ -21,8 +21,10 @@
 
                     foreach ($shares as $shareData) {
                         $share = $shareData['share'];
-                        $totalAccesses += $share->use_count;
-                        if (!$share->is_active) {
+                        $totalAccesses += (int)$share->use_count;
+                        $shareIsActive = (int)$share->is_active === 1;
+
+                        if (!$shareIsActive) {
                             $revokedShares++;
                         } elseif ($shareData['is_expired'] || $shareData['is_max_uses_reached']) {
                             $expiredShares++;
@@ -105,8 +107,9 @@
                                             $permissions = $shareData['permissions'];
                                             $isExpired = $shareData['is_expired'];
                                             $isMaxUsed = $shareData['is_max_uses_reached'];
-                                            $isRevoked = !$share->is_active;
-                                            $isActive = $share->is_active && !$isExpired && !$isMaxUsed;
+                                            $shareIsActive = (int)$share->is_active === 1;
+                                            $isRevoked = !$shareIsActive;
+                                            $isActive = $shareIsActive && !$isExpired && !$isMaxUsed;
                                         ?>
                                         <div class="share-card <?= !$isActive ? 'share-inactive' : '' ?>"
                                              data-share-id="<?= $share->id ?>">
