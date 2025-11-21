@@ -277,18 +277,17 @@ const offlineFormsStyle = document.createElement('style');
 offlineFormsStyle.textContent = `
   #connection-status {
     position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
+    bottom: 80px;
+    right: 20px;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     z-index: 9998;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
   }
 

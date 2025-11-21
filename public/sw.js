@@ -2,7 +2,7 @@
 // SERVICE WORKER - KitiSmart PWA
 // ===================================
 
-const CACHE_VERSION = 'kitismart-v1.0.2';
+const CACHE_VERSION = 'kitismart-v1.0.3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -140,7 +140,73 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => {
           // Si offline, retourner depuis le cache
-          return caches.match(request);
+          return caches.match(request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+
+            // Si pas en cache non plus, retourner la page offline
+            return new Response(
+              `<!DOCTYPE html>
+              <html lang="fr">
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>KitiSmart - Hors ligne</title>
+                <style>
+                  body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                    margin: 0;
+                    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+                    color: white;
+                    text-align: center;
+                    padding: 2rem;
+                  }
+                  .offline-container {
+                    max-width: 400px;
+                  }
+                  h1 {
+                    font-size: 4rem;
+                    margin: 0 0 1rem;
+                  }
+                  p {
+                    font-size: 1.2rem;
+                    margin: 0 0 2rem;
+                  }
+                  button {
+                    background: white;
+                    color: #0d9488;
+                    border: none;
+                    padding: 1rem 2rem;
+                    font-size: 1rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                  }
+                  button:hover {
+                    transform: scale(1.05);
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="offline-container">
+                  <h1>📡</h1>
+                  <h2>Page non disponible hors ligne</h2>
+                  <p>Cette page n'a pas encore été visitée. Visitez-la d'abord en ligne pour l'utiliser hors connexion.</p>
+                  <button onclick="window.location.href='/dashboard'">Retour au Dashboard</button>
+                </div>
+              </body>
+              </html>`,
+              {
+                status: 200,
+                headers: { 'Content-Type': 'text/html' }
+              }
+            );
+          });
         })
     );
     return;
