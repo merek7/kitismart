@@ -75,8 +75,46 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Ignorer les requêtes non-GET
+  // ===================================
+  // Gestion des requêtes non-GET (POST, PUT, DELETE) pour mode hors ligne
+  // ===================================
   if (request.method !== 'GET') {
+    event.respondWith(
+      fetch(request)
+        .catch(async () => {
+          // Si la requête échoue (hors ligne), stocker dans IndexedDB via le client
+          const requestData = {
+            url: request.url,
+            method: request.method,
+            headers: Object.fromEntries(request.headers.entries()),
+            body: await request.clone().text(),
+            timestamp: Date.now()
+          };
+
+          // Envoyer au client pour stockage dans IndexedDB
+          const clients = await self.clients.matchAll();
+          clients.forEach(client => {
+            client.postMessage({
+              type: 'SAVE_OFFLINE_REQUEST',
+              data: requestData
+            });
+          });
+
+          console.log('[SW] Requête sauvegardée pour synchronisation ultérieure');
+
+          return new Response(
+            JSON.stringify({
+              success: false,
+              offline: true,
+              message: 'Données enregistrées hors ligne. Elles seront synchronisées automatiquement.'
+            }),
+            {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
+        })
+    );
     return;
   }
 
@@ -213,6 +251,37 @@ self.addEventListener('message', (event) => {
       console.log('[SW] Tous les caches supprimés');
     });
   }
+
+  if (event.data && event.data.type === 'SYNC_NOW') {
+    event.waitUntil(syncOfflineData());
+  }
+});
+
+// ===================================
+// Synchronisation en arrière-plan
+// ===================================
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-offline-data') {
+    event.waitUntil(syncOfflineData());
+  }
+});
+
+async function syncOfflineData() {
+  console.log('[SW] Déclenchement de la synchronisation des données hors ligne...');
+
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => {
+    client.postMessage({
+      type: 'SYNC_OFFLINE_DATA'
+    });
+  });
+}
+
+// ===================================
+// Notification de changement de contrôleur
+// ===================================
+self.addEventListener('controllerchange', () => {
+  console.log('[SW] Nouveau Service Worker activé');
 });
 
 console.log('[SW] Service Worker chargé - Version:', CACHE_VERSION);

@@ -106,6 +106,11 @@
     <!-- Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+    <!-- PWA Offline Scripts -->
+    <script src="/assets/js/offline-storage.js"></script>
+    <script src="/assets/js/sync-manager.js"></script>
+    <script src="/assets/js/offline-forms.js"></script>
+
     <!-- Script pour le toggle du navbar mobile -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -162,19 +167,43 @@
     <script>
         // Enregistrer le Service Worker pour PWA
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('✅ Service Worker enregistré avec succès:', registration.scope);
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('✅ Service Worker enregistré avec succès:', registration.scope);
 
-                        // Vérifier les mises à jour toutes les heures
-                        setInterval(() => {
-                            registration.update();
-                        }, 60 * 60 * 1000);
-                    })
-                    .catch((error) => {
-                        console.error('❌ Erreur d\'enregistrement du Service Worker:', error);
+                    // Initialiser le gestionnaire de synchronisation
+                    if (window.syncManager) {
+                        await window.syncManager.init();
+                        console.log('✅ Sync Manager initialisé');
+                    }
+
+                    // Demander la permission pour les notifications
+                    if (window.syncManager) {
+                        await window.syncManager.requestNotificationPermission();
+                    }
+
+                    // Vérifier les mises à jour toutes les heures
+                    setInterval(() => {
+                        registration.update();
+                    }, 60 * 60 * 1000);
+
+                    // Vérifier les mises à jour du SW
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('[PWA] Nouvelle version disponible');
+                                if (confirm('Une nouvelle version est disponible. Voulez-vous actualiser ?')) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    window.location.reload();
+                                }
+                            }
+                        });
                     });
+                } catch (error) {
+                    console.error('❌ Erreur d\'enregistrement du Service Worker:', error);
+                }
             });
 
             // Écouter les mises à jour du Service Worker
@@ -183,7 +212,7 @@
             });
         }
 
-        // Détecter le mode offline/online
+        // Détecter le mode offline/online (géré par sync-manager.js maintenant)
         window.addEventListener('online', () => {
             console.log('🌐 Connexion rétablie');
         });
@@ -192,5 +221,8 @@
             console.log('📡 Mode hors ligne activé');
         });
     </script>
+
+    <!-- Badge de synchronisation -->
+    <div id="sync-badge" style="display: none;"></div>
 </body>
 </html> 
