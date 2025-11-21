@@ -105,8 +105,8 @@ class BudgetShare
             return false;
         }
 
-        // Vérifier si actif
-        if (!$share->is_active) {
+        // Vérifier si actif (cast explicite pour éviter les problèmes de type string/int)
+        if ((int)$share->is_active !== 1) {
             return false;
         }
 
@@ -116,7 +116,7 @@ class BudgetShare
         }
 
         // Vérifier le nombre max d'utilisations
-        if ($share->max_uses && $share->use_count >= $share->max_uses) {
+        if ($share->max_uses && (int)$share->use_count >= (int)$share->max_uses) {
             return false;
         }
 
