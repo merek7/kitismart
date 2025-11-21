@@ -62,24 +62,37 @@
                 <a href="/budget/create" class="nav-link <?= $currentPage === 'budget' ? 'active' : '' ?>">
                     <i class="fas fa-wallet"></i> Budget
                 </a>
-                <a href="/budgets/history" class="nav-link <?= $currentPage === 'budgets' ? 'active' : '' ?>">
-                    <i class="fas fa-history"></i> Historique
-                </a>
                 <a href="/expenses/create" class="nav-link <?= $currentPage === 'expenses' ? 'active' : '' ?>">
                     <i class="fas fa-receipt"></i> Dépenses
                 </a>
                 <a href="/categories" class="nav-link <?= $currentPage === 'categories' ? 'active' : '' ?>">
                     <i class="fas fa-tags"></i> Catégories
                 </a>
-                <a href="/expenses/recurrences" class="nav-link <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
-                    <i class="fas fa-sync-alt"></i> Récurrences
-                </a>
-                <a href="/notifications/settings" class="nav-link <?= $currentPage === 'notifications' ? 'active' : '' ?>">
-                    <i class="fas fa-bell"></i> Notifications
-                </a>
-                <a href="/settings" class="nav-link <?= $currentPage === 'settings' ? 'active' : '' ?>">
-                    <i class="fas fa-cog"></i> Paramètres
-                </a>
+
+                <!-- Menu déroulant "Plus" -->
+                <div class="nav-dropdown">
+                    <button class="nav-link nav-dropdown-toggle <?= in_array($currentPage, ['budgets', 'recurrences', 'shares', 'notifications', 'settings']) ? 'active' : '' ?>">
+                        <i class="fas fa-ellipsis-h"></i> Plus <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </button>
+                    <div class="nav-dropdown-menu">
+                        <a href="/budgets/history" class="dropdown-item <?= $currentPage === 'budgets' ? 'active' : '' ?>">
+                            <i class="fas fa-history"></i> Historique
+                        </a>
+                        <a href="/expenses/recurrences" class="dropdown-item <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
+                            <i class="fas fa-sync-alt"></i> Récurrences
+                        </a>
+                        <a href="/budget/shares/manage" class="dropdown-item <?= $currentPage === 'shares' ? 'active' : '' ?>">
+                            <i class="fas fa-share-nodes"></i> Partages
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="/notifications/settings" class="dropdown-item <?= $currentPage === 'notifications' ? 'active' : '' ?>">
+                            <i class="fas fa-bell"></i> Notifications
+                        </a>
+                        <a href="/settings" class="dropdown-item <?= $currentPage === 'settings' ? 'active' : '' ?>">
+                            <i class="fas fa-cog"></i> Paramètres
+                        </a>
+                    </div>
+                </div>
             </div>
             <div class="nav-user">
                 <div class="user-menu">
@@ -125,7 +138,7 @@
                 });
 
                 // Fermer le menu quand on clique sur un lien
-                const navLinks = navMenu.querySelectorAll('.nav-link');
+                const navLinks = navMenu.querySelectorAll('.nav-link:not(.nav-dropdown-toggle)');
                 navLinks.forEach(link => {
                     link.addEventListener('click', function() {
                         navMenu.classList.remove('nav-menu-active');
@@ -141,6 +154,33 @@
                         navToggle.classList.remove('active');
                         document.body.classList.remove('nav-open');
                     }
+                });
+            }
+
+            // Menu déroulant "Plus"
+            const dropdownToggle = document.querySelector('.nav-dropdown-toggle');
+            const dropdown = document.querySelector('.nav-dropdown');
+
+            if (dropdownToggle && dropdown) {
+                dropdownToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropdown.classList.toggle('open');
+                });
+
+                // Fermer le dropdown si on clique en dehors
+                document.addEventListener('click', function(event) {
+                    if (!dropdown.contains(event.target)) {
+                        dropdown.classList.remove('open');
+                    }
+                });
+
+                // Fermer le dropdown quand on clique sur un item
+                const dropdownItems = dropdown.querySelectorAll('.dropdown-item');
+                dropdownItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        dropdown.classList.remove('open');
+                    });
                 });
             }
         });

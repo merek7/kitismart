@@ -14,7 +14,7 @@ class BudgetShareController extends Controller
     /**
      * Afficher le formulaire de création de partage
      */
-    public function showShareForm($budgetId)
+    public function showShareForm($id)
     {
         // Vérifier l'authentification
         if (!isset($_SESSION['user_id'])) {
@@ -26,7 +26,7 @@ class BudgetShareController extends Controller
         $userId = (int)$_SESSION['user_id'];
 
         // Vérifier que le budget appartient à l'utilisateur
-        $budget = Budget::findById($budgetId, $userId);
+        $budget = Budget::findById($id, $userId);
         if (!$budget) {
             $_SESSION['error'] = "Budget non trouvé";
             header('Location: /dashboard');
@@ -34,7 +34,7 @@ class BudgetShareController extends Controller
         }
 
         // Récupérer les partages existants
-        $existingShares = BudgetShare::getSharesByBudget($budgetId, $userId);
+        $existingShares = BudgetShare::getSharesByBudget($id, $userId);
 
         $csrfToken = Csrf::generateToken();
 
@@ -51,7 +51,7 @@ class BudgetShareController extends Controller
     /**
      * Créer un nouveau partage
      */
-    public function createShare($budgetId)
+    public function createShare($id)
     {
         try {
             if (!$this->isPostRequest()) {
@@ -73,14 +73,14 @@ class BudgetShareController extends Controller
             $userId = (int)$_SESSION['user_id'];
 
             // Vérifier que le budget appartient à l'utilisateur
-            $budget = Budget::findById($budgetId, $userId);
+            $budget = Budget::findById($id, $userId);
             if (!$budget) {
                 return $this->jsonResponse(['success' => false, 'message' => 'Budget non trouvé'], 404);
             }
 
             // Préparer les données
             $shareData = [
-                'budget_id' => $budgetId,
+                'budget_id' => $id,
                 'created_by_user_id' => $userId,
                 'password' => $data['password'],
                 'permissions' => [
