@@ -74,6 +74,9 @@
                 <a href="/expenses/recurrences" class="nav-link <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
                     <i class="fas fa-sync-alt"></i> Récurrences
                 </a>
+                <a href="/budget/shares/manage" class="nav-link <?= $currentPage === 'shares' ? 'active' : '' ?>">
+                    <i class="fas fa-share-nodes"></i> Partages
+                </a>
                 <a href="/notifications/settings" class="nav-link <?= $currentPage === 'notifications' ? 'active' : '' ?>">
                     <i class="fas fa-bell"></i> Notifications
                 </a>

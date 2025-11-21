@@ -442,7 +442,7 @@ class BudgetShareController extends Controller
 
         $this->view('budget/manage_shares', [
             'title' => 'Gérer les partages',
-            'currentPage' => 'budget',
+            'currentPage' => 'shares',
             'shares' => $sharesData,
             'csrfToken' => $csrfToken,
             'layout' => 'dashboard'
