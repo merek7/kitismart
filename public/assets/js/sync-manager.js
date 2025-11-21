@@ -94,26 +94,20 @@ class SyncManager {
       let successCount = 0;
       let errorCount = 0;
 
-      // Synchroniser les requêtes en attente
-      const pendingRequests = await window.offlineStorage.getPendingRequests();
-      for (const request of pendingRequests) {
-        try {
-          await this.syncRequest(request);
-          await window.offlineStorage.deleteSynced('pendingRequests', request.id);
-          successCount++;
-        } catch (error) {
-          console.error('[SyncManager] Erreur de synchronisation:', error);
-          errorCount++;
-        }
-      }
+      // NOTE: On ignore pendingRequests car il utilise un format différent
+      // On se concentre uniquement sur offlineExpenses et offlineBudgets
+      // qui sont sauvegardés directement par offline-forms.js
 
       // Synchroniser les dépenses
       const pendingExpenses = await window.offlineStorage.getPendingExpenses();
+      console.log(`[SyncManager] ${pendingExpenses.length} dépense(s) à synchroniser`);
+
       for (const expense of pendingExpenses) {
         try {
           await this.syncExpense(expense);
           await window.offlineStorage.deleteSynced('offlineExpenses', expense.id);
           successCount++;
+          console.log('[SyncManager] Dépense synchronisée avec succès');
         } catch (error) {
           console.error('[SyncManager] Erreur de synchronisation de dépense:', error);
           errorCount++;
@@ -122,11 +116,14 @@ class SyncManager {
 
       // Synchroniser les budgets
       const pendingBudgets = await window.offlineStorage.getPendingBudgets();
+      console.log(`[SyncManager] ${pendingBudgets.length} budget(s) à synchroniser`);
+
       for (const budget of pendingBudgets) {
         try {
           await this.syncBudget(budget);
           await window.offlineStorage.deleteSynced('offlineBudgets', budget.id);
           successCount++;
+          console.log('[SyncManager] Budget synchronisé avec succès');
         } catch (error) {
           console.error('[SyncManager] Erreur de synchronisation de budget:', error);
           errorCount++;

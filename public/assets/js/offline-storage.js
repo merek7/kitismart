@@ -287,17 +287,18 @@ class OfflineStorage {
   async getPendingCount() {
     if (!this.db) await this.init();
 
-    const [requests, expenses, budgets] = await Promise.all([
-      this.getPendingRequests(),
+    // NOTE: On ignore les pendingRequests car on ne les synchronise plus
+    // On compte uniquement les expenses et budgets
+    const [expenses, budgets] = await Promise.all([
       this.getPendingExpenses(),
       this.getPendingBudgets()
     ]);
 
     return {
-      requests: requests.length,
+      requests: 0,  // Ignoré
       expenses: expenses.length,
       budgets: budgets.length,
-      total: requests.length + expenses.length + budgets.length
+      total: expenses.length + budgets.length
     };
   }
 
