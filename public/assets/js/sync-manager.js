@@ -45,7 +45,16 @@ class SyncManager {
     }
 
     // Afficher le nombre d'éléments en attente
-    this.updateSyncBadge();
+    await this.updateSyncBadge();
+
+    // Si en ligne et qu'il y a des données en attente, synchroniser immédiatement
+    const counts = await window.offlineStorage.getPendingCount();
+    if (navigator.onLine && counts.total > 0) {
+      console.log(`[SyncManager] ${counts.total} élément(s) en attente - Synchronisation immédiate`);
+      setTimeout(() => {
+        this.syncAll();
+      }, 2000); // Attendre 2 secondes que la page se charge
+    }
 
     // Synchroniser périodiquement
     this.startPeriodicSync();
@@ -385,21 +394,45 @@ syncManagerStyle.textContent = `
   }
 
   #sync-badge {
-    display: none;
     position: fixed;
     bottom: 20px;
     right: 20px;
     background-color: #F44336;
     color: white;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
+    width: 50px;
+    height: 50px;
+    display: none;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
     z-index: 9999;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+  }
+
+  #sync-badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(244, 67, 54, 0.6);
+    animation: none;
+  }
+
+  #sync-badge[style*="display: inline"] {
+    display: flex !important;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(244, 67, 54, 0.6);
+    }
   }
 `;
 document.head.appendChild(syncManagerStyle);

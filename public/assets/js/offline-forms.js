@@ -52,6 +52,11 @@ class OfflineForms {
         try {
           await window.offlineStorage.saveOfflineExpense(expenseData);
 
+          // Mettre à jour le badge
+          if (window.syncManager) {
+            await window.syncManager.updateSyncBadge();
+          }
+
           window.syncManager.showNotification(
             'Dépense enregistrée hors ligne',
             'Elle sera synchronisée dès que vous serez en ligne',
@@ -117,6 +122,11 @@ class OfflineForms {
         // En cas d'erreur réseau, sauvegarder hors ligne
         await window.offlineStorage.saveOfflineExpense(expenseData);
 
+        // Mettre à jour le badge
+        if (window.syncManager) {
+          await window.syncManager.updateSyncBadge();
+        }
+
         window.syncManager.showNotification(
           'Dépense enregistrée hors ligne',
           'Elle sera synchronisée dès que possible',
@@ -157,6 +167,11 @@ class OfflineForms {
 
         try {
           await window.offlineStorage.saveOfflineBudget(budgetData);
+
+          // Mettre à jour le badge
+          if (window.syncManager) {
+            await window.syncManager.updateSyncBadge();
+          }
 
           window.syncManager.showNotification(
             'Budget enregistré hors ligne',
@@ -220,6 +235,11 @@ class OfflineForms {
 
         // En cas d'erreur réseau, sauvegarder hors ligne
         await window.offlineStorage.saveOfflineBudget(budgetData);
+
+        // Mettre à jour le badge
+        if (window.syncManager) {
+          await window.syncManager.updateSyncBadge();
+        }
 
         window.syncManager.showNotification(
           'Budget enregistré hors ligne',

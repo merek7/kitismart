@@ -223,6 +223,19 @@
     </script>
 
     <!-- Badge de synchronisation -->
-    <div id="sync-badge" style="display: none;"></div>
+    <div id="sync-badge" style="display: none;" title="Cliquez pour synchroniser"></div>
+
+    <!-- Listener pour le badge -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const syncBadge = document.getElementById('sync-badge');
+            if (syncBadge && window.syncManager) {
+                syncBadge.addEventListener('click', function() {
+                    console.log('[Badge] Synchronisation manuelle déclenchée');
+                    window.syncManager.syncAll();
+                });
+            }
+        });
+    </script>
 </body>
 </html> 
