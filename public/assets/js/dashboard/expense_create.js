@@ -212,19 +212,25 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify(dataToSend),
             success: function (response) {
+                formToSubmit.removeClass('form-loading');
+
                 if (response.success) {
                     // Afficher un message différent selon s'il y a des erreurs partielles
                     if (response.errors && response.errors.length > 0) {
                         let errorsList = response.errors.join('<br>');
                         showGlobalMessage(
                             `${response.created_count} dépense(s) créée(s) avec succès, mais avec des erreurs :<br>${errorsList}`,
-                            'error'
+                            'warning'
                         );
+                        // Rediriger quand même après un succès partiel
+                        setTimeout(() => {
+                            window.location.href = '/expenses/list';
+                        }, 3000);
                     } else {
                         showGlobalMessage('Dépenses enregistrées avec succès ! Redirection...', 'success');
                         setTimeout(() => {
                             window.location.href = '/expenses/list';
-                        }, 2000);
+                        }, 1500);
                     }
                 } else {
                     // Afficher les erreurs détaillées si disponibles
@@ -237,18 +243,20 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr) {
+                formToSubmit.removeClass('form-loading');
+
                 try {
                     const response = JSON.parse(xhr.responseText);
                     if (response.errors) {
                         Object.keys(response.errors).forEach(field => {
                             showError($('#' + field), response.errors[field]);
                         });
-                        showGlobalMessage(response.message || 'Des erreurs ont été détectées');
+                        showGlobalMessage(response.message || 'Des erreurs ont été détectées', 'error');
                     } else {
-                        showGlobalMessage(response.message || 'Une erreur est survenue');
+                        showGlobalMessage(response.message || 'Une erreur est survenue', 'error');
                     }
                 } catch (e) {
-                    showGlobalMessage('Une erreur inattendue est survenue');
+                    showGlobalMessage('Une erreur inattendue est survenue', 'error');
                 }
             }
         });

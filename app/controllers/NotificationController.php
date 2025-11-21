@@ -110,9 +110,9 @@ class NotificationController extends Controller
             $data = [
                 'user_name' => $user->nom,
                 'percentage' => round($percentage, 2),
-                'budget_initial' => number_format($budget->initial_amount, 2, ',', ' '),
-                'budget_remaining' => number_format($budget->remaining_amount, 2, ',', ' '),
-                'budget_spent' => number_format($budget->initial_amount - $budget->remaining_amount, 2, ',', ' '),
+                'budget_initial' => number_format((float)$budget->initial_amount, 2, ',', ' '),
+                'budget_remaining' => number_format((float)$budget->remaining_amount, 2, ',', ' '),
+                'budget_spent' => number_format((float)$budget->initial_amount - (float)$budget->remaining_amount, 2, ',', ' '),
                 'is_over_budget' => $percentage > 100
             ];
 
