@@ -309,8 +309,8 @@ class SyncManager {
 window.syncManager = new SyncManager();
 
 // CSS pour les notifications
-const style = document.createElement('style');
-style.textContent = `
+const syncManagerStyle = document.createElement('style');
+syncManagerStyle.textContent = `
   .notification {
     position: fixed;
     top: 20px;
@@ -402,4 +402,4 @@ style.textContent = `
     z-index: 9999;
   }
 `;
-document.head.appendChild(style);
+document.head.appendChild(syncManagerStyle);

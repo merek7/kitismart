@@ -273,8 +273,8 @@ class OfflineForms {
 window.offlineForms = new OfflineForms();
 
 // CSS pour le statut de connexion
-const style = document.createElement('style');
-style.textContent = `
+const offlineFormsStyle = document.createElement('style');
+offlineFormsStyle.textContent = `
   #connection-status {
     position: fixed;
     top: 10px;
@@ -310,7 +310,7 @@ style.textContent = `
     font-size: 0.875rem;
   }
 `;
-document.head.appendChild(style);
+document.head.appendChild(offlineFormsStyle);
 
 // Initialiser au chargement de la page
 if (document.readyState === 'loading') {
