@@ -59,5 +59,11 @@ return [
     ['POST', '/budget/shared/expense/create', 'BudgetShareController#guestCreateExpense', 'budget_guest_expense_create'],
     ['GET', '/budget/shared/logout', 'BudgetShareController#guestLogout', 'budget_guest_logout'],
     ['GET', '/budget/shared/[*:token]', 'BudgetShareController#showGuestAccess', 'budget_guest_access'],
-    ['POST', '/budget/shared/[*:token]/authenticate', 'BudgetShareController#authenticateGuest', 'budget_guest_auth']
+    ['POST', '/budget/shared/[*:token]/authenticate', 'BudgetShareController#authenticateGuest', 'budget_guest_auth'],
+
+    // Onboarding API Routes
+    ['POST', '/api/onboarding/complete/[a:step]', 'OnboardingController#completeStep', 'onboarding_complete'],
+    ['POST', '/api/onboarding/skip/[a:step]', 'OnboardingController#skipStep', 'onboarding_skip'],
+    ['GET', '/api/onboarding/status', 'OnboardingController#getStatus', 'onboarding_status'],
+    ['POST', '/api/onboarding/reset', 'OnboardingController#reset', 'onboarding_reset']
 ];

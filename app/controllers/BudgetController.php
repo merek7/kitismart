@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Budget;
+use App\Models\UserOnboarding;
 use App\Utils\Csrf;
 use App\Exceptions\TokenInvalidOrExpiredException;
 
@@ -16,6 +17,11 @@ class BudgetController extends Controller {
             $depense= $activeBudget ? Budget::getBudgetSummary($activeBudget->id) : null;
             $previousBudgets = Budget::getPreviousBudgets($_SESSION['user_id'], 50);
 
+            // Préparer les données d'onboarding
+            $onboarding = [
+                'stepsToShow' => UserOnboarding::getStepsForPage((int)$_SESSION['user_id'], 'budget_create')
+            ];
+
             $this->view('dashboard/budget_create', [
                 'title' => 'Créer un budget',
                 'currentPage' => 'budget',
@@ -24,6 +30,7 @@ class BudgetController extends Controller {
                 'activeBudget' => $activeBudget,
                 'expensesSummary' => $depense,
                 'previousBudgets' => $previousBudgets,
+                'onboarding' => $onboarding
             ]);
         } catch (\Exception $e) {
             error_log("Erreur lors de la création du formulaire de budget: " . $e->getMessage());

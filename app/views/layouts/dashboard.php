@@ -41,6 +41,10 @@
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
+    <!-- Shepherd.js CSS pour l'onboarding -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/css/shepherd.css" />
+    <link rel="stylesheet" href="/assets/css/onboarding/onboarding.css" />
+
 </head>
 <body>
     <!-- Navbar -->
@@ -200,6 +204,15 @@
 
     <!-- PWA Install Script -->
     <script src="/assets/js/pwa-install.js"></script>
+
+    <!-- Onboarding Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js"></script>
+    <?php if (!empty($onboarding) && !empty($onboarding['stepsToShow'])): ?>
+        <script>
+            window.onboardingConfig = <?= json_encode($onboarding) ?>;
+        </script>
+        <script src="/assets/js/onboarding/onboarding.js"></script>
+    <?php endif; ?>
 
     <!-- ================================
          PWA Service Worker Registration
