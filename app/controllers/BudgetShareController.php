@@ -486,7 +486,11 @@ class BudgetShareController extends Controller
      */
     private function isGuestAuthenticated(): bool
     {
+        error_log("isGuestAuthenticated() - Checking...");
+        error_log("isGuestAuthenticated() - SESSION: " . json_encode($_SESSION));
+
         if (!isset($_SESSION['guest_authenticated']) || $_SESSION['guest_authenticated'] !== true) {
+            error_log("isGuestAuthenticated() - FAIL: guest_authenticated not set or not true");
             return false;
         }
 
@@ -494,18 +498,22 @@ class BudgetShareController extends Controller
         $sessionTimeout = 2 * 60 * 60; // 2 heures en secondes
         if (isset($_SESSION['guest_authenticated_at'])) {
             if ((time() - $_SESSION['guest_authenticated_at']) > $sessionTimeout) {
+                error_log("isGuestAuthenticated() - FAIL: session timeout");
                 return false;
             }
         }
 
         // Vérifier que le partage est toujours valide
         if (isset($_SESSION['guest_share_id'])) {
+            error_log("isGuestAuthenticated() - Loading share id: " . $_SESSION['guest_share_id']);
             $share = \RedBeanPHP\R::load('budgetshare', $_SESSION['guest_share_id']);
             if (!BudgetShare::isValid($share)) {
+                error_log("isGuestAuthenticated() - FAIL: share not valid");
                 return false;
             }
         }
 
+        error_log("isGuestAuthenticated() - SUCCESS");
         return true;
     }
 }

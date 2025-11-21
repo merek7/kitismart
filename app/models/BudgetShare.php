@@ -101,25 +101,35 @@ class BudgetShare
      */
     public static function isValid($share): bool
     {
+        // Debug logging
+        error_log("BudgetShare::isValid() - Checking share");
+
         if (!$share || !$share->id) {
+            error_log("BudgetShare::isValid() - FAIL: share is null or no id");
             return false;
         }
 
+        error_log("BudgetShare::isValid() - share_id=" . $share->id . ", is_active=" . var_export($share->is_active, true) . ", type=" . gettype($share->is_active));
+
         // Vérifier si actif (cast explicite pour éviter les problèmes de type string/int)
         if ((int)$share->is_active !== 1) {
+            error_log("BudgetShare::isValid() - FAIL: is_active check failed, (int)is_active=" . (int)$share->is_active);
             return false;
         }
 
         // Vérifier l'expiration
         if ($share->expires_at && strtotime($share->expires_at) < time()) {
+            error_log("BudgetShare::isValid() - FAIL: expired, expires_at=" . $share->expires_at);
             return false;
         }
 
         // Vérifier le nombre max d'utilisations
         if ($share->max_uses && (int)$share->use_count >= (int)$share->max_uses) {
+            error_log("BudgetShare::isValid() - FAIL: max_uses reached, use_count=" . $share->use_count . ", max_uses=" . $share->max_uses);
             return false;
         }
 
+        error_log("BudgetShare::isValid() - SUCCESS");
         return true;
     }
 
