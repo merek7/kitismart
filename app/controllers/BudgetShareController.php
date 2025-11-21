@@ -6,6 +6,8 @@ use App\Core\Controller;
 use App\Models\Budget;
 use App\Models\BudgetShare;
 use App\Models\Expense;
+use App\Models\Categorie;
+use App\Models\CustomCategory;
 use App\Utils\Csrf;
 use App\Exceptions\TokenInvalidOrExpiredException;
 
@@ -293,6 +295,18 @@ class BudgetShareController extends Controller
 
         $csrfToken = Csrf::generateToken();
 
+        // Récupérer les catégories si permission d'ajouter
+        $categories = [];
+        $customCategories = [];
+        if (BudgetShare::hasPermission($permissions, 'add')) {
+            $categories = Categorie::getAll();
+            // Récupérer les catégories personnalisées du propriétaire du budget
+            $share = \RedBeanPHP\R::load('budgetshare', $_SESSION['guest_share_id']);
+            if ($share->created_by_user_id) {
+                $customCategories = CustomCategory::getAllByUser((int)$share->created_by_user_id);
+            }
+        }
+
         $this->view('budget/shared_dashboard', [
             'title' => 'Budget Partagé',
             'currentPage' => 'shared_budget',
@@ -300,6 +314,8 @@ class BudgetShareController extends Controller
             'expenses' => $expenses,
             'stats' => $stats,
             'permissions' => $permissions,
+            'categories' => $categories,
+            'customCategories' => $customCategories,
             'csrfToken' => $csrfToken,
             'layout' => 'guest'
         ]);

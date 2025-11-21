@@ -1,175 +1,174 @@
 <div class="content-wrapper">
     <div class="page-header">
-        <h1><i class="fas fa-eye"></i> Consultation du Budget</h1>
+        <h1><i class="fas fa-eye"></i> Budget Partagé</h1>
+        <div class="header-actions">
+            <a href="/budget/shared/logout" class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
     </div>
 
     <div class="page-content">
         <div class="container">
-            <!-- Informations du budget -->
+            <!-- Carte des permissions -->
             <div class="row mb-4">
                 <div class="col-md-12">
-                    <div class="card budget-overview-card">
-                        <div class="card-body">
-                            <h3><i class="fas fa-wallet"></i> <?= htmlspecialchars($budget->name ?? 'Budget') ?></h3>
-                            <div class="budget-details">
-                                <div class="budget-period">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <span>Période: Du <?= date('d/m/Y', strtotime($budget->start_date)) ?>
-                                    <?= $budget->end_date ? ' au ' . date('d/m/Y', strtotime($budget->end_date)) : ' (En cours)' ?>
-                                    </span>
-                                </div>
-                                <?php if ($stats): ?>
-                                    <div class="budget-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-icon">
-                                                <i class="fas fa-coins"></i>
-                                            </div>
-                                            <div class="stat-details">
-                                                <div class="stat-label">Budget Initial</div>
-                                                <div class="stat-value"><?= number_format($budget->initial_amount, 0, ',', ' ') ?> FCFA</div>
-                                            </div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-icon">
-                                                <i class="fas fa-shopping-cart"></i>
-                                            </div>
-                                            <div class="stat-details">
-                                                <div class="stat-label">Dépensé</div>
-                                                <div class="stat-value text-danger"><?= number_format($stats['total'], 0, ',', ' ') ?> FCFA</div>
-                                            </div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-icon">
-                                                <i class="fas fa-check-circle"></i>
-                                            </div>
-                                            <div class="stat-details">
-                                                <div class="stat-label">Restant</div>
-                                                <div class="stat-value text-success"><?= number_format($budget->remaining_amount, 0, ',', ' ') ?> FCFA</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Barre de progression -->
-                                    <div class="budget-progress-bar">
-                                        <?php
-                                            $percentage = $budget->initial_amount > 0
-                                                ? (($budget->initial_amount - $budget->remaining_amount) / $budget->initial_amount) * 100
-                                                : 0;
-                                            $progressClass = $percentage < 50 ? 'bg-success' :
-                                                            ($percentage < 80 ? 'bg-warning' : 'bg-danger');
-                                        ?>
-                                        <div class="progress" style="height: 25px;">
-                                            <div class="progress-bar <?= $progressClass ?>"
-                                                 role="progressbar"
-                                                 style="width: <?= min($percentage, 100) ?>%"
-                                                 aria-valuenow="<?= $percentage ?>"
-                                                 aria-valuemin="0"
-                                                 aria-valuemax="100">
-                                                <?= round($percentage, 1) ?>% utilisé
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
+                    <div class="permissions-overview-card">
+                        <div class="permissions-header">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Vos autorisations</span>
+                        </div>
+                        <div class="permissions-list">
+                            <div class="permission-item <?= $permissions['can_view'] ? 'active' : 'inactive' ?>">
+                                <i class="fas fa-eye"></i>
+                                <span>Consulter</span>
+                            </div>
+                            <div class="permission-item <?= $permissions['can_add'] ? 'active' : 'inactive' ?>">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Ajouter</span>
+                            </div>
+                            <div class="permission-item <?= $permissions['can_edit'] ? 'active' : 'inactive' ?>">
+                                <i class="fas fa-edit"></i>
+                                <span>Modifier</span>
+                            </div>
+                            <div class="permission-item <?= $permissions['can_delete'] ? 'active' : 'inactive' ?>">
+                                <i class="fas fa-trash"></i>
+                                <span>Supprimer</span>
+                            </div>
+                            <div class="permission-item <?= $permissions['can_view_stats'] ? 'active' : 'inactive' ?>">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Statistiques</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Permissions de l'invité -->
-            <div class="row mb-3">
+            <!-- Résumé du budget -->
+            <?php if ($stats): ?>
+            <div class="row mb-4">
                 <div class="col-md-12">
-                    <div class="card permissions-card">
-                        <div class="card-body">
-                            <h5><i class="fas fa-key"></i> Vos permissions</h5>
-                            <div class="permissions-badges">
-                                <?php if ($permissions['can_view']): ?>
-                                    <span class="badge badge-primary"><i class="fas fa-eye"></i> Consulter</span>
-                                <?php endif; ?>
-                                <?php if ($permissions['can_add']): ?>
-                                    <span class="badge badge-success"><i class="fas fa-plus"></i> Ajouter</span>
-                                <?php endif; ?>
-                                <?php if ($permissions['can_edit']): ?>
-                                    <span class="badge badge-warning"><i class="fas fa-edit"></i> Modifier</span>
-                                <?php endif; ?>
-                                <?php if ($permissions['can_delete']): ?>
-                                    <span class="badge badge-danger"><i class="fas fa-trash"></i> Supprimer</span>
-                                <?php endif; ?>
-                                <?php if ($permissions['can_view_stats']): ?>
-                                    <span class="badge badge-info"><i class="fas fa-chart-bar"></i> Statistiques</span>
-                                <?php endif; ?>
+                    <div class="budget-summary-card">
+                        <div class="summary-header">
+                            <h3><i class="fas fa-wallet"></i> <?= htmlspecialchars($budget->name ?? 'Budget') ?></h3>
+                            <span class="budget-period">
+                                <i class="fas fa-calendar-alt"></i>
+                                Du <?= date('d/m/Y', strtotime($budget->start_date)) ?>
+                                <?= $budget->end_date ? ' au ' . date('d/m/Y', strtotime($budget->end_date)) : ' (En cours)' ?>
+                            </span>
+                        </div>
+                        <div class="summary-stats">
+                            <div class="stat-card stat-initial">
+                                <div class="stat-icon">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Budget Initial</span>
+                                    <span class="stat-value"><?= number_format($budget->initial_amount, 0, ',', ' ') ?> FCFA</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-spent">
+                                <div class="stat-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Total Dépensé</span>
+                                    <span class="stat-value"><?= number_format($stats['total'], 0, ',', ' ') ?> FCFA</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-remaining">
+                                <div class="stat-icon">
+                                    <i class="fas fa-piggy-bank"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Restant</span>
+                                    <span class="stat-value"><?= number_format($budget->remaining_amount, 0, ',', ' ') ?> FCFA</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Barre de progression -->
+                        <?php
+                            $percentage = $budget->initial_amount > 0
+                                ? (($budget->initial_amount - $budget->remaining_amount) / $budget->initial_amount) * 100
+                                : 0;
+                            $progressClass = $percentage < 50 ? 'progress-success' :
+                                            ($percentage < 80 ? 'progress-warning' : 'progress-danger');
+                        ?>
+                        <div class="budget-progress-wrapper">
+                            <div class="progress-info">
+                                <span>Utilisation du budget</span>
+                                <span class="percentage"><?= round($percentage, 1) ?>%</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill <?= $progressClass ?>" style="width: <?= min($percentage, 100) ?>%"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Bouton d'ajout de dépense si permission -->
-            <?php if ($permissions['can_add']): ?>
-                <div class="row mb-3">
-                    <div class="col-md-12">
-                        <button type="button" class="btn btn-primary" id="add-expense-btn">
-                            <i class="fas fa-plus-circle"></i> Ajouter une dépense
-                        </button>
-                    </div>
-                </div>
             <?php endif; ?>
 
             <!-- Liste des dépenses -->
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card">
+                    <div class="card expenses-card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-list"></i> Dépenses
+                                <i class="fas fa-list-ul"></i> Liste des Dépenses
                             </h3>
+                            <?php if ($permissions['can_add']): ?>
+                            <div class="card-tools">
+                                <button type="button" id="add-expense-btn" class="btn btn-primary btn-action">
+                                    <i class="fas fa-plus-circle"></i> Nouvelle dépense
+                                </button>
+                            </div>
+                            <?php endif; ?>
                         </div>
                         <div class="card-body">
                             <?php if (empty($expenses)): ?>
-                                <div class="no-expenses">
-                                    <i class="fas fa-inbox"></i>
-                                    <p>Aucune dépense enregistrée pour le moment</p>
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="fas fa-inbox"></i>
+                                    </div>
+                                    <h4>Aucune dépense</h4>
+                                    <p>Ce budget ne contient pas encore de dépenses.</p>
+                                    <?php if ($permissions['can_add']): ?>
+                                    <button type="button" class="btn btn-primary" id="add-expense-btn-empty">
+                                        <i class="fas fa-plus-circle"></i> Ajouter une dépense
+                                    </button>
+                                    <?php endif; ?>
                                 </div>
                             <?php else: ?>
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Description</th>
-                                                <th>Catégorie</th>
-                                                <th>Montant</th>
-                                                <th>Statut</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($expenses as $expense): ?>
-                                                <tr>
-                                                    <td><?= date('d/m/Y', strtotime($expense->payment_date)) ?></td>
-                                                    <td><?= htmlspecialchars($expense->description) ?></td>
-                                                    <td>
-                                                        <span class="category-badge">
-                                                            <?= htmlspecialchars($expense->category ?? 'Non catégorisé') ?>
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <strong><?= number_format($expense->amount, 0, ',', ' ') ?> FCFA</strong>
-                                                    </td>
-                                                    <td>
+                                <div class="expenses-list">
+                                    <?php foreach ($expenses as $expense): ?>
+                                        <div class="expense-item" data-id="<?= $expense->id ?>">
+                                            <div class="expense-date">
+                                                <span class="date-day"><?= date('d', strtotime($expense->payment_date)) ?></span>
+                                                <span class="date-month"><?= strftime('%b', strtotime($expense->payment_date)) ?></span>
+                                            </div>
+                                            <div class="expense-details">
+                                                <div class="expense-description">
+                                                    <?= htmlspecialchars($expense->description ?: 'Sans description') ?>
+                                                </div>
+                                                <div class="expense-meta">
+                                                    <span class="expense-category">
+                                                        <i class="fas fa-tag"></i>
+                                                        <?= htmlspecialchars(ucfirst($expense->category ?? 'Non catégorisé')) ?>
+                                                    </span>
+                                                    <span class="expense-status status-<?= $expense->status ?>">
                                                         <?php if ($expense->status === 'paid'): ?>
-                                                            <span class="badge badge-success">
-                                                                <i class="fas fa-check-circle"></i> Payé
-                                                            </span>
+                                                            <i class="fas fa-check-circle"></i> Payé
                                                         <?php else: ?>
-                                                            <span class="badge badge-warning">
-                                                                <i class="fas fa-clock"></i> En attente
-                                                            </span>
+                                                            <i class="fas fa-clock"></i> En attente
                                                         <?php endif; ?>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="expense-amount <?= $expense->status === 'paid' ? 'paid' : 'pending' ?>">
+                                                <?= number_format($expense->amount, 0, ',', ' ') ?> FCFA
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -181,83 +180,281 @@
 </div>
 
 <?php if ($permissions['can_add']): ?>
-<!-- Modal d'ajout de dépense -->
+<!-- Modal d'ajout de dépense amélioré -->
 <div id="expense-modal" class="modal-overlay">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
                     <i class="fas fa-plus-circle"></i> Ajouter une dépense
                 </h5>
-                <button type="button" class="close-modal" data-dismiss="modal">&times;</button>
+                <button type="button" class="close-modal" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="add-expense-form">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
 
-                    <div class="form-group">
-                        <label for="description">Description <span class="text-danger">*</span></label>
-                        <textarea class="form-control"
-                                  id="description"
-                                  name="description"
-                                  rows="2"
-                                  required
-                                  placeholder="Détails de la dépense..."></textarea>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="category">
+                                    <i class="fas fa-tag"></i> Type de dépense <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-folder"></i></span>
+                                    </div>
+                                    <select class="form-control select2-category" id="category" name="category" required>
+                                        <option value="" disabled selected>Choisir un type</option>
+                                        <optgroup label="Catégories par défaut">
+                                            <?php foreach($categories as $cat): ?>
+                                                <option value="<?= htmlspecialchars($cat) ?>"
+                                                        data-icon="<?= $cat === 'fixe' ? 'calendar-check' : ($cat === 'epargne' ? 'piggy-bank' : 'shopping-cart') ?>">
+                                                    <?= ucfirst(htmlspecialchars($cat)) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </optgroup>
+                                        <?php if (!empty($customCategories)): ?>
+                                            <optgroup label="Catégories personnalisées">
+                                                <?php foreach($customCategories as $customCat): ?>
+                                                    <option value="custom_<?= $customCat->id ?>"
+                                                            data-icon="<?= htmlspecialchars($customCat->icon) ?>"
+                                                            data-color="<?= htmlspecialchars($customCat->color) ?>">
+                                                        <?= htmlspecialchars($customCat->name) ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </optgroup>
+                                        <?php endif; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="amount">
+                                    <i class="fas fa-coins"></i> Montant (FCFA) <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+                                    </div>
+                                    <input type="number"
+                                           class="form-control"
+                                           id="amount"
+                                           name="amount"
+                                           required
+                                           min="0"
+                                           step="1"
+                                           placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="payment_date">
+                                    <i class="fas fa-calendar-alt"></i> Date de paiement <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                    </div>
+                                    <input type="date"
+                                           class="form-control"
+                                           id="payment_date"
+                                           name="payment_date"
+                                           required
+                                           value="<?= date('Y-m-d') ?>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="status">
+                                    <i class="fas fa-check-circle"></i> Statut <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-flag"></i></span>
+                                    </div>
+                                    <select class="form-control select2-status" id="status" name="status" required>
+                                        <option value="pending" data-icon="clock">En attente</option>
+                                        <option value="paid" data-icon="check-circle">Payé</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="amount">Montant (FCFA) <span class="text-danger">*</span></label>
-                        <input type="number"
-                               class="form-control"
-                               id="amount"
-                               name="amount"
-                               required
-                               min="0"
-                               step="1"
-                               placeholder="0">
+                        <label for="description">
+                            <i class="fas fa-align-left"></i> Description
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-comment"></i></span>
+                            </div>
+                            <textarea class="form-control"
+                                      id="description"
+                                      name="description"
+                                      rows="3"
+                                      placeholder="Détails de la dépense (optionnel)..."></textarea>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="payment_date">Date <span class="text-danger">*</span></label>
-                        <input type="date"
-                               class="form-control"
-                               id="payment_date"
-                               name="payment_date"
-                               required
-                               value="<?= date('Y-m-d') ?>">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="category_type">Catégorie</label>
-                        <select class="form-control" id="category_type" name="category_type">
-                            <option value="variable">Variable</option>
-                            <option value="fixe">Fixe</option>
-                            <option value="epargne">Épargne</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="status">Statut</label>
-                        <select class="form-control" id="status" name="status">
-                            <option value="pending">En attente</option>
-                            <option value="paid">Payé</option>
-                        </select>
-                    </div>
-
-                    <div id="expense-message" class="message"></div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Enregistrer
-                        </button>
-                    </div>
+                    <div id="expense-message" class="alert-container"></div>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+                <button type="submit" form="add-expense-form" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
             </div>
         </div>
     </div>
 </div>
 <?php endif; ?>
 
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+<!-- CSS personnalisé -->
 <link rel="stylesheet" href="/assets/css/budget/shared_dashboard.css">
-<script src="/assets/js/budget/shared_dashboard.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser Select2 pour les catégories
+    if (typeof $ !== 'undefined' && $.fn.select2) {
+        function formatCategory(option) {
+            if (!option.id) return option.text;
+            var icon = $(option.element).data('icon') || 'tag';
+            var color = $(option.element).data('color') || '';
+            var iconHtml = '<i class="fas fa-' + icon + '"' + (color ? ' style="color:' + color + '"' : '') + '></i> ';
+            return $('<span>' + iconHtml + option.text + '</span>');
+        }
+
+        $('.select2-category').select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#expense-modal'),
+            templateResult: formatCategory,
+            templateSelection: formatCategory,
+            placeholder: 'Choisir un type',
+            allowClear: false
+        });
+
+        function formatStatus(option) {
+            if (!option.id) return option.text;
+            var icon = $(option.element).data('icon') || 'flag';
+            var iconClass = option.id === 'paid' ? 'text-success' : 'text-warning';
+            return $('<span><i class="fas fa-' + icon + ' ' + iconClass + '"></i> ' + option.text + '</span>');
+        }
+
+        $('.select2-status').select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#expense-modal'),
+            templateResult: formatStatus,
+            templateSelection: formatStatus,
+            minimumResultsForSearch: Infinity
+        });
+    }
+
+    // Gestion du modal
+    const modal = document.getElementById('expense-modal');
+    const addExpenseBtn = document.getElementById('add-expense-btn');
+    const addExpenseBtnEmpty = document.getElementById('add-expense-btn-empty');
+    const closeModalBtns = document.querySelectorAll('[data-dismiss="modal"]');
+
+    function openModal() {
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeModal() {
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    if (addExpenseBtn) addExpenseBtn.addEventListener('click', openModal);
+    if (addExpenseBtnEmpty) addExpenseBtnEmpty.addEventListener('click', openModal);
+
+    closeModalBtns.forEach(btn => {
+        btn.addEventListener('click', closeModal);
+    });
+
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeModal();
+        });
+    }
+
+    // Soumission du formulaire
+    const form = document.getElementById('add-expense-form');
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const messageContainer = document.getElementById('expense-message');
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            // Récupérer les données
+            const formData = {
+                csrf_token: form.querySelector('[name="csrf_token"]').value,
+                category: form.querySelector('[name="category"]').value,
+                amount: parseFloat(form.querySelector('[name="amount"]').value),
+                payment_date: form.querySelector('[name="payment_date"]').value,
+                status: form.querySelector('[name="status"]').value,
+                description: form.querySelector('[name="description"]').value
+            };
+
+            // Validation
+            if (!formData.category || !formData.amount || !formData.payment_date) {
+                messageContainer.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Veuillez remplir tous les champs obligatoires.</div>';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enregistrement...';
+
+            try {
+                const response = await fetch('/budget/shared/expense/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    messageContainer.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> ' + data.message + '</div>';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    messageContainer.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ' + data.message + '</div>';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                messageContainer.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Erreur de connexion.</div>';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer';
+            }
+        });
+    }
+});
+</script>
