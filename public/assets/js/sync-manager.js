@@ -193,9 +193,12 @@ class SyncManager {
    * Synchroniser une dépense
    */
   async syncExpense(expense) {
+    console.log('[DEBUG] Données brutes de l\'expense:', expense);
+
     const formData = new FormData();
     Object.keys(expense).forEach(key => {
       if (key !== 'id' && key !== 'timestamp' && key !== 'synced') {
+        console.log(`[DEBUG] Ajout au FormData: ${key} = ${expense[key]}`);
         formData.append(key, expense[key]);
       }
     });
@@ -206,7 +209,16 @@ class SyncManager {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // Tenter de récupérer le message d'erreur du serveur
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.text();
+        console.error('[DEBUG] Réponse du serveur:', errorData);
+        errorMessage += ` - ${errorData}`;
+      } catch (e) {
+        console.error('[DEBUG] Impossible de lire la réponse d\'erreur');
+      }
+      throw new Error(errorMessage);
     }
 
     return response.json();
@@ -216,9 +228,12 @@ class SyncManager {
    * Synchroniser un budget
    */
   async syncBudget(budget) {
+    console.log('[DEBUG] Données brutes du budget:', budget);
+
     const formData = new FormData();
     Object.keys(budget).forEach(key => {
       if (key !== 'id' && key !== 'timestamp' && key !== 'synced') {
+        console.log(`[DEBUG] Ajout au FormData: ${key} = ${budget[key]}`);
         formData.append(key, budget[key]);
       }
     });
@@ -229,7 +244,16 @@ class SyncManager {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // Tenter de récupérer le message d'erreur du serveur
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.text();
+        console.error('[DEBUG] Réponse du serveur:', errorData);
+        errorMessage += ` - ${errorData}`;
+      } catch (e) {
+        console.error('[DEBUG] Impossible de lire la réponse d\'erreur');
+      }
+      throw new Error(errorMessage);
     }
 
     return response.json();
