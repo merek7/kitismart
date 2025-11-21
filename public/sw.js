@@ -2,7 +2,7 @@
 // SERVICE WORKER - KitiSmart PWA
 // ===================================
 
-const CACHE_VERSION = 'kitismart-v1.0.7';
+const CACHE_VERSION = 'kitismart-v1.0.8';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 

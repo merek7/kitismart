@@ -195,17 +195,24 @@ class SyncManager {
   async syncExpense(expense) {
     console.log('[DEBUG] Données brutes de l\'expense:', expense);
 
-    const formData = new FormData();
+    // Préparer les données en excluant id, timestamp, synced
+    const expenseData = {};
     Object.keys(expense).forEach(key => {
       if (key !== 'id' && key !== 'timestamp' && key !== 'synced') {
-        console.log(`[DEBUG] Ajout au FormData: ${key} = ${expense[key]}`);
-        formData.append(key, expense[key]);
+        console.log(`[DEBUG] Ajout à expenseData: ${key} = ${expense[key]}`);
+        expenseData[key] = expense[key];
       }
     });
 
+    console.log('[DEBUG] JSON à envoyer:', JSON.stringify(expenseData));
+
+    // Le serveur attend du JSON, pas du FormData
     const response = await fetch('/expenses/create', {
       method: 'POST',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(expenseData)
     });
 
     if (!response.ok) {
@@ -230,17 +237,24 @@ class SyncManager {
   async syncBudget(budget) {
     console.log('[DEBUG] Données brutes du budget:', budget);
 
-    const formData = new FormData();
+    // Préparer les données en excluant id, timestamp, synced
+    const budgetData = {};
     Object.keys(budget).forEach(key => {
       if (key !== 'id' && key !== 'timestamp' && key !== 'synced') {
-        console.log(`[DEBUG] Ajout au FormData: ${key} = ${budget[key]}`);
-        formData.append(key, budget[key]);
+        console.log(`[DEBUG] Ajout à budgetData: ${key} = ${budget[key]}`);
+        budgetData[key] = budget[key];
       }
     });
 
+    console.log('[DEBUG] JSON à envoyer:', JSON.stringify(budgetData));
+
+    // Le serveur attend du JSON, pas du FormData
     const response = await fetch('/budget/create', {
       method: 'POST',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(budgetData)
     });
 
     if (!response.ok) {
