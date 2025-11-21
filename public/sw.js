@@ -79,15 +79,18 @@ self.addEventListener('fetch', (event) => {
   // Gestion des requêtes non-GET (POST, PUT, DELETE) pour mode hors ligne
   // ===================================
   if (request.method !== 'GET') {
+    // Cloner la requête AVANT de l'utiliser dans fetch (pour pouvoir lire le body après)
+    const requestClone = request.clone();
+
     event.respondWith(
       fetch(request)
         .catch(async () => {
           // Si la requête échoue (hors ligne), stocker dans IndexedDB via le client
           const requestData = {
-            url: request.url,
-            method: request.method,
-            headers: Object.fromEntries(request.headers.entries()),
-            body: await request.clone().text(),
+            url: requestClone.url,
+            method: requestClone.method,
+            headers: Object.fromEntries(requestClone.headers.entries()),
+            body: await requestClone.text(),
             timestamp: Date.now()
           };
 
