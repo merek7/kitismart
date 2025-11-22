@@ -8,6 +8,7 @@ use App\Utils\Csrf;
 use App\Exceptions\TokenInvalidOrExpiredException;
 use App\Models\Budget;
 use App\Models\Categorie;
+use App\Models\CustomCategory;
 
 
 
@@ -22,11 +23,19 @@ class ExpenseController extends Controller
     {
         $csrfToken = Csrf::generateToken();
         $categories = Categorie::getDefaultCategories();
+        $customCategories = [];
+
+        // Charger les catégories personnalisées de l'utilisateur
+        if (isset($_SESSION['user_id'])) {
+            $customCategories = CustomCategory::findByUser($_SESSION['user_id']);
+        }
+
         try {
             $this->view('dashboard/expense_create', [
                 'title' => 'Nouvelle Dépense',
                 'currentPage' => 'expenses',
                 'categories' => $categories,
+                'customCategories' => $customCategories,
                 'layout' => 'dashboard',
                 'budget' => BUDGET->remaining_amount,
                 'csrfToken' => $csrfToken
@@ -203,11 +212,18 @@ class ExpenseController extends Controller
                 throw new \Exception("Aucun budget actif trouvé");
             }
 
+            // Valider que le budget a un ID valide
+            $budgetId = (int)($activeBudget->id ?? 0);
+            if ($budgetId <= 0) {
+                throw new \Exception("Budget actif invalide (ID manquant ou incorrect)");
+            }
+
             // Récupérer les dépenses de l'utilisateur pour le budget actif
-            $expenses = Expense::getExpensesByUser($activeBudget->id, $userId);
+            $expenses = Expense::getExpensesByUser($budgetId, $userId);
 
             // Récupérer les catégories pour le filtre
             $categories = Categorie::getDefaultCategories();
+            $customCategories = CustomCategory::findByUser($userId);
             error_log(print_r($categories, true));
 
             // Calculer les statistiques
@@ -238,7 +254,10 @@ class ExpenseController extends Controller
                 'currentPage' => 'expenses',
                 'expenses' => $expenses,
                 'categories' => $categories,
+                'customCategories' => $customCategories,
                 'stats' => $stats,
+                'styles' => ['dashboard/expense_list.css'],
+                'pageScripts' => ['dashboard/expense_list.js'],
                 'layout' => 'dashboard'
             ]);
 
@@ -255,8 +274,10 @@ class ExpenseController extends Controller
     public function listPaginated()
     {
         try {
-            // Récupérer l'ID de l'utilisateur connecté
-            $userId = $_SESSION['user_id'];
+            // Récupérer l'ID de l'utilisateur connecté et le CASTER en int
+            $userId = (int)$_SESSION['user_id'];
+            error_log("=== ExpenseController::listPaginated ===");
+            error_log("userId from session: $userId (type: " . gettype($userId) . ")");
 
             // Récupérer le budget actif
             $activeBudget = Budget::getActiveBudget($userId);
@@ -264,13 +285,28 @@ class ExpenseController extends Controller
                 throw new \Exception("Aucun budget actif trouvé");
             }
 
+            // Valider que le budget a un ID valide
+            $budgetId = (int)($activeBudget->id ?? 0);
+            if ($budgetId <= 0) {
+                throw new \Exception("Budget actif invalide (ID manquant ou incorrect)");
+            }
+
             // Récupérer le numéro de page depuis la requête
-            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            // S'assurer que $page est toujours un entier positif (minimum 1)
+            $page = max(1, (int)($_GET['page'] ?? 1));
 
             // Récupérer les dépenses paginées
-            $paginatedExpenses = Expense::getPaginatedExpensesByUser($activeBudget->id, $userId, $page);
+            error_log("BEFORE getPaginatedExpensesByUser()");
+            $paginatedExpenses = Expense::getPaginatedExpensesByUser($budgetId, $userId, $page);
+            error_log("AFTER getPaginatedExpensesByUser()");
 
+            error_log("BEFORE getDefaultCategories()");
             $categories = Categorie::getDefaultCategories();
+            error_log("AFTER getDefaultCategories() - Got " . count($categories) . " categories");
+
+            error_log("BEFORE CustomCategory::findByUser() with userId=$userId");
+            $customCategories = CustomCategory::findByUser($userId);
+            error_log("AFTER CustomCategory::findByUser() - Got " . count($customCategories) . " custom categories");
             // Calculer les statistiques pour les dépenses de la page
             $stats = [
                 'total' => 0,
@@ -292,13 +328,17 @@ class ExpenseController extends Controller
             // Afficher la vue avec les données
             $this->view('dashboard/expense_list', [
                 'title' => 'Liste des dépenses',
+                'currentPage' => 'expenses',
                 'categories' => $categories,
-                'currentPage' => $paginatedExpenses['current_page'],
+                'customCategories' => $customCategories,
+                'page' => $paginatedExpenses['current_page'],
                 'lastPage' => $paginatedExpenses['last_page'],
                 'nextPage' => $paginatedExpenses['next_page'],
                 'previousPage' => $paginatedExpenses['previous_page'],
                 'expenses' => $paginatedExpenses['expenses'],
                 'stats' => $stats,
+                'styles' => ['dashboard/expense_list.css'],
+                'pageScripts' => ['dashboard/expense_list.js'],
                 'layout' => 'dashboard'
             ]);
 

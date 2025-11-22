@@ -18,17 +18,29 @@ class SettingsController extends Controller
 
     public function index()
     {
-        $user = User::find($_SESSION['user_id']);
+        error_log("SettingsController::index - user_id from session: " . ($_SESSION['user_id'] ?? 'NOT SET'));
+
+        $userId = (int)$_SESSION['user_id'];
+        error_log("SettingsController::index - userId casted to int: " . $userId);
+
+        $user = User::findById($userId);
+
+        error_log("SettingsController::index - User found: " . ($user ? 'YES' : 'NO'));
+        if ($user) {
+            error_log("SettingsController::index - User data: " . print_r($user, true));
+        }
 
         if (!$user) {
+            error_log("SettingsController::index - User not found, redirecting to dashboard");
             $_SESSION['error'] = "Utilisateur non trouvé";
             return $this->redirect('/dashboard');
         }
 
-        $this->render('dashboard/settings', [
+        $this->view('dashboard/settings', [
             'user' => $user,
-            'csrf_token' => Csrf::generateToken()
-        ]);
+            'csrf_token' => Csrf::generateToken(),
+            'currentPage' => 'settings'
+        ], 'dashboard');
     }
 
     public function updateProfile()
@@ -57,7 +69,7 @@ class SettingsController extends Controller
             return $this->redirect('/settings');
         }
 
-        $user = User::find($_SESSION['user_id']);
+        $user = User::findById((int)$_SESSION['user_id']);
 
         if (!$user) {
             $_SESSION['error'] = "Utilisateur non trouvé";
@@ -121,7 +133,7 @@ class SettingsController extends Controller
             return $this->redirect('/settings');
         }
 
-        $user = User::find($_SESSION['user_id']);
+        $user = User::findById((int)$_SESSION['user_id']);
 
         if (!$user) {
             $_SESSION['error'] = "Utilisateur non trouvé";
@@ -168,7 +180,7 @@ class SettingsController extends Controller
             return $this->redirect('/settings');
         }
 
-        $user = User::find($_SESSION['user_id']);
+        $user = User::findById((int)$_SESSION['user_id']);
 
         if (!$user) {
             $_SESSION['error'] = "Utilisateur non trouvé";

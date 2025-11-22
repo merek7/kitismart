@@ -43,7 +43,8 @@ class User{
     }
 
     public static function findById(int $id): ?object {
-        return R::findOne('vw_users', 'id = ?', [$id]);
+        // Utiliser la table 'users' au lieu de la vue 'vw_users'
+        return R::findOne('users', 'id = ?', [$id]);
     }
 
     public static function confirmAccount(string $token): bool {

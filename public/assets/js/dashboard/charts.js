@@ -3,25 +3,30 @@
 // ===================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Détecter le mode sombre
+    const isDarkMode = () => document.documentElement.getAttribute('data-theme') === 'dark';
+
     // Configuration globale Chart.js
     Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
     Chart.defaults.font.size = 13;
-    Chart.defaults.color = '#6B7280';
+    Chart.defaults.color = isDarkMode() ? '#9CA3AF' : '#6B7280';
     Chart.defaults.plugins.legend.position = 'bottom';
     Chart.defaults.plugins.legend.labels.padding = 15;
     Chart.defaults.plugins.legend.labels.usePointStyle = true;
 
     // Couleurs cohérentes avec le thème
     const colors = {
-        primary: '#0D9488',
-        secondary: '#14B8A6',
+        primary: isDarkMode() ? '#14B8A6' : '#0D9488',
+        secondary: isDarkMode() ? '#0D9488' : '#14B8A6',
         success: '#10B981',
         warning: '#F59E0B',
         danger: '#EF4444',
         info: '#3B82F6',
         purple: '#8B5CF6',
         pink: '#EC4899',
-        gray: '#6B7280'
+        gray: isDarkMode() ? '#9CA3AF' : '#6B7280',
+        gridColor: isDarkMode() ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+        borderColor: isDarkMode() ? '#374151' : '#fff'
     };
 
     // ===================================
@@ -66,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     data: categoryValues,
                     backgroundColor: categoryColors.slice(0, categoryLabels.length),
                     borderWidth: 3,
-                    borderColor: '#fff',
+                    borderColor: colors.borderColor,
                     hoverOffset: 10
                 }]
             },
@@ -179,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         },
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
+                            color: colors.gridColor
                         }
                     },
                     x: {
@@ -264,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         },
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
+                            color: colors.gridColor
                         }
                     },
                     y: {

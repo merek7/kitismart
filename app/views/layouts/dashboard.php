@@ -4,7 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Dashboard - KitiSmart' ?></title>
-    
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Application de gestion de budget personnel intelligente">
+    <meta name="theme-color" content="#0d9488">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="KitiSmart">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/assets/img/icons/icon-192x192.png">
+
+    <!-- Charger le mode sombre immédiatement (éviter le flash) -->
+    <script>
+        (function() {
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- CSS -->
     <link rel="stylesheet" href="/assets/css/dashboard/index.css">
     <?php if (!empty($styles)): ?>
@@ -12,7 +34,7 @@
             <link rel="stylesheet" href="/assets/css/<?= htmlspecialchars($style) ?>" rel="stylesheet">
         <?php endforeach; ?>
     <?php endif; ?>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -27,18 +49,36 @@
             <div class="nav-brand">
                 <img src="/assets/img/logo.svg" alt="KitiSmart" class="nav-logo">
             </div>
-            <div class="nav-menu">
+
+            <!-- Bouton hamburger pour mobile -->
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span class="nav-toggle-icon"></span>
+            </button>
+
+            <div class="nav-menu" id="navMenu">
                 <a href="/dashboard" class="nav-link <?= $currentPage === 'dashboard' ? 'active' : '' ?>">
                     <i class="fas fa-home"></i> Accueil
                 </a>
                 <a href="/budget/create" class="nav-link <?= $currentPage === 'budget' ? 'active' : '' ?>">
                     <i class="fas fa-wallet"></i> Budget
                 </a>
+                <a href="/budgets/history" class="nav-link <?= $currentPage === 'budgets' ? 'active' : '' ?>">
+                    <i class="fas fa-history"></i> Historique
+                </a>
                 <a href="/expenses/create" class="nav-link <?= $currentPage === 'expenses' ? 'active' : '' ?>">
                     <i class="fas fa-receipt"></i> Dépenses
                 </a>
+                <a href="/categories" class="nav-link <?= $currentPage === 'categories' ? 'active' : '' ?>">
+                    <i class="fas fa-tags"></i> Catégories
+                </a>
                 <a href="/expenses/recurrences" class="nav-link <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
                     <i class="fas fa-sync-alt"></i> Récurrences
+                </a>
+                <a href="/notifications/settings" class="nav-link <?= $currentPage === 'notifications' ? 'active' : '' ?>">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+                <a href="/settings" class="nav-link <?= $currentPage === 'settings' ? 'active' : '' ?>">
+                    <i class="fas fa-cog"></i> Paramètres
                 </a>
             </div>
             <div class="nav-user">
@@ -60,8 +100,46 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- Script pour le toggle du navbar mobile -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('nav-menu-active');
+                    navToggle.classList.toggle('active');
+                    document.body.classList.toggle('nav-open');
+                });
+
+                // Fermer le menu quand on clique sur un lien
+                const navLinks = navMenu.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navMenu.classList.remove('nav-menu-active');
+                        navToggle.classList.remove('active');
+                        document.body.classList.remove('nav-open');
+                    });
+                });
+
+                // Fermer le menu si on clique en dehors
+                document.addEventListener('click', function(event) {
+                    if (!navMenu.contains(event.target) && !navToggle.contains(event.target)) {
+                        navMenu.classList.remove('nav-menu-active');
+                        navToggle.classList.remove('active');
+                        document.body.classList.remove('nav-open');
+                    }
+                });
+            }
+        });
+    </script>
 
     <?php
     error_log("Scripts disponibles dans le layout: " . print_r($pageScripts ?? [], true));
@@ -74,5 +152,45 @@
     <?php else: ?>
         <?php error_log("Aucun script spécifique à charger"); ?>
     <?php endif; ?>
+
+    <!-- PWA Install Script -->
+    <script src="/assets/js/pwa-install.js"></script>
+
+    <!-- ================================
+         PWA Service Worker Registration
+         ================================ -->
+    <script>
+        // Enregistrer le Service Worker pour PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker enregistré avec succès:', registration.scope);
+
+                        // Vérifier les mises à jour toutes les heures
+                        setInterval(() => {
+                            registration.update();
+                        }, 60 * 60 * 1000);
+                    })
+                    .catch((error) => {
+                        console.error('❌ Erreur d\'enregistrement du Service Worker:', error);
+                    });
+            });
+
+            // Écouter les mises à jour du Service Worker
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                console.log('🔄 Nouveau Service Worker activé');
+            });
+        }
+
+        // Détecter le mode offline/online
+        window.addEventListener('online', () => {
+            console.log('🌐 Connexion rétablie');
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('📡 Mode hors ligne activé');
+        });
+    </script>
 </body>
 </html> 

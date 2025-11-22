@@ -9,185 +9,225 @@
     </div>
 
     <div class="page-content">
-        <!-- Résumé des dépenses -->
-        <div class="expense-summary-card">
-            <div class="summary-item">
-                <i class="fas fa-list-ul"></i>
-                <div class="summary-content">
-                    <span class="summary-label">Nombre de dépenses</span>
-                    <span id="expense-count" class="summary-value">1</span>
-                </div>
-            </div>
-            <div class="summary-item">
-                <i class="fas fa-coins"></i>
-                <div class="summary-content">
-                    <span class="summary-label">Montant total</span>
-                    <span id="total-amount" class="summary-value">0 FCFA</span>
-                </div>
-            </div>
-            <div class="summary-item">
-                <i class="fas fa-wallet"></i>
-                <div class="summary-content">
-                    <span class="summary-label">Budget restant</span>
-                    <span id="remaining-budget"
-                          class="summary-value"
-                          data-initial-budget="<?= $budget ?>"><?= number_format($budget, 2, ',', ' ') ?> FCFA</span>
-                    <div class="budget-progress">
-                        <div class="progress-bar" style="width: 0%"></div>
-                    </div>
-                    <div class="budget-status">
-                        <span>0%</span>
-                        <span id="budget-total">Budget: <?= number_format($budget, 2, ',', ' ') ?> FCFA</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Formulaire de création de dépenses -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-plus-circle"></i> Ajouter des dépenses
-                </h3>
-                <div class="card-tools">
-                    <button type="button" id="add-expense" class="btn btn-tool btn-action">
-                        <i class="fas fa-plus"></i> Nouvelle dépense
-                    </button>
-                    <a href="/expenses/list" class="btn btn-tool btn-action">
-                        <i class="fas fa-list"></i> Liste des dépenses
-                    </a>
-                </div>
-            </div>
-
-            <div id="global-message" class="message"></div>
-
-            <form id="expense-form" action="/expenses/create" method="POST">
-                <div class="card-body">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
-
-                    <div id="expense-container" class="expense-scroll">
-                        <div class="expense-item">
-                            <div class="expense-header">
-                                <span class="expense-number">#1</span>
-                                <button type="button" class="btn-remove" title="Supprimer cette dépense">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="category">Type de dépense</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
-                                        </div>
-                                        <select class="form-control select2 category-select" name="category[]" required>
-                                            <option value="" disabled selected>Choisir un type</option>
-                                            <?php foreach($categories as $cat): ?>
-                                                <option value="<?= htmlspecialchars($cat) ?>"
-                                                        data-icon="<?= $cat === 'fixe' ? 'calendar-check' : ($cat === 'epargne' ? 'piggy-bank' : 'shopping-cart') ?>">
-                                                    <?= ucfirst(htmlspecialchars($cat)) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="amount">Montant (FCFA)</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-coins"></i></span>
-                                        </div>
-                                        <input type="number"
-                                            class="form-control amount-input"
-                                            name="amount[]"
-                                            placeholder="0.00"
-                                            min="0"
-                                            step="0.01"
-                                            required>
-                                    </div>
+        <div class="container">
+            <!-- Résumé des dépenses -->
+            <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="expense-summary-card">
+                            <div class="summary-item">
+                                <i class="fas fa-list-ul"></i>
+                                <div class="summary-content">
+                                    <span class="summary-label">Nombre de dépenses</span>
+                                    <span id="expense-count" class="summary-value">1</span>
                                 </div>
                             </div>
-
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="date">Date de paiement</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                                        </div>
-                                        <input type="date"
-                                            class="form-control"
-                                            name="date[]"
-                                            required>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="status">Statut</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
-                                        </div>
-                                        <select class="form-control" name="status[]" required>
-                                            <option value="pending">En attente</option>
-                                            <option value="paid">Payé</option>
-                                        </select>
-                                    </div>
+                            <div class="summary-item">
+                                <i class="fas fa-coins"></i>
+                                <div class="summary-content">
+                                    <span class="summary-label">Montant total</span>
+                                    <span id="total-amount" class="summary-value">0 FCFA</span>
                                 </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="description">Description</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                            <div class="summary-item">
+                                <i class="fas fa-wallet"></i>
+                                <div class="summary-content">
+                                    <span class="summary-label">Budget restant</span>
+                                    <span id="remaining-budget" class="summary-value" data-initial-budget="<?= htmlspecialchars($budget) ?>"><?= htmlspecialchars($budget) ?> FCFA</span>
+                                    <div class="budget-progress">
+                                        <div class="progress-bar" style="width: 0%"></div>
                                     </div>
-                                    <textarea class="form-control"
-                                            name="description[]"
-                                            rows="2"
-                                            placeholder="Détails de la dépense..."></textarea>
+                                    <div class="budget-status">
+                                        <span>0%</span>
+                                        <span>Budget: <?= htmlspecialchars($budget) ?> FCFA</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Enregistrer les dépenses
-                    </button>
-                    <a href="/dashboard" class="btn btn-cancel">
-                        <i class="fas fa-times"></i> Annuler
-                    </a>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-plus-circle"></i> Ajouter des dépenses
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" id="add-expense" class="btn btn-tool btn-action">
+                                    <i class="fas fa-plus"></i> Nouvelle dépense
+                                </button>
+                                <a href="/expenses/list" class="btn btn-tool btn-action">
+                                    <i class="fas fa-list"></i> Liste des dépenses
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="global-message" class="message"></div>
+
+                        <form id="expense-form" action="/expenses/create" method="POST">
+                            <div class="card-body">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                                
+                                <div id="expense-container" class="expense-scroll">
+                                    <div class="expense-item">
+                                        <div class="expense-header">
+                                            <span class="expense-number">#1</span>
+                                            <button type="button" class="btn-remove" title="Supprimer cette dépense">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="category">Type de dépense</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                                        </div>
+                                                        <select class="form-control select2 category-select" name="category[]" required>
+                                                            <option value="" disabled selected>Choisir un type</option>
+                                                            <optgroup label="Catégories par défaut">
+                                                                <?php foreach($categories as $cat): ?>
+                                                                    <option value="<?= htmlspecialchars($cat) ?>"
+                                                                            data-icon="<?= $cat === 'fixe' ? 'calendar-check' : ($cat === 'epargne' ? 'piggy-bank' : 'shopping-cart') ?>"
+                                                                            data-type="default">
+                                                                        <?= ucfirst(htmlspecialchars($cat)) ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </optgroup>
+                                                            <?php if (!empty($customCategories)): ?>
+                                                                <optgroup label="Mes catégories personnalisées">
+                                                                    <?php foreach($customCategories as $customCat): ?>
+                                                                        <option value="custom_<?= $customCat->id ?>"
+                                                                                data-icon="<?= htmlspecialchars($customCat->icon) ?>"
+                                                                                data-color="<?= htmlspecialchars($customCat->color) ?>"
+                                                                                data-type="custom">
+                                                                            <i class="fas <?= htmlspecialchars($customCat->icon) ?>"></i> <?= htmlspecialchars($customCat->name) ?>
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                </optgroup>
+                                                            <?php endif; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="amount">Montant</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="fas fa-euro-sign"></i></span>
+                                                        </div>
+                                                        <input type="number"
+                                                            class="form-control amount-input"
+                                                            name="amount[]"
+                                                            placeholder="0.00"
+                                                            min="0"
+                                                            step="0.01"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="date">Date de paiement</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                                        </div>
+                                                        <input type="date"
+                                                            class="form-control"
+                                                            name="date[]"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="status">Statut</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
+                                                        </div>
+                                                        <select class="form-control" name="status[]" required>
+                                                            <option value="pending">En attente</option>
+                                                            <option value="paid">Payé</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="description">Description</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                                                </div>
+                                                <textarea class="form-control"
+                                                        name="description[]"
+                                                        rows="2"
+                                                        placeholder="Détails de la dépense..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Enregistrer les dépenses
+                                </button>
+                                <a href="/dashboard" class="btn btn-cancel">
+                                    <i class="fas fa-times"></i> Annuler
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modale de confirmation -->
+<!-- Modal de confirmation -->
 <div id="confirmation-modal" class="modal-overlay">
-    <div class="modal-container">
-        <div class="modal-header">
-            <i class="fas fa-question-circle modal-icon"></i>
-            <h3>Confirmer l'enregistrement</h3>
-        </div>
-        <div class="modal-body">
-            <p>Voulez-vous vraiment enregistrer <strong id="modal-expense-count">1</strong> dépense(s) pour un montant total de <strong id="modal-total-amount">0 FCFA</strong> ?</p>
-            <div class="modal-info">
-                <i class="fas fa-info-circle"></i>
-                <span>Cette action mettra à jour votre budget restant.</span>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle"></i> Confirmer l'enregistrement
+                </h5>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-cancel" id="modal-cancel">
-                <i class="fas fa-times"></i> Annuler
-            </button>
-            <button type="button" class="btn btn-primary" id="modal-confirm">
-                <i class="fas fa-check"></i> Confirmer
-            </button>
+            <div class="modal-body">
+                <p>Vous êtes sur le point d'enregistrer :</p>
+                <ul class="confirmation-list">
+                    <li>
+                        <i class="fas fa-list"></i>
+                        <strong id="modal-expense-count">0</strong> dépense(s)
+                    </li>
+                    <li>
+                        <i class="fas fa-coins"></i>
+                        Pour un montant total de <strong id="modal-total-amount">0 FCFA</strong>
+                    </li>
+                </ul>
+                <p class="text-muted">
+                    <i class="fas fa-info-circle"></i> Cette action mettra à jour votre budget.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-cancel" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+                <button type="button" id="modal-confirm" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Confirmer
+                </button>
+            </div>
         </div>
     </div>
 </div>

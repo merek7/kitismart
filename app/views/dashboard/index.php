@@ -50,8 +50,8 @@ $title = 'Dashboard - KitiSmart';
                             </div>
                         </div>
                         <div class="progress-footer">
-                            <span><?= number_format($activeBudget->initial_amount - $activeBudget->remaining_amount, 2) ?> € utilisés</span>
-                            <span><?= number_format($activeBudget->initial_amount, 2) ?> € total</span>
+                            <span><?= number_format($activeBudget->initial_amount - $activeBudget->remaining_amount, 0, ',', ' ') ?> FCFA utilisés</span>
+                            <span><?= number_format($activeBudget->initial_amount, 0, ',', ' ') ?> FCFA total</span>
                         </div>
                     </div>
                 </div>
@@ -63,8 +63,8 @@ $title = 'Dashboard - KitiSmart';
                         </div>
                         <div class="stat-content">
                             <h3>Budget Initial</h3>
-                            <p class="stat-value" data-value="<?= $activeBudget->initial_amount ?>">
-                                0 €
+                            <p class="stat-value">
+                                <?= number_format($activeBudget->initial_amount, 0, ',', ' ') ?> FCFA
                             </p>
                         </div>
                     </div>
@@ -75,8 +75,8 @@ $title = 'Dashboard - KitiSmart';
                         </div>
                         <div class="stat-content">
                             <h3>Dépenses du mois</h3>
-                            <p class="stat-value" data-value="<?= $activeBudget->initial_amount - $activeBudget->remaining_amount ?>">
-                                0 €
+                            <p class="stat-value">
+                                <?= number_format($activeBudget->initial_amount - $activeBudget->remaining_amount, 0, ',', ' ') ?> FCFA
                             </p>
                         </div>
                     </div>
@@ -87,8 +87,8 @@ $title = 'Dashboard - KitiSmart';
                         </div>
                         <div class="stat-content">
                             <h3>Dépenses en attente</h3>
-                            <p class="stat-value" data-value="<?= $depenseEnAttente ?>">
-                                0 FCFA
+                            <p class="stat-value">
+                                <?= number_format($depenseEnAttente, 0, ',', ' ') ?> FCFA
                             </p>
                         </div>
                     </div>
@@ -99,9 +99,8 @@ $title = 'Dashboard - KitiSmart';
                         </div>
                         <div class="stat-content">
                             <h3>Budget restant</h3>
-                            <p class="stat-value <?= $activeBudget->remaining_amount < 0 ? 'text-danger' : 'text-success' ?>"
-                               data-value="<?= $activeBudget->remaining_amount ?>">
-                                0 FCFA
+                            <p class="stat-value <?= $activeBudget->remaining_amount < 0 ? 'text-danger' : 'text-success' ?>">
+                                <?= number_format($activeBudget->remaining_amount, 0, ',', ' ') ?> FCFA
                             </p>
                         </div>
                     </div>
@@ -121,6 +120,96 @@ $title = 'Dashboard - KitiSmart';
                         <span>Voir les dépenses</span>
                     </a>
                 </div>
+
+                <!-- Section Récurrences à venir -->
+                <?php if (!empty($upcomingRecurrences)): ?>
+                <div class="recurrences-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-sync-alt"></i> Prochaines dépenses récurrentes
+                    </h2>
+
+                    <div class="recurrences-grid">
+                        <?php foreach ($upcomingRecurrences as $recurrence): ?>
+                            <?php
+                            // Calculer les jours restants
+                            $nextDate = new DateTime($recurrence->next_execution_date);
+                            $today = new DateTime();
+                            $daysLeft = $today->diff($nextDate)->days;
+                            $isPast = $nextDate < $today;
+                            $isToday = $nextDate->format('Y-m-d') === $today->format('Y-m-d');
+
+                            // Déterminer la classe CSS selon l'urgence
+                            $urgencyClass = 'low';
+                            if ($isPast || $isToday) {
+                                $urgencyClass = 'urgent';
+                            } elseif ($daysLeft <= 3) {
+                                $urgencyClass = 'medium';
+                            }
+
+                            // Icône selon fréquence
+                            $freqIcons = [
+                                'daily' => 'fa-calendar-day',
+                                'weekly' => 'fa-calendar-week',
+                                'bimonthly' => 'fa-calendar-alt',
+                                'monthly' => 'fa-calendar',
+                                'yearly' => 'fa-calendar-check'
+                            ];
+                            $icon = $freqIcons[$recurrence->frequency] ?? 'fa-sync-alt';
+                            ?>
+
+                            <div class="recurrence-card urgency-<?= $urgencyClass ?>">
+                                <div class="recurrence-header">
+                                    <div class="recurrence-icon">
+                                        <i class="fas <?= $icon ?>"></i>
+                                    </div>
+                                    <div class="recurrence-title">
+                                        <h3><?= htmlspecialchars($recurrence->description) ?></h3>
+                                        <span class="recurrence-frequency">
+                                            <?= App\Models\ExpenseRecurrence::getFrequencyLabel($recurrence->frequency) ?>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="recurrence-body">
+                                    <div class="recurrence-amount">
+                                        <?= number_format($recurrence->amount, 0, ',', ' ') ?> FCFA
+                                    </div>
+
+                                    <div class="recurrence-date">
+                                        <i class="far fa-clock"></i>
+                                        <?php if ($isPast): ?>
+                                            <span class="text-urgent">En retard!</span>
+                                        <?php elseif ($isToday): ?>
+                                            <span class="text-urgent">Aujourd'hui</span>
+                                        <?php else: ?>
+                                            Dans <?= $daysLeft ?> jour<?= $daysLeft > 1 ? 's' : '' ?>
+                                        <?php endif; ?>
+                                        <br>
+                                        <small class="text-muted"><?= date('d/m/Y', strtotime($recurrence->next_execution_date)) ?></small>
+                                    </div>
+                                </div>
+
+                                <div class="recurrence-footer">
+                                    <?php if ($isPast || $isToday): ?>
+                                        <span class="badge badge-urgent">
+                                            <i class="fas fa-exclamation-triangle"></i> À exécuter
+                                        </span>
+                                    <?php endif; ?>
+                                    <a href="/expenses/recurrences" class="btn-link-small">
+                                        Gérer <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="recurrences-footer">
+                        <a href="/expenses/recurrences" class="btn-view-all">
+                            <i class="fas fa-list"></i> Voir toutes les récurrences
+                        </a>
+                    </div>
+                </div>
+                <?php endif; ?>
 
                 <!-- Section Graphiques -->
                 <div class="charts-section">
