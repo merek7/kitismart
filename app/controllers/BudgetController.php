@@ -10,16 +10,23 @@ use App\Exceptions\TokenInvalidOrExpiredException;
 
 class BudgetController extends Controller {
 
+    public function __construct()
+    {
+        $this->requireAuth();
+    }
+
     public function showCreateBudgetForm() {
+        $userId = $_SESSION['user_id'];
         $csrfToken = Csrf::generateToken();
+
         try{
-            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+            $activeBudget = Budget::getActiveBudget($userId);
             $depense= $activeBudget ? Budget::getBudgetSummary($activeBudget->id) : null;
-            $previousBudgets = Budget::getPreviousBudgets($_SESSION['user_id'], 50);
+            $previousBudgets = Budget::getPreviousBudgets($userId, 50);
 
             // Préparer les données d'onboarding
             $onboarding = [
-                'stepsToShow' => UserOnboarding::getStepsForPage((int)$_SESSION['user_id'], 'budget_create')
+                'stepsToShow' => UserOnboarding::getStepsForPage((int)$userId, 'budget_create')
             ];
 
             $this->view('dashboard/budget_create', [
@@ -44,9 +51,14 @@ class BudgetController extends Controller {
             ]);
         }
     }
-   
+
     public function create() {
         try {
+            // Vérifier l'authentification
+            if (!isset($_SESSION['user_id'])) {
+                return $this->jsonResponse(['success' => false, 'message' => 'Non authentifié'], 401);
+            }
+
             if (!$this->isPostRequest()) {
                 return $this->jsonResponse(['success' => false, 'message' => 'Méthode non autorisée'], 405);
             }
