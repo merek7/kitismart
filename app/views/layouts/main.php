@@ -63,19 +63,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/assets/js/app.js"></script>
 
-    <!-- Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try {
-                    const registration = await navigator.serviceWorker.register('/service-worker.js');
-                    console.log('[PWA] Service Worker enregistré:', registration.scope);
-                } catch (error) {
-                    console.error('[PWA] Erreur d\'enregistrement du Service Worker:', error);
-                }
-            });
-        }
-    </script>
+    <!-- Service Worker - Désactivé (optionnel via Paramètres) -->
+    <!-- Le Service Worker n'est plus enregistré automatiquement -->
 
     <?php
     error_log("Scripts disponibles dans le layout: " . print_r($pageScripts ?? [], true));
