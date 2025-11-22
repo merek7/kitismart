@@ -356,8 +356,9 @@
 
 .input-with-icon input,
 .input-with-icon select {
-    padding-left: 2.75rem;
+    padding-left: 3.25rem;
     width: 100%;
+    text-indent: 0;
 }
 
 .form-control {

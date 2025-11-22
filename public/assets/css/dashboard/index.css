@@ -1086,9 +1086,10 @@ body {
 .input-with-icon select,
 .input-with-icon textarea {
   width: 100%;
-  padding-left: 3rem;
+  padding-left: 3.25rem;
   padding-right: 1rem;
   transition: all 0.3s ease;
+  text-indent: 0;
 }
 
 /* Padding spécial pour les inputs avec validation-icon */

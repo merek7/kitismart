@@ -101,7 +101,7 @@
             <div class="nav-user">
                 <div class="user-menu">
                     <span class="user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Utilisateur') ?></span>
-                    <a href="/logout" id="logoutBtn" class="btn-logout">
+                    <a href="#" id="logoutBtn" class="btn-logout" onclick="event.preventDefault(); if(window.cleanLogout) window.cleanLogout(); else window.location.href='/logout';">
                         <i class="fas fa-sign-out-alt"></i> Déconnexion
                     </a>
                 </div>
@@ -204,6 +204,9 @@
 
     <!-- PWA Install Script -->
     <script src="/assets/js/pwa-install.js"></script>
+
+    <!-- PWA Session Management -->
+    <script src="/assets/js/pwa-session.js"></script>
 
     <!-- Onboarding Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js"></script>
