@@ -16,9 +16,21 @@ class Mailer {
         $this->mailer->Password = $_ENV['SMTP_PASSWORD'] ?? '';
         $this->mailer->Port = (int)($_ENV['SMTP_PORT'] ?? 2525);
 
+        // Timeout de connexion (en secondes)
+        $this->mailer->Timeout = 10;
+        $this->mailer->SMTPKeepAlive = false;
+
         // Configuration optionnelle de l'encryption (tls, ssl)
         if (!empty($_ENV['SMTP_ENCRYPTION'])) {
             $this->mailer->SMTPSecure = $_ENV['SMTP_ENCRYPTION'];
+        } else {
+            // Désactiver la vérification SSL auto si pas d'encryption spécifiée
+            $this->mailer->SMTPAutoTLS = false;
+        }
+
+        // Debug en mode dev (0 = off, 2 = verbose)
+        if (($_ENV['APP_ENV'] ?? 'prod') === 'dev') {
+            $this->mailer->SMTPDebug = 0; // Mettre à 2 pour debug verbose
         }
 
         $this->mailer->CharSet = 'UTF-8';
