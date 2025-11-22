@@ -72,4 +72,66 @@ class BudgetController extends Controller {
             ], 500);
         }
     }
+
+    /**
+     * Récupère le budget actif de l'utilisateur (API)
+     */
+    public function getActiveBudget() {
+        try {
+            if (!isset($_SESSION['user_id'])) {
+                return $this->jsonResponse(['success' => false, 'message' => 'Non authentifié'], 401);
+            }
+
+            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+
+            if (!$activeBudget) {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'message' => 'Aucun budget actif'
+                ], 404);
+            }
+
+            return $this->jsonResponse([
+                'success' => true,
+                'budget' => $activeBudget
+            ]);
+        } catch (\Exception $e) {
+            error_log("Erreur getActiveBudget: " . $e->getMessage());
+            return $this->jsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération du budget'
+            ], 500);
+        }
+    }
+
+    /**
+     * Récupère le résumé d'un budget (API)
+     */
+    public function getBudgetSummary($id) {
+        try {
+            if (!isset($_SESSION['user_id'])) {
+                return $this->jsonResponse(['success' => false, 'message' => 'Non authentifié'], 401);
+            }
+
+            $summary = Budget::getBudgetSummary($id);
+
+            if (!$summary) {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'message' => 'Budget non trouvé'
+                ], 404);
+            }
+
+            return $this->jsonResponse([
+                'success' => true,
+                'summary' => $summary
+            ]);
+        } catch (\Exception $e) {
+            error_log("Erreur getBudgetSummary: " . $e->getMessage());
+            return $this->jsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération du résumé'
+            ], 500);
+        }
+    }
 } 
