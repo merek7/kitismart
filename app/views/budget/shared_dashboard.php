@@ -198,13 +198,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="category">
-                                    <i class="fas fa-tag"></i> Type de dépense <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-folder"></i></span>
-                                    </div>
+                                <label for="category">Type de dépense <span class="text-danger">*</span></label>
+                                <div class="input-with-icon select-wrapper">
+                                    <i class="fas fa-tag"></i>
                                     <select class="form-control select2-category" id="category" name="category" required>
                                         <option value="" disabled selected>Choisir un type</option>
                                         <optgroup label="Catégories par défaut">
@@ -227,18 +223,15 @@
                                             </optgroup>
                                         <?php endif; ?>
                                     </select>
+                                    <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="amount">
-                                    <i class="fas fa-coins"></i> Montant (FCFA) <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-                                    </div>
+                                <label for="amount">Montant (FCFA) <span class="text-danger">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-coins"></i>
                                     <input type="number"
                                            class="form-control"
                                            id="amount"
@@ -247,6 +240,7 @@
                                            min="0"
                                            step="1"
                                            placeholder="0">
+                                    <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -255,48 +249,38 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="payment_date">
-                                    <i class="fas fa-calendar-alt"></i> Date de paiement <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                                    </div>
+                                <label for="payment_date">Date de paiement <span class="text-danger">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-calendar-alt"></i>
                                     <input type="date"
                                            class="form-control"
                                            id="payment_date"
                                            name="payment_date"
                                            required
                                            value="<?= date('Y-m-d') ?>">
+                                    <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="status">
-                                    <i class="fas fa-check-circle"></i> Statut <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-flag"></i></span>
-                                    </div>
+                                <label for="status">Statut <span class="text-danger">*</span></label>
+                                <div class="input-with-icon select-wrapper">
+                                    <i class="fas fa-flag"></i>
                                     <select class="form-control select2-status" id="status" name="status" required>
                                         <option value="pending" data-icon="clock">En attente</option>
                                         <option value="paid" data-icon="check-circle">Payé</option>
                                     </select>
+                                    <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="description">
-                            <i class="fas fa-align-left"></i> Description
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-comment"></i></span>
-                            </div>
+                        <label for="description">Description</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-align-left"></i>
                             <textarea class="form-control"
                                       id="description"
                                       name="description"

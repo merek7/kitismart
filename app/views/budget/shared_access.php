@@ -103,23 +103,50 @@
             font-size: 0.95rem;
         }
 
-        .password-input-group {
+        /* Input with icon pattern */
+        .input-with-icon {
             position: relative;
+            display: flex;
+            align-items: center;
         }
 
-        .password-input-group input {
+        .input-with-icon > i:first-child {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 1rem;
+            z-index: 1;
+        }
+
+        .input-with-icon input {
             width: 100%;
-            padding: 14px 45px 14px 15px;
+            padding: 14px 45px 14px 45px;
             border: 2px solid var(--border-color);
             border-radius: 10px;
             font-size: 1rem;
             transition: all 0.3s;
         }
 
-        .password-input-group input:focus {
+        .input-with-icon input:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+
+        .input-with-icon .validation-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .form-group.valid .validation-icon {
+            opacity: 1;
         }
 
         .toggle-password {
@@ -133,6 +160,7 @@
             cursor: pointer;
             font-size: 1.2rem;
             transition: color 0.3s;
+            z-index: 2;
         }
 
         .toggle-password:hover {
@@ -298,10 +326,9 @@
                         <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
 
                         <div class="form-group">
-                            <label for="guest_name">
-                                <i class="fas fa-user"></i> Votre nom
-                            </label>
-                            <div class="password-input-group">
+                            <label for="guest_name">Votre nom</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
                                 <input
                                     type="text"
                                     id="guest_name"
@@ -311,14 +338,14 @@
                                     autocomplete="name"
                                     minlength="2"
                                     maxlength="100">
+                                <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="password">
-                                <i class="fas fa-key"></i> Mot de passe
-                            </label>
-                            <div class="password-input-group">
+                            <label for="password">Mot de passe</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-key"></i>
                                 <input
                                     type="password"
                                     id="password"
@@ -461,6 +488,25 @@
         // Focus on guest name field on load
         window.addEventListener('load', function() {
             document.getElementById('guest_name').focus();
+        });
+
+        // Real-time validation
+        document.getElementById('guest_name').addEventListener('input', function() {
+            const formGroup = this.closest('.form-group');
+            if (this.value.trim().length >= 2) {
+                formGroup.classList.add('valid');
+            } else {
+                formGroup.classList.remove('valid');
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            const formGroup = this.closest('.form-group');
+            if (this.value.length >= 1) {
+                formGroup.classList.add('valid');
+            } else {
+                formGroup.classList.remove('valid');
+            }
         });
         <?php endif; ?>
     </script>
