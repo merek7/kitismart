@@ -29,8 +29,9 @@ class EmailTestController extends Controller
         $this->view('admin/email-test', [
             'title' => 'Test des Emails - KitiSmart',
             'csrfToken' => $csrfToken,
-            'emailTypes' => $this->getEmailTypes()
-        ]);
+            'emailTypes' => $this->getEmailTypes(),
+            'currentPage' => 'email-test'
+        ], 'dashboard');
     }
 
     /**

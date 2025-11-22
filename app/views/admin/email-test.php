@@ -1,143 +1,158 @@
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <!-- Header -->
-            <div class="d-flex align-items-center justify-content-between mb-4">
+<div class="content-wrapper">
+    <div class="page-header">
+        <h1><i class="fas fa-envelope"></i> Test des Emails</h1>
+        <div class="breadcrumb">
+            <a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a>
+            <span>/</span>
+            <span>Test Emails</span>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="container">
+            <div class="settings-header">
                 <div>
-                    <h1 class="h3 mb-1">Test des Emails</h1>
-                    <p class="text-muted mb-0">Testez et prévisualisez tous les types d'emails de l'application</p>
+                    <p class="subtitle">Testez et prévisualisez tous les types d'emails de l'application</p>
                 </div>
-                <span class="badge bg-warning text-dark">Mode Développement</span>
+                <span class="badge-dev">Mode Développement</span>
             </div>
 
-            <!-- Alert -->
-            <div class="alert alert-info d-flex align-items-center mb-4">
-                <svg class="me-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                </svg>
+            <!-- Info SMTP -->
+            <div class="info-box info-box-primary">
+                <i class="fas fa-server"></i>
                 <div>
                     Les emails sont envoyés via <strong><?= htmlspecialchars($_ENV['SMTP_HOST'] ?? 'SMTP non configuré') ?></strong>.
-                    Consultez <a href="https://mailtrap.io" target="_blank" class="alert-link">Mailtrap</a> pour voir les emails de test.
+                    Consultez <a href="https://mailtrap.io" target="_blank">Mailtrap</a> pour voir les emails de test.
                 </div>
             </div>
 
-            <!-- Email Test Form -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Envoyer un email de test</h5>
-                </div>
-                <div class="card-body">
-                    <form id="emailTestForm">
-                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+            <!-- Message de feedback -->
+            <div id="feedback-message" class="alert" style="display: none;"></div>
 
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="recipient_email" class="form-label">Email destinataire</label>
-                                <input type="email"
-                                       class="form-control"
-                                       id="recipient_email"
-                                       name="recipient_email"
-                                       placeholder="test@exemple.com"
-                                       required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="email_type" class="form-label">Type d'email</label>
-                                <select class="form-select" id="email_type" name="email_type" required>
-                                    <option value="">Sélectionner un type...</option>
-                                    <?php foreach ($emailTypes as $key => $type): ?>
-                                        <option value="<?= htmlspecialchars($key) ?>">
-                                            <?= $type['icon'] ?> <?= htmlspecialchars($type['name']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
+            <div class="settings-container">
+                <!-- Section: Envoyer un email de test -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <h2><i class="fas fa-paper-plane"></i> Envoyer un email de test</h2>
+                            <p>Sélectionnez le type d'email et entrez une adresse de destination</p>
                         </div>
+                    </div>
+                    <div class="settings-card">
+                        <form id="emailTestForm">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
 
-                        <div class="mt-4 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary" id="sendBtn">
-                                <span class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
-                                Envoyer l'email de test
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary" id="previewBtn">
-                                Prévisualiser
-                            </button>
-                        </div>
-                    </form>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-title">
+                                        <i class="fas fa-at"></i> Email destinataire
+                                    </div>
+                                    <div class="setting-description">
+                                        L'adresse email qui recevra le test
+                                    </div>
+                                </div>
+                                <div class="setting-control setting-control-wide">
+                                    <input type="email"
+                                           class="form-control"
+                                           id="recipient_email"
+                                           name="recipient_email"
+                                           placeholder="test@exemple.com"
+                                           required>
+                                </div>
+                            </div>
 
-                    <!-- Result message -->
-                    <div id="resultMessage" class="mt-3 d-none"></div>
-                </div>
-            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-title">
+                                        <i class="fas fa-list"></i> Type d'email
+                                    </div>
+                                    <div class="setting-description">
+                                        Le type de notification à tester
+                                    </div>
+                                </div>
+                                <div class="setting-control setting-control-wide">
+                                    <select class="form-select" id="email_type" name="email_type" required>
+                                        <option value="">Sélectionner un type...</option>
+                                        <?php foreach ($emailTypes as $key => $type): ?>
+                                            <option value="<?= htmlspecialchars($key) ?>">
+                                                <?= $type['icon'] ?> <?= htmlspecialchars($type['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
 
-            <!-- Email Types List -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Types d'emails disponibles</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th></th>
-                                    <th>Type</th>
-                                    <th>Description</th>
-                                    <th class="text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($emailTypes as $key => $type): ?>
-                                <tr>
-                                    <td class="text-center" style="width: 50px;">
-                                        <span style="font-size: 1.5rem;"><?= $type['icon'] ?></span>
-                                    </td>
-                                    <td>
-                                        <strong><?= htmlspecialchars($type['name']) ?></strong>
-                                    </td>
-                                    <td class="text-muted">
-                                        <?= htmlspecialchars($type['description']) ?>
-                                    </td>
-                                    <td class="text-end">
-                                        <a href="/admin/email-test/preview?type=<?= urlencode($key) ?>"
-                                           target="_blank"
-                                           class="btn btn-sm btn-outline-primary">
-                                            Voir
-                                        </a>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                            <div class="setting-item setting-actions">
+                                <button type="submit" class="btn-save" id="sendBtn">
+                                    <span class="spinner" style="display: none;"></span>
+                                    <i class="fas fa-paper-plane"></i> Envoyer l'email de test
+                                </button>
+                                <button type="button" class="btn-secondary" id="previewBtn">
+                                    <i class="fas fa-eye"></i> Prévisualiser
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </div>
 
-            <!-- SMTP Configuration Info -->
-            <div class="card shadow-sm mt-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Configuration SMTP actuelle</h5>
+                <!-- Section: Types d'emails disponibles -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <h2><i class="fas fa-mail-bulk"></i> Types d'emails disponibles</h2>
+                            <p>Tous les emails que l'application peut envoyer</p>
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <?php foreach ($emailTypes as $key => $type): ?>
+                        <div class="setting-item email-type-item">
+                            <div class="setting-info">
+                                <div class="setting-title">
+                                    <span class="email-icon"><?= $type['icon'] ?></span>
+                                    <?= htmlspecialchars($type['name']) ?>
+                                </div>
+                                <div class="setting-description">
+                                    <?= htmlspecialchars($type['description']) ?>
+                                </div>
+                            </div>
+                            <div class="setting-control">
+                                <a href="/admin/email-test/preview?type=<?= urlencode($key) ?>"
+                                   target="_blank"
+                                   class="btn-preview">
+                                    <i class="fas fa-external-link-alt"></i> Voir
+                                </a>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <small class="text-muted d-block">Serveur</small>
-                            <strong><?= htmlspecialchars($_ENV['SMTP_HOST'] ?? 'Non configuré') ?></strong>
+
+                <!-- Section: Configuration SMTP -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <h2><i class="fas fa-cogs"></i> Configuration SMTP actuelle</h2>
+                            <p>Paramètres de connexion au serveur de mail</p>
                         </div>
-                        <div class="col-md-2">
-                            <small class="text-muted d-block">Port</small>
-                            <strong><?= htmlspecialchars($_ENV['SMTP_PORT'] ?? '2525') ?></strong>
-                        </div>
-                        <div class="col-md-3">
-                            <small class="text-muted d-block">Expéditeur</small>
-                            <strong><?= htmlspecialchars($_ENV['MAIL_FROM'] ?? 'Non configuré') ?></strong>
-                        </div>
-                        <div class="col-md-2">
-                            <small class="text-muted d-block">Encryption</small>
-                            <strong><?= htmlspecialchars($_ENV['SMTP_ENCRYPTION'] ?? 'Aucune') ?: 'Aucune' ?></strong>
-                        </div>
-                        <div class="col-md-2">
-                            <small class="text-muted d-block">Environnement</small>
-                            <span class="badge bg-warning text-dark"><?= htmlspecialchars($_ENV['APP_ENV'] ?? 'dev') ?></span>
+                    </div>
+                    <div class="settings-card smtp-config">
+                        <div class="smtp-grid">
+                            <div class="smtp-item">
+                                <div class="smtp-label"><i class="fas fa-server"></i> Serveur</div>
+                                <div class="smtp-value"><?= htmlspecialchars($_ENV['SMTP_HOST'] ?? 'Non configuré') ?></div>
+                            </div>
+                            <div class="smtp-item">
+                                <div class="smtp-label"><i class="fas fa-plug"></i> Port</div>
+                                <div class="smtp-value"><?= htmlspecialchars($_ENV['SMTP_PORT'] ?? '2525') ?></div>
+                            </div>
+                            <div class="smtp-item">
+                                <div class="smtp-label"><i class="fas fa-user"></i> Expéditeur</div>
+                                <div class="smtp-value"><?= htmlspecialchars($_ENV['MAIL_FROM'] ?? 'Non configuré') ?></div>
+                            </div>
+                            <div class="smtp-item">
+                                <div class="smtp-label"><i class="fas fa-lock"></i> Encryption</div>
+                                <div class="smtp-value"><?= htmlspecialchars($_ENV['SMTP_ENCRYPTION'] ?? 'Aucune') ?: 'Aucune' ?></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -146,13 +161,179 @@
     </div>
 </div>
 
+<style>
+.badge-dev {
+    background: linear-gradient(135deg, #facc15, #f59e0b);
+    color: #1f2937;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.info-box-primary {
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+    border-left-color: #0ea5e9;
+}
+
+.info-box-primary a {
+    color: #0369a1;
+    font-weight: 600;
+}
+
+.setting-control-wide {
+    min-width: 300px;
+}
+
+.setting-control-wide .form-control,
+.setting-control-wide .form-select {
+    width: 100%;
+}
+
+.setting-actions {
+    justify-content: flex-start;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.email-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.btn-preview {
+    background: var(--primary-color, #0d9488);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-preview:hover {
+    background: var(--secondary-color, #0f766e);
+    color: white;
+}
+
+.smtp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.smtp-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--bg-secondary, #f9fafb);
+    border-radius: 8px;
+}
+
+.smtp-label {
+    font-size: 0.8rem;
+    color: var(--text-muted, #6b7280);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.smtp-value {
+    font-weight: 600;
+    color: var(--text-primary, #1f2937);
+    word-break: break-all;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Mode sombre */
+[data-theme="dark"] .badge-dev {
+    background: linear-gradient(135deg, #facc15, #f59e0b);
+    color: #1f2937;
+}
+
+[data-theme="dark"] .info-box-primary {
+    background: rgba(14, 165, 233, 0.1);
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: #374151;
+    color: #f9fafb;
+    border-color: #4b5563;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: #4b5563;
+}
+
+[data-theme="dark"] .smtp-item {
+    background: #1f2937;
+}
+
+@media (max-width: 768px) {
+    .setting-control-wide {
+        min-width: 100%;
+    }
+
+    .setting-actions {
+        flex-direction: column;
+    }
+
+    .setting-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .smtp-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('emailTestForm');
     const sendBtn = document.getElementById('sendBtn');
     const previewBtn = document.getElementById('previewBtn');
-    const resultMessage = document.getElementById('resultMessage');
-    const spinner = sendBtn.querySelector('.spinner-border');
+    const feedbackMessage = document.getElementById('feedback-message');
+    const spinner = sendBtn.querySelector('.spinner');
+    const btnIcon = sendBtn.querySelector('.fa-paper-plane');
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -170,7 +351,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         sendBtn.disabled = true;
-        spinner.classList.remove('d-none');
+        spinner.style.display = 'inline-block';
+        btnIcon.style.display = 'none';
 
         try {
             const response = await fetch('/admin/email-test/send', {
@@ -190,7 +372,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showMessage('Erreur de connexion: ' + error.message, 'danger');
         } finally {
             sendBtn.disabled = false;
-            spinner.classList.add('d-none');
+            spinner.style.display = 'none';
+            btnIcon.style.display = 'inline';
         }
     });
 
@@ -204,12 +387,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function showMessage(message, type) {
-        resultMessage.className = 'mt-3 alert alert-' + type;
-        resultMessage.textContent = message;
-        resultMessage.classList.remove('d-none');
+        feedbackMessage.className = 'alert alert-' + type;
+        feedbackMessage.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'times-circle') + '"></i> ' + message;
+        feedbackMessage.style.display = 'flex';
+        feedbackMessage.style.alignItems = 'center';
+        feedbackMessage.style.gap = '0.5rem';
 
         setTimeout(() => {
-            resultMessage.classList.add('d-none');
+            feedbackMessage.style.display = 'none';
         }, 5000);
     }
 });
