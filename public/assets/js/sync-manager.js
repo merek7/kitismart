@@ -6,6 +6,38 @@ class SyncManager {
     this.syncing = false;
     this.syncInterval = null;
     this.onlineListenerAttached = false;
+    this.cachedCsrfToken = null;
+  }
+
+  /**
+   * Récupérer un nouveau token CSRF depuis le serveur
+   */
+  async getFreshCsrfToken() {
+    try {
+      const response = await fetch('/api/csrf-token', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        console.error('[SyncManager] Erreur récupération CSRF token:', response.status);
+        return null;
+      }
+
+      const data = await response.json();
+      if (data.success && data.csrf_token) {
+        this.cachedCsrfToken = data.csrf_token;
+        console.log('[SyncManager] Nouveau CSRF token récupéré');
+        return data.csrf_token;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('[SyncManager] Erreur getFreshCsrfToken:', error);
+      return null;
+    }
   }
 
   /**
@@ -132,6 +164,14 @@ class SyncManager {
       let errorCount = 0;
 
       console.log('[SyncManager] Début de la synchronisation...');
+
+      // Récupérer un nouveau token CSRF avant de synchroniser
+      const freshToken = await this.getFreshCsrfToken();
+      if (!freshToken) {
+        console.error('[SyncManager] Impossible de récupérer un token CSRF - synchronisation annulée');
+        this.syncing = false;
+        return;
+      }
 
       // Synchroniser les requêtes en attente (interceptées par le Service Worker)
       const pendingRequests = await window.offlineStorage.getPendingRequests();
@@ -352,9 +392,11 @@ class SyncManager {
         // Convertir FormData en objet JSON pour expenses/create
         if (requestData.url.includes('/expenses/create')) {
           const expenseData = this.formDataToExpenseJSON(formData);
+          // Remplacer le token CSRF expiré par le frais
+          expenseData.csrf_token = this.cachedCsrfToken;
           bodyToSend = JSON.stringify(expenseData);
           headersToSend['content-type'] = 'application/json';
-          console.log('[SyncManager] Body converti en JSON:', expenseData);
+          console.log('[SyncManager] Body converti en JSON avec token frais:', expenseData);
         } else {
           // Pour autres requêtes, recréer le FormData
           bodyToSend = formData;
@@ -363,6 +405,20 @@ class SyncManager {
       } catch (error) {
         console.error('[SyncManager] Erreur de parsing multipart:', error);
         // Fallback: essayer d'envoyer tel quel
+      }
+    }
+
+    // Si le body est du JSON, remplacer le token CSRF
+    if (headersToSend['content-type']?.includes('application/json') && typeof bodyToSend === 'string') {
+      try {
+        const jsonBody = JSON.parse(bodyToSend);
+        if (jsonBody.csrf_token) {
+          jsonBody.csrf_token = this.cachedCsrfToken;
+          bodyToSend = JSON.stringify(jsonBody);
+          console.log('[SyncManager] Token CSRF remplacé dans le body JSON');
+        }
+      } catch (e) {
+        // Pas un JSON valide, continuer
       }
     }
 
@@ -471,6 +527,10 @@ class SyncManager {
     // Normaliser les données au cas où elles viennent de l'ancien format
     const normalizedExpense = this.normalizeExpenseData(expense);
 
+    // Remplacer le token CSRF expiré par le nouveau
+    normalizedExpense.csrf_token = this.cachedCsrfToken;
+    console.log('[SyncManager] Utilisation du token CSRF frais pour expense');
+
     console.log('[SyncManager] Données normalisées:', normalizedExpense);
     console.log('[DEBUG] JSON à envoyer:', JSON.stringify(normalizedExpense));
 
@@ -506,14 +566,18 @@ class SyncManager {
   async syncBudget(budget) {
     console.log('[DEBUG] Données brutes du budget:', budget);
 
-    // Préparer les données en excluant id, timestamp, synced
+    // Préparer les données en excluant id, timestamp, synced, et l'ancien csrf_token
     const budgetData = {};
     Object.keys(budget).forEach(key => {
-      if (key !== 'id' && key !== 'timestamp' && key !== 'synced') {
+      if (key !== 'id' && key !== 'timestamp' && key !== 'synced' && key !== 'csrf_token') {
         console.log(`[DEBUG] Ajout à budgetData: ${key} = ${budget[key]}`);
         budgetData[key] = budget[key];
       }
     });
+
+    // Utiliser le token CSRF frais au lieu de l'ancien
+    budgetData.csrf_token = this.cachedCsrfToken;
+    console.log('[DEBUG] Utilisation du token CSRF frais');
 
     console.log('[DEBUG] JSON à envoyer:', JSON.stringify(budgetData));
 

@@ -65,5 +65,8 @@ return [
     ['POST', '/api/onboarding/complete/[*:step]', 'OnboardingController#completeStep', 'onboarding_complete'],
     ['POST', '/api/onboarding/skip/[*:step]', 'OnboardingController#skipStep', 'onboarding_skip'],
     ['GET', '/api/onboarding/status', 'OnboardingController#getStatus', 'onboarding_status'],
-    ['POST', '/api/onboarding/reset', 'OnboardingController#reset', 'onboarding_reset']
+    ['POST', '/api/onboarding/reset', 'OnboardingController#reset', 'onboarding_reset'],
+
+    // API utilitaires
+    ['GET', '/api/csrf-token', 'ApiController#getCsrfToken', 'api_csrf_token']
 ];
