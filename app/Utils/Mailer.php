@@ -24,17 +24,36 @@ class Mailer {
         $this->mailer->CharSet = 'UTF-8';
     }
 
-    public function sendConfirmationEmail($email, $name, $token) {
+    /**
+     * Réinitialiser le mailer pour un nouvel envoi
+     */
+    private function resetMailer(): void
+    {
+        $this->mailer->clearAddresses();
+        $this->mailer->clearAttachments();
+    }
+
+    /**
+     * Échapper les données utilisateur pour éviter XSS dans les emails HTML
+     */
+    private function escape(string $value): string
+    {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
+
+    public function sendConfirmationEmail($email, $name, $token): bool {
         try {
+            $this->resetMailer();
             $this->mailer->setFrom($_ENV['MAIL_FROM'], $_ENV['MAIL_FROM_NAME']);
             $this->mailer->addAddress($email, $name);
             $this->mailer->isHTML(true);
-            
-            $confirmationLink = $_ENV['APP_URL'] . "/confirmation/" . $token;
-            
+
+            $confirmationLink = $_ENV['APP_URL'] . "/confirmation/" . urlencode($token);
+            $safeName = $this->escape($name);
+
             $this->mailer->Subject = 'Confirmez votre compte KitiSmart';
             $this->mailer->Body = "
-                <h2>Bonjour {$name},</h2>
+                <h2>Bonjour {$safeName},</h2>
                 <p>Merci de vous être inscrit sur KitiSmart. Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :</p>
                 <p><a href='{$confirmationLink}'>Confirmer mon compte</a></p>
                 <p>Ce lien est valable pendant 20 minutes.</p>
@@ -50,15 +69,17 @@ class Mailer {
 
     public function sendPasswordResetEmail(string $email, string $name, string $token): bool {
         try {
+            $this->resetMailer();
             $this->mailer->setFrom($_ENV['MAIL_FROM'], $_ENV['MAIL_FROM_NAME']);
             $this->mailer->addAddress($email, $name);
             $this->mailer->isHTML(true);
-            
-            $resetLink = $_ENV['APP_URL'] . "/reset-password/" . $token;
-            
+
+            $resetLink = $_ENV['APP_URL'] . "/reset-password/" . urlencode($token);
+            $safeName = $this->escape($name);
+
             $this->mailer->Subject = "Réinitialisation de votre mot de passe - KitiSmart";
             $this->mailer->Body = "
-                <h2>Bonjour {$name},</h2>
+                <h2>Bonjour {$safeName},</h2>
                 <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
                 <p>Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe :</p>
                 <p><a href='{$resetLink}'>{$resetLink}</a></p>
@@ -68,6 +89,109 @@ class Mailer {
             return $this->mailer->send();
         } catch (Exception $e) {
             error_log("Erreur d'envoi d'email: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Envoyer une alerte de budget (80% ou dépassement)
+     */
+    public function sendBudgetAlertEmail(string $email, string $name, array $data): bool {
+        try {
+            $this->resetMailer();
+            $this->mailer->setFrom($_ENV['MAIL_FROM'], $_ENV['MAIL_FROM_NAME']);
+            $this->mailer->addAddress($email, $name);
+            $this->mailer->isHTML(true);
+
+            // Variables pour le template
+            $user_name = $this->escape($name);
+            $percentage = $data['percentage'] ?? 0;
+            $is_over_budget = $data['is_over_budget'] ?? false;
+            $budget_initial = number_format($data['budget_initial'] ?? 0, 0, ',', ' ');
+            $budget_spent = number_format($data['budget_spent'] ?? 0, 0, ',', ' ');
+            $budget_remaining = number_format($data['budget_remaining'] ?? 0, 0, ',', ' ');
+
+            $this->mailer->Subject = $is_over_budget
+                ? "Budget dépassé - KitiSmart"
+                : "Alerte budget à {$percentage}% - KitiSmart";
+
+            // Générer le contenu depuis le template
+            ob_start();
+            include dirname(__DIR__) . '/views/emails/budget_alert.php';
+            $this->mailer->Body = ob_get_clean();
+
+            return $this->mailer->send();
+        } catch (Exception $e) {
+            error_log("Erreur d'envoi d'email budget_alert: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Envoyer une alerte de dépense importante
+     */
+    public function sendExpenseAlertEmail(string $email, string $name, array $data): bool {
+        try {
+            $this->resetMailer();
+            $this->mailer->setFrom($_ENV['MAIL_FROM'], $_ENV['MAIL_FROM_NAME']);
+            $this->mailer->addAddress($email, $name);
+            $this->mailer->isHTML(true);
+
+            // Variables pour le template
+            $user_name = $this->escape($name);
+            $expense_amount = $data['expense_amount'] ?? 0;
+            $expense_description = $this->escape($data['expense_description'] ?? '');
+            $expense_date = $data['expense_date'] ?? date('Y-m-d');
+            $expense_category = $this->escape($data['expense_category'] ?? '');
+            $threshold = $data['threshold'] ?? 0;
+            $budget_remaining = $data['budget_remaining'] ?? null;
+
+            $this->mailer->Subject = "Alerte: Dépense de " . number_format($expense_amount, 0, ',', ' ') . " FCFA - KitiSmart";
+
+            // Générer le contenu depuis le template
+            ob_start();
+            include dirname(__DIR__) . '/views/emails/expense_alert.php';
+            $this->mailer->Body = ob_get_clean();
+
+            return $this->mailer->send();
+        } catch (Exception $e) {
+            error_log("Erreur d'envoi d'email expense_alert: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Envoyer le récapitulatif mensuel
+     */
+    public function sendMonthlySummaryEmail(string $email, string $name, array $data): bool {
+        try {
+            $this->resetMailer();
+            $this->mailer->setFrom($_ENV['MAIL_FROM'], $_ENV['MAIL_FROM_NAME']);
+            $this->mailer->addAddress($email, $name);
+            $this->mailer->isHTML(true);
+
+            // Variables pour le template
+            $user_name = $this->escape($name);
+            $period = $this->escape($data['period'] ?? date('F Y'));
+            $budget_initial = $data['budget_initial'] ?? 0;
+            $budget_remaining = $data['budget_remaining'] ?? 0;
+            $total_spent = $data['total_spent'] ?? 0;
+            $expense_count = $data['expense_count'] ?? 0;
+            $usage_percentage = $data['usage_percentage'] ?? 0;
+            $categories = $data['categories'] ?? [];
+            $top_expenses = $data['top_expenses'] ?? [];
+            $insights = $data['insights'] ?? [];
+
+            $this->mailer->Subject = "Récapitulatif mensuel - {$period} - KitiSmart";
+
+            // Générer le contenu depuis le template
+            ob_start();
+            include dirname(__DIR__) . '/views/emails/monthly_summary.php';
+            $this->mailer->Body = ob_get_clean();
+
+            return $this->mailer->send();
+        } catch (Exception $e) {
+            error_log("Erreur d'envoi d'email monthly_summary: " . $e->getMessage());
             return false;
         }
     }
