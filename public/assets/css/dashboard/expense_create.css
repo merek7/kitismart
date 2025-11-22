@@ -94,6 +94,18 @@
   gap: 0.5rem;
 }
 
+#global-message.warning {
+  background-color: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  color: #92400e;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* Styles pour la modal de confirmation */
 .modal-overlay {
   position: fixed;

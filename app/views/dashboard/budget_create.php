@@ -1,14 +1,45 @@
 <div class="content-wrapper">
     <div class="page-header">
-        <h1><i class="fas fa-wallet"></i> Nouveau Budget</h1>
+        <h1><i class="fas fa-wallet"></i> Gestion du Budget</h1>
         <div class="breadcrumb">
             <a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a>
             <span>/</span>
-            <span>Nouveau Budget</span>
+            <span>Budget</span>
         </div>
     </div>
 
     <div class="page-content">
+        <?php if(isset($activeBudget) && $activeBudget): ?>
+        <!-- Budget Actif -->
+        <div class="card mb-4" style="border-left: 4px solid #0d9488;">
+            <div class="card-header" style="background: linear-gradient(135deg, #0d9488, #0f766e); color: white;">
+                <h3 class="card-title" style="margin: 0;"><i class="fas fa-check-circle"></i> Budget Actif</h3>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h4 style="margin: 0 0 10px 0;"><?= htmlspecialchars($activeBudget->name ?? 'Budget') ?></h4>
+                        <p style="margin: 0; color: #666;">
+                            <i class="fas fa-calendar"></i> Depuis le <?= date('d/m/Y', strtotime($activeBudget->start_date)) ?>
+                        </p>
+                        <p style="margin: 5px 0 0 0;">
+                            <strong style="color: #0d9488;"><?= number_format($activeBudget->remaining_amount, 0, ',', ' ') ?> FCFA</strong>
+                            <span style="color: #999;">restants sur <?= number_format($activeBudget->initial_amount, 0, ',', ' ') ?> FCFA</span>
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <a href="/budget/<?= $activeBudget->id ?>/share" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea, #764ba2); border: none;">
+                            <i class="fas fa-share-alt"></i> Partager ce budget
+                        </a>
+                        <a href="/budget/shares/manage" class="btn btn-secondary">
+                            <i class="fas fa-list"></i> Mes partages
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <?php if(isset($error)): ?>
             <div class="alert alert-danger">
                 <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($error) ?>

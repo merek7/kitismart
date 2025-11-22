@@ -46,5 +46,18 @@ return [
     ['GET', '/settings', 'SettingsController#index', 'settings'],
     ['POST', '/settings/update-profile', 'SettingsController#updateProfile', 'settings_update_profile'],
     ['POST', '/settings/update-password', 'SettingsController#updatePassword', 'settings_update_password'],
-    ['POST', '/settings/delete-account', 'SettingsController#deleteAccount', 'settings_delete_account']
+    ['POST', '/settings/delete-account', 'SettingsController#deleteAccount', 'settings_delete_account'],
+
+    // Budget Sharing Routes
+    ['GET', '/budget/[i:id]/share', 'BudgetShareController#showShareForm', 'budget_share_form'],
+    ['POST', '/budget/[i:id]/share', 'BudgetShareController#createShare', 'budget_share_create'],
+    ['GET', '/budget/shares/manage', 'BudgetShareController#manageShares', 'budget_shares_manage'],
+    ['POST', '/budget/shares/[i:id]/revoke', 'BudgetShareController#revokeShare', 'budget_share_revoke'],
+
+    // Guest Access Routes
+    ['GET', '/budget/shared/[*:token]', 'BudgetShareController#showGuestAccess', 'budget_guest_access'],
+    ['POST', '/budget/shared/[*:token]/authenticate', 'BudgetShareController#authenticateGuest', 'budget_guest_auth'],
+    ['GET', '/budget/shared/dashboard', 'BudgetShareController#guestDashboard', 'budget_guest_dashboard'],
+    ['POST', '/budget/shared/expense/create', 'BudgetShareController#guestCreateExpense', 'budget_guest_expense_create'],
+    ['GET', '/budget/shared/logout', 'BudgetShareController#guestLogout', 'budget_guest_logout']
 ];

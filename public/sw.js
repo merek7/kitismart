@@ -2,7 +2,7 @@
 // SERVICE WORKER - KitiSmart PWA
 // ===================================
 
-const CACHE_VERSION = 'kitismart-v1.0.1';
+const CACHE_VERSION = 'kitismart-v1.1.0';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -75,8 +75,56 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Ignorer les requêtes non-GET
-  if (request.method !== 'GET') {
+  // ===================================
+  // Gestion des requêtes non-GET (POST, PUT, DELETE) pour mode hors ligne
+  // ===================================
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    // Ignorer les requêtes HEAD (vérifications de connectivité)
+    // Ignorer aussi les requêtes de synchronisation (marquées avec X-Sync-Request)
+    if (request.headers.get('X-Sync-Request') === 'true') {
+      console.log('[SW] Requête de synchronisation détectée - pas d\'interception');
+      return; // Laisser passer la requête normalement
+    }
+
+    // Cloner la requête AVANT de l'utiliser dans fetch (pour pouvoir lire le body après)
+    const requestClone = request.clone();
+
+    event.respondWith(
+      fetch(request)
+        .catch(async () => {
+          // Si la requête échoue (hors ligne), stocker dans IndexedDB via le client
+          const requestData = {
+            url: requestClone.url,
+            method: requestClone.method,
+            headers: Object.fromEntries(requestClone.headers.entries()),
+            body: await requestClone.text(),
+            timestamp: Date.now()
+          };
+
+          // Envoyer au client pour stockage dans IndexedDB
+          const clients = await self.clients.matchAll();
+          clients.forEach(client => {
+            client.postMessage({
+              type: 'SAVE_OFFLINE_REQUEST',
+              data: requestData
+            });
+          });
+
+          console.log('[SW] Requête sauvegardée pour synchronisation ultérieure');
+
+          return new Response(
+            JSON.stringify({
+              success: false,
+              offline: true,
+              message: 'Données enregistrées hors ligne. Elles seront synchronisées automatiquement.'
+            }),
+            {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
+        })
+    );
     return;
   }
 
@@ -99,7 +147,73 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => {
           // Si offline, retourner depuis le cache
-          return caches.match(request);
+          return caches.match(request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+
+            // Si pas en cache non plus, retourner la page offline
+            return new Response(
+              `<!DOCTYPE html>
+              <html lang="fr">
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>KitiSmart - Hors ligne</title>
+                <style>
+                  body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                    margin: 0;
+                    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+                    color: white;
+                    text-align: center;
+                    padding: 2rem;
+                  }
+                  .offline-container {
+                    max-width: 400px;
+                  }
+                  h1 {
+                    font-size: 4rem;
+                    margin: 0 0 1rem;
+                  }
+                  p {
+                    font-size: 1.2rem;
+                    margin: 0 0 2rem;
+                  }
+                  button {
+                    background: white;
+                    color: #0d9488;
+                    border: none;
+                    padding: 1rem 2rem;
+                    font-size: 1rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                  }
+                  button:hover {
+                    transform: scale(1.05);
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="offline-container">
+                  <h1>📡</h1>
+                  <h2>Page non disponible hors ligne</h2>
+                  <p>Cette page n'a pas encore été visitée. Visitez-la d'abord en ligne pour l'utiliser hors connexion.</p>
+                  <button onclick="window.location.href='/dashboard'">Retour au Dashboard</button>
+                </div>
+              </body>
+              </html>`,
+              {
+                status: 200,
+                headers: { 'Content-Type': 'text/html' }
+              }
+            );
+          });
         })
     );
     return;
@@ -213,6 +327,37 @@ self.addEventListener('message', (event) => {
       console.log('[SW] Tous les caches supprimés');
     });
   }
+
+  if (event.data && event.data.type === 'SYNC_NOW') {
+    event.waitUntil(syncOfflineData());
+  }
+});
+
+// ===================================
+// Synchronisation en arrière-plan
+// ===================================
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-offline-data') {
+    event.waitUntil(syncOfflineData());
+  }
+});
+
+async function syncOfflineData() {
+  console.log('[SW] Déclenchement de la synchronisation des données hors ligne...');
+
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => {
+    client.postMessage({
+      type: 'SYNC_OFFLINE_DATA'
+    });
+  });
+}
+
+// ===================================
+// Notification de changement de contrôleur
+// ===================================
+self.addEventListener('controllerchange', () => {
+  console.log('[SW] Nouveau Service Worker activé');
 });
 
 console.log('[SW] Service Worker chargé - Version:', CACHE_VERSION);

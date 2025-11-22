@@ -73,7 +73,13 @@ class ExpenseController extends Controller
                 foreach ($data['expenses'] as $index => $expenseData) {
                     // Ajouter l'ID utilisateur à chaque dépense
                     $expenseData['user_id'] = $_SESSION['user_id'];
-                    $expenseData['budget_id'] = BUDGET->id;
+
+                    // Récupérer le budget actif pour l'utilisateur
+                    $activeBudget = Budget::getActiveBudget((int)$_SESSION['user_id']);
+                    if (!$activeBudget || !$activeBudget->id) {
+                        throw new \Exception("Aucun budget actif trouvé pour l'utilisateur");
+                    }
+                    $expenseData['budget_id'] = (int)$activeBudget->id;
 
                     try {
                         // Validation pour chaque dépense
@@ -81,7 +87,14 @@ class ExpenseController extends Controller
 
                         // Création de la dépense
                         $expense = Expense::create($expenseData);
-                        $createdExpenses[] = $expense;
+                        // Convertir l'objet RedBean en tableau pour éviter les erreurs de sérialisation
+                        $createdExpenses[] = [
+                            'id' => (int)$expense->id,
+                            'description' => $expense->description,
+                            'amount' => (float)$expense->amount,
+                            'payment_date' => $expense->payment_date,
+                            'status' => $expense->status
+                        ];
                         error_log("✅ Dépense #{$index} créée avec succès (ID: {$expense->id})");
                     } catch (\Exception $e) {
                         $errorMessage = "Erreur à l'index $index: " . $e->getMessage();
@@ -100,13 +113,27 @@ class ExpenseController extends Controller
             } else {
                 // Traitement d'une seule dépense (code existant)
                 $data['user_id'] = $_SESSION['user_id'];
+
+                // Récupérer le budget actif pour l'utilisateur
+                $activeBudget = Budget::getActiveBudget((int)$_SESSION['user_id']);
+                if (!$activeBudget || !$activeBudget->id) {
+                    throw new \Exception("Aucun budget actif trouvé pour l'utilisateur");
+                }
+                $data['budget_id'] = (int)$activeBudget->id;
+
                 $this->validateExpenseData($data);
                 $expense = Expense::create($data);
 
                 return $this->jsonResponse([
                     'success' => true,
                     'message' => 'Dépense créée avec succès',
-                    'expense' => $expense
+                    'expense' => [
+                        'id' => (int)$expense->id,
+                        'description' => $expense->description,
+                        'amount' => (float)$expense->amount,
+                        'payment_date' => $expense->payment_date,
+                        'status' => $expense->status
+                    ]
                 ], 200);
             }
         } catch (\Exception $e) {
