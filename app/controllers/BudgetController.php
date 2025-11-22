@@ -66,6 +66,11 @@ class BudgetController extends Controller {
             $data = json_decode(file_get_contents('php://input'), true);
             $data['user_id'] = $_SESSION['user_id'];
 
+            // Mapper 'amount' vers 'initial_amount' si nécessaire
+            if (isset($data['amount']) && !isset($data['initial_amount'])) {
+                $data['initial_amount'] = $data['amount'];
+            }
+
             // Validation CSRF
             if (!Csrf::validateToken($data['csrf_token'] ?? '')) {
                 throw new TokenInvalidOrExpiredException();
