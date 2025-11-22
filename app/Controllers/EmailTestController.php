@@ -30,7 +30,8 @@ class EmailTestController extends Controller
             'title' => 'Test des Emails - KitiSmart',
             'csrfToken' => $csrfToken,
             'emailTypes' => $this->getEmailTypes(),
-            'currentPage' => 'email-test'
+            'currentPage' => 'email-test',
+            'style' => 'dashboard/notification_settings.css'
         ], 'dashboard');
     }
 
