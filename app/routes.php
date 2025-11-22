@@ -68,5 +68,10 @@ return [
     ['POST', '/api/onboarding/reset', 'OnboardingController#reset', 'onboarding_reset'],
 
     // API utilitaires
-    ['GET', '/api/csrf-token', 'ApiController#getCsrfToken', 'api_csrf_token']
+    ['GET', '/api/csrf-token', 'ApiController#getCsrfToken', 'api_csrf_token'],
+
+    // Admin - Test des emails (DEV ONLY)
+    ['GET', '/admin/email-test', 'EmailTestController#index', 'email_test'],
+    ['POST', '/admin/email-test/send', 'EmailTestController#sendTest', 'email_test_send'],
+    ['GET', '/admin/email-test/preview', 'EmailTestController#preview', 'email_test_preview']
 ];

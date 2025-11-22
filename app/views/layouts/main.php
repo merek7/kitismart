@@ -43,6 +43,9 @@
                     <a href="/dashboard">Tableau de bord</a>
                     <a href="/expenses">Dépenses</a>
                     <a href="/profile">Profil</a>
+                    <?php if (($_ENV['APP_ENV'] ?? 'prod') === 'dev'): ?>
+                        <a href="/admin/email-test" style="color: #facc15;">Test Emails</a>
+                    <?php endif; ?>
                     <a href="/logout">Déconnexion</a>
                 </div>
             <?php endif; ?>

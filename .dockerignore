@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment (will be set by Coolify)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Development files
+node_modules/
+npm-debug.log
+
+# Documentation (not needed in production)
+*.md
+!README.md
+
+# Tests
+tests/
+phpunit.xml
+
+# Cache
+*.cache
+
+# Docker files (don't copy into container)
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Migration scripts (run separately)
+migrate_to_postgresql.php
+
+# Cron installation guide
+CRON_INSTALLATION.md

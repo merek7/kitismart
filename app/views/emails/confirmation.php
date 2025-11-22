@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reinitialisation de mot de passe - KitiSmart</title>
+    <title>Confirmez votre compte KitiSmart</title>
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -27,12 +27,12 @@
         }
         .header h1 {
             margin: 0;
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 700;
         }
         .header .subtitle {
             margin-top: 10px;
-            font-size: 15px;
+            font-size: 16px;
             opacity: 0.9;
         }
         .header .icon {
@@ -58,19 +58,19 @@
             color: #6b7280;
             line-height: 1.8;
             font-size: 16px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
-        .info-box {
-            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
-            border-left: 4px solid #0ea5e9;
+        .highlight-box {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border-left: 4px solid #10b981;
             padding: 20px;
             margin: 25px 0;
             border-radius: 8px;
         }
-        .info-box p {
+        .highlight-box p {
             margin: 0;
-            color: #0c4a6e;
-            font-size: 14px;
+            color: #2c3e50;
+            font-size: 15px;
             line-height: 1.6;
         }
         .cta-section {
@@ -87,6 +87,10 @@
             font-weight: 600;
             font-size: 16px;
             box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
         }
         .warning-box {
             background-color: #fef3c7;
@@ -101,27 +105,40 @@
             font-size: 14px;
             line-height: 1.5;
         }
-        .security-tips {
+        .features {
             margin: 30px 0;
             padding: 25px;
             background-color: #f8f9fa;
             border-radius: 10px;
         }
-        .security-tips h3 {
-            margin: 0 0 15px 0;
+        .features h3 {
+            margin: 0 0 20px 0;
             color: #2c3e50;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
         }
-        .security-tips ul {
-            margin: 0;
-            padding-left: 20px;
-            color: #6b7280;
-            font-size: 14px;
-            line-height: 1.8;
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
         }
-        .security-tips li {
-            margin-bottom: 8px;
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #0d9488, #14b8a6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+        .feature-text {
+            color: #4b5563;
+            font-size: 14px;
         }
         .footer {
             background-color: #f8f9fa;
@@ -143,28 +160,15 @@
             background: linear-gradient(to right, transparent, #e5e7eb, transparent);
             margin: 30px 0;
         }
-        .alert-box {
-            background-color: #fef2f2;
-            border-left: 4px solid #ef4444;
-            padding: 15px 20px;
-            margin: 20px 0;
-            border-radius: 6px;
-        }
-        .alert-box p {
-            margin: 0;
-            color: #991b1b;
-            font-size: 14px;
-            line-height: 1.5;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="logo">KitiSmart</div>
-            <div class="icon">&#128274;</div>
-            <h1>Reinitialisation du mot de passe</h1>
-            <div class="subtitle">Securisez votre compte en quelques clics</div>
+            <div class="icon">&#9989;</div>
+            <h1>Bienvenue !</h1>
+            <div class="subtitle">Confirmez votre adresse email pour commencer</div>
         </div>
 
         <div class="content">
@@ -173,53 +177,54 @@
             </div>
 
             <p class="message">
-                Vous avez demande la reinitialisation de votre mot de passe sur <strong>KitiSmart</strong>.
-                Cliquez sur le bouton ci-dessous pour definir un nouveau mot de passe securise.
+                Merci de vous etre inscrit sur <strong>KitiSmart</strong>, votre assistant de gestion budgetaire intelligent !
+                Pour activer votre compte et commencer a gerer vos finances, veuillez confirmer votre adresse email.
             </p>
 
             <div class="cta-section">
-                <a href="<?= $resetLink ?>" class="cta-button">
-                    Reinitialiser mon mot de passe
+                <a href="<?= $confirmationLink ?>" class="cta-button">
+                    Confirmer mon compte
                 </a>
             </div>
 
             <div class="warning-box">
                 <p>
-                    <strong>&#9200; Ce lien expirera dans 1 heure.</strong><br>
-                    Si vous n'avez pas fait cette demande, vous pouvez ignorer cet email en toute securite.
-                    Votre mot de passe actuel restera inchange.
+                    <strong>Important :</strong> Ce lien est valable pendant <strong>20 minutes</strong>.
+                    Si vous n'avez pas cree de compte sur KitiSmart, veuillez ignorer cet email.
                 </p>
             </div>
 
             <div class="divider"></div>
 
-            <div class="security-tips">
-                <h3>&#128737; Conseils de securite :</h3>
-                <ul>
-                    <li>Choisissez un mot de passe d'au moins 8 caracteres</li>
-                    <li>Melangez lettres majuscules, minuscules, chiffres et symboles</li>
-                    <li>Evitez les informations personnelles (date de naissance, nom...)</li>
-                    <li>Utilisez un mot de passe unique pour chaque service</li>
-                </ul>
-            </div>
-
-            <div class="alert-box">
-                <p>
-                    <strong>&#9888; Vous n'avez pas fait cette demande ?</strong><br>
-                    Si vous n'etes pas a l'origine de cette demande, quelqu'un a peut-etre tente d'acceder a votre compte.
-                    Dans ce cas, ignorez cet email et envisagez de verifier la securite de votre adresse email.
-                </p>
+            <div class="features">
+                <h3>Ce que vous pourrez faire avec KitiSmart :</h3>
+                <div class="feature-item">
+                    <div class="feature-icon">&#128176;</div>
+                    <span class="feature-text">Creer et gerer vos budgets mensuels</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">&#128200;</div>
+                    <span class="feature-text">Suivre vos depenses en temps reel</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">&#128276;</div>
+                    <span class="feature-text">Recevoir des alertes personnalisees</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">&#128101;</div>
+                    <span class="feature-text">Partager vos budgets en famille</span>
+                </div>
             </div>
 
             <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-top: 25px;">
                 Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>
-                <a href="<?= $resetLink ?>" style="color: #0d9488; word-break: break-all;"><?= $resetLink ?></a>
+                <a href="<?= $confirmationLink ?>" style="color: #0d9488; word-break: break-all;"><?= $confirmationLink ?></a>
             </p>
         </div>
 
         <div class="footer">
             <p><strong>KitiSmart</strong> - Votre assistant de gestion budgetaire</p>
-            <p>Cet email a ete envoye automatiquement suite a une demande de reinitialisation.</p>
+            <p>Cet email a ete envoye automatiquement suite a votre inscription.</p>
             <p style="margin-top: 15px;">
                 &copy; <?= date('Y') ?> KitiSmart. Tous droits reserves.
             </p>

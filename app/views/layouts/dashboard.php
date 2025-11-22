@@ -95,6 +95,12 @@
                         <a href="/settings" class="dropdown-item <?= $currentPage === 'settings' ? 'active' : '' ?>">
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
+                        <?php if (($_ENV['APP_ENV'] ?? 'prod') === 'dev'): ?>
+                            <div class="dropdown-divider"></div>
+                            <a href="/admin/email-test" class="dropdown-item <?= $currentPage === 'email-test' ? 'active' : '' ?>" style="color: #facc15;">
+                                <i class="fas fa-envelope"></i> Test Emails
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
