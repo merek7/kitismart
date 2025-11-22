@@ -121,7 +121,7 @@
                             <h5 class="mb-0"><i class="fas fa-palette"></i> Préférences d'affichage</h5>
                         </div>
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <h6><i class="fas fa-moon"></i> Mode sombre</h6>
                                     <p class="text-muted mb-0 small">
@@ -131,6 +131,24 @@
                                 <div class="custom-control custom-switch">
                                     <input type="checkbox" class="custom-control-input" id="darkModeToggle">
                                     <label class="custom-control-label" for="darkModeToggle"></label>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6><i class="fas fa-wifi"></i> Mode hors ligne (PWA)</h6>
+                                    <p class="text-muted mb-0 small">
+                                        Permet d'utiliser l'application sans connexion internet.
+                                        <br><span id="pwa-status" class="pwa-status"></span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <button type="button" id="pwa-enable-btn" class="btn btn-sm btn-outline-primary" onclick="PWAManager.enableOfflineMode()">
+                                        <i class="fas fa-download"></i> Activer
+                                    </button>
+                                    <button type="button" id="pwa-disable-btn" class="btn btn-sm btn-outline-secondary" style="display: none;" onclick="PWAManager.disableOfflineMode()">
+                                        <i class="fas fa-times"></i> Désactiver
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -284,6 +302,36 @@
 .custom-control-input:checked ~ .custom-control-label::before {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
+}
+
+/* PWA Status Indicator */
+.pwa-status {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+
+.pwa-status.active {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.pwa-status.inactive {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+[data-theme="dark"] .pwa-status.active {
+    background: #064e3b;
+    color: #6ee7b7;
+}
+
+[data-theme="dark"] .pwa-status.inactive {
+    background: #7f1d1d;
+    color: #fca5a5;
 }
 </style>
 

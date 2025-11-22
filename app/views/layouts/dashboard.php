@@ -218,33 +218,39 @@
     <?php endif; ?>
 
     <!-- ================================
-         PWA Service Worker Registration
+         PWA Service Worker Registration (Optionnel)
          ================================ -->
     <script>
-        // Enregistrer le Service Worker pour PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
+        // Gestion du mode hors ligne optionnel
+        const PWAManager = {
+            // Vérifie si le mode hors ligne est activé
+            isOfflineModeEnabled() {
+                return localStorage.getItem('pwa_offline_enabled') === 'true';
+            },
+
+            // Vérifie si on est sur mobile
+            isMobile() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            },
+
+            // Active le mode hors ligne
+            async enableOfflineMode() {
+                if (!('serviceWorker' in navigator)) {
+                    alert('Votre navigateur ne supporte pas le mode hors ligne.');
+                    return false;
+                }
+
                 try {
                     const registration = await navigator.serviceWorker.register('/sw.js');
                     console.log('✅ Service Worker enregistré avec succès:', registration.scope);
+                    localStorage.setItem('pwa_offline_enabled', 'true');
 
                     // Initialiser le gestionnaire de synchronisation
                     if (window.syncManager) {
                         await window.syncManager.init();
-                        console.log('✅ Sync Manager initialisé');
                     }
 
-                    // Demander la permission pour les notifications
-                    if (window.syncManager) {
-                        await window.syncManager.requestNotificationPermission();
-                    }
-
-                    // Vérifier les mises à jour toutes les heures
-                    setInterval(() => {
-                        registration.update();
-                    }, 60 * 60 * 1000);
-
-                    // Vérifier les mises à jour du SW
+                    // Gérer les mises à jour
                     registration.addEventListener('updatefound', () => {
                         const newWorker = registration.installing;
                         newWorker.addEventListener('statechange', () => {
@@ -257,18 +263,136 @@
                             }
                         });
                     });
+
+                    this.updateUI();
+                    return true;
                 } catch (error) {
                     console.error('❌ Erreur d\'enregistrement du Service Worker:', error);
+                    return false;
                 }
-            });
+            },
 
-            // Écouter les mises à jour du Service Worker
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                console.log('🔄 Nouveau Service Worker activé');
-            });
-        }
+            // Désactive le mode hors ligne
+            async disableOfflineMode() {
+                try {
+                    // Désenregistrer tous les service workers
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const registration of registrations) {
+                        await registration.unregister();
+                    }
 
-        // Détecter le mode offline/online (géré par sync-manager.js maintenant)
+                    // Supprimer tous les caches
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+
+                    localStorage.setItem('pwa_offline_enabled', 'false');
+                    console.log('✅ Mode hors ligne désactivé');
+
+                    this.updateUI();
+                    return true;
+                } catch (error) {
+                    console.error('❌ Erreur lors de la désactivation:', error);
+                    return false;
+                }
+            },
+
+            // Met à jour l'interface utilisateur
+            updateUI() {
+                const enableBtn = document.getElementById('pwa-enable-btn');
+                const disableBtn = document.getElementById('pwa-disable-btn');
+                const statusIndicator = document.getElementById('pwa-status');
+
+                if (this.isOfflineModeEnabled()) {
+                    if (enableBtn) enableBtn.style.display = 'none';
+                    if (disableBtn) disableBtn.style.display = 'inline-flex';
+                    if (statusIndicator) {
+                        statusIndicator.textContent = 'Mode hors ligne actif';
+                        statusIndicator.className = 'pwa-status active';
+                    }
+                } else {
+                    if (enableBtn) enableBtn.style.display = 'inline-flex';
+                    if (disableBtn) disableBtn.style.display = 'none';
+                    if (statusIndicator) {
+                        statusIndicator.textContent = 'Mode hors ligne désactivé';
+                        statusIndicator.className = 'pwa-status inactive';
+                    }
+                }
+            },
+
+            // Initialise au chargement
+            async init() {
+                // Si le mode hors ligne est déjà activé, réenregistrer le SW
+                if (this.isOfflineModeEnabled() && 'serviceWorker' in navigator) {
+                    try {
+                        const registration = await navigator.serviceWorker.register('/sw.js');
+                        console.log('✅ Service Worker restauré');
+
+                        if (window.syncManager) {
+                            await window.syncManager.init();
+                        }
+                    } catch (error) {
+                        console.error('Erreur restauration SW:', error);
+                    }
+                }
+
+                this.updateUI();
+
+                // Afficher le bouton d'activation sur mobile si pas encore activé
+                if (this.isMobile() && !this.isOfflineModeEnabled()) {
+                    this.showMobilePrompt();
+                }
+            },
+
+            // Affiche une suggestion sur mobile
+            showMobilePrompt() {
+                // Ne pas afficher si déjà fermé récemment
+                const dismissed = localStorage.getItem('pwa_prompt_dismissed');
+                if (dismissed) {
+                    const dismissedTime = parseInt(dismissed, 10);
+                    // Ne pas réafficher pendant 7 jours
+                    if (Date.now() - dismissedTime < 7 * 24 * 60 * 60 * 1000) {
+                        return;
+                    }
+                }
+
+                setTimeout(() => {
+                    const prompt = document.createElement('div');
+                    prompt.id = 'pwa-mobile-prompt';
+                    prompt.innerHTML = `
+                        <div class="pwa-prompt-content">
+                            <i class="fas fa-wifi-slash"></i>
+                            <div class="pwa-prompt-text">
+                                <strong>Mode hors ligne disponible</strong>
+                                <p>Activez-le pour utiliser l'app sans connexion</p>
+                            </div>
+                            <button id="pwa-prompt-enable" class="btn btn-sm btn-primary">Activer</button>
+                            <button id="pwa-prompt-close" class="btn btn-sm btn-link"><i class="fas fa-times"></i></button>
+                        </div>
+                    `;
+                    document.body.appendChild(prompt);
+
+                    document.getElementById('pwa-prompt-enable').addEventListener('click', async () => {
+                        await this.enableOfflineMode();
+                        prompt.remove();
+                    });
+
+                    document.getElementById('pwa-prompt-close').addEventListener('click', () => {
+                        localStorage.setItem('pwa_prompt_dismissed', Date.now().toString());
+                        prompt.remove();
+                    });
+                }, 3000);
+            }
+        };
+
+        // Exposer globalement
+        window.PWAManager = PWAManager;
+
+        // Initialiser au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            PWAManager.init();
+        });
+
+        // Détecter le mode offline/online
         window.addEventListener('online', () => {
             console.log('🌐 Connexion rétablie');
         });
@@ -277,6 +401,78 @@
             console.log('📡 Mode hors ligne activé');
         });
     </script>
+
+    <!-- Style pour le prompt PWA -->
+    <style>
+        #pwa-mobile-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            animation: slideUp 0.3s ease;
+        }
+
+        .pwa-prompt-content {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            gap: 0.75rem;
+        }
+
+        .pwa-prompt-content > i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .pwa-prompt-text {
+            flex: 1;
+        }
+
+        .pwa-prompt-text strong {
+            display: block;
+            font-size: 0.95rem;
+            color: #1f2937;
+        }
+
+        .pwa-prompt-text p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        #pwa-prompt-close {
+            padding: 0.25rem;
+            color: #9ca3af;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mode sombre */
+        [data-theme="dark"] #pwa-mobile-prompt {
+            background: #1f2937;
+        }
+
+        [data-theme="dark"] .pwa-prompt-text strong {
+            color: #f9fafb;
+        }
+
+        [data-theme="dark"] .pwa-prompt-text p {
+            color: #9ca3af;
+        }
+    </style>
 
     <!-- Badge de synchronisation -->
     <div id="sync-badge" style="display: none;">
