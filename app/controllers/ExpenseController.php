@@ -10,24 +10,26 @@ use App\Models\Budget;
 use App\Models\Categorie;
 use App\Models\CustomCategory;
 
-
-
-$activeBudget = Budget::getActiveBudget(isset($_SESSION['user_id']));
-if ($activeBudget && !defined('BUDGET')) {
-    define('BUDGET', $activeBudget);
-}
-
 class ExpenseController extends Controller
 {
+    public function __construct()
+    {
+        $this->requireAuth();
+    }
+
     public function showCreateExpenseForm()
     {
+        $userId = $_SESSION['user_id'];
         $csrfToken = Csrf::generateToken();
         $categories = Categorie::getDefaultCategories();
-        $customCategories = [];
+        $customCategories = CustomCategory::findByUser($userId);
 
-        // Charger les catégories personnalisées de l'utilisateur
-        if (isset($_SESSION['user_id'])) {
-            $customCategories = CustomCategory::findByUser($_SESSION['user_id']);
+        // Récupérer le budget actif
+        $activeBudget = Budget::getActiveBudget($userId);
+
+        if (!$activeBudget) {
+            $_SESSION['error'] = "Vous devez d'abord créer un budget";
+            return $this->redirect('/budget/create');
         }
 
         try {
@@ -37,7 +39,7 @@ class ExpenseController extends Controller
                 'categories' => $categories,
                 'customCategories' => $customCategories,
                 'layout' => 'dashboard',
-                'budget' => BUDGET->remaining_amount,
+                'budget' => $activeBudget->remaining_amount,
                 'csrfToken' => $csrfToken
             ]);
         } catch (\Exception $e) {
