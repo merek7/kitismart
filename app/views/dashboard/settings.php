@@ -43,27 +43,25 @@
 
                                 <div class="form-group">
                                     <label for="nom">Nom</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
-                                        </div>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-user-circle"></i>
                                         <input type="text" class="form-control" id="nom" name="nom"
                                                value="<?= htmlspecialchars($user->nom) ?>" required
                                                placeholder="Votre nom">
+                                        <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                        </div>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-envelope"></i>
                                         <input type="email" class="form-control email-readonly" id="email" name="email"
                                                value="<?= htmlspecialchars($user->email) ?>" readonly disabled>
+                                        <span class="validation-icon locked"><i class="fas fa-lock"></i></span>
                                     </div>
                                     <small class="form-text text-muted">
-                                        <i class="fas fa-lock"></i> L'adresse email ne peut pas être modifiée
+                                        <i class="fas fa-info-circle"></i> L'adresse email ne peut pas être modifiée
                                     </small>
                                 </div>
 
@@ -94,23 +92,21 @@
 
                                 <div class="form-group">
                                     <label for="current_password">Mot de passe actuel</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                        </div>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-lock"></i>
                                         <input type="password" class="form-control" id="current_password"
                                                name="current_password" required placeholder="••••••••">
+                                        <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="new_password">Nouveau mot de passe</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                        </div>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-key"></i>
                                         <input type="password" class="form-control" id="new_password"
                                                name="new_password" required minlength="8" placeholder="••••••••">
+                                        <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                     </div>
                                     <small class="form-text text-muted">
                                         <i class="fas fa-info-circle"></i> Minimum 8 caractères
@@ -119,12 +115,11 @@
 
                                 <div class="form-group">
                                     <label for="confirm_password">Confirmer le nouveau mot de passe</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-check-double"></i></span>
-                                        </div>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-check-double"></i>
                                         <input type="password" class="form-control" id="confirm_password"
                                                name="confirm_password" required minlength="8" placeholder="••••••••">
+                                        <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                                     </div>
                                 </div>
 
@@ -307,6 +302,12 @@
     cursor: not-allowed;
 }
 
+/* Locked validation icon for email */
+.validation-icon.locked {
+    opacity: 1;
+    color: #94a3b8;
+}
+
 .form-text {
     font-size: 0.8rem;
     margin-top: 0.5rem;
@@ -476,6 +477,59 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             document.body.style.transition = '';
         }, 300);
+    });
+
+    // ================================
+    // Validation en temps réel des inputs
+    // ================================
+    const profileInputs = document.querySelectorAll('#nom');
+    const passwordInputs = document.querySelectorAll('#current_password, #new_password, #confirm_password');
+
+    // Validation du nom
+    profileInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const formGroup = this.closest('.form-group');
+            if (this.value.trim().length >= 2) {
+                formGroup.classList.add('valid');
+                formGroup.classList.remove('error');
+            } else {
+                formGroup.classList.remove('valid');
+            }
+        });
+
+        // Marquer comme valide si déjà rempli
+        if (input.value.trim().length >= 2) {
+            input.closest('.form-group').classList.add('valid');
+        }
+    });
+
+    // Validation des mots de passe
+    passwordInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const formGroup = this.closest('.form-group');
+            const confirmPassword = document.getElementById('confirm_password');
+            const newPassword = document.getElementById('new_password');
+
+            if (this.id === 'current_password' && this.value.length >= 1) {
+                formGroup.classList.add('valid');
+            } else if (this.id === 'new_password' && this.value.length >= 8) {
+                formGroup.classList.add('valid');
+                // Revalider la confirmation
+                if (confirmPassword.value === this.value && confirmPassword.value.length >= 8) {
+                    confirmPassword.closest('.form-group').classList.add('valid');
+                } else {
+                    confirmPassword.closest('.form-group').classList.remove('valid');
+                }
+            } else if (this.id === 'confirm_password') {
+                if (this.value === newPassword.value && this.value.length >= 8) {
+                    formGroup.classList.add('valid');
+                } else {
+                    formGroup.classList.remove('valid');
+                }
+            } else {
+                formGroup.classList.remove('valid');
+            }
+        });
     });
 });
 </script>
