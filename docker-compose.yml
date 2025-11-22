@@ -1,0 +1,70 @@
+# KitiSmart - Docker Compose for Coolify
+# =======================================
+# This file can be used directly in Coolify or for local development
+
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kitismart-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:80"
+    environment:
+      - APP_ENV=${APP_ENV:-prod}
+      - APP_URL=${APP_URL:-http://localhost:8080}
+      - DB_DRIVER=${DB_DRIVER:-pgsql}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-kitismart}
+      - DB_USER=${DB_USER:-kitismart}
+      - DB_PASS=${DB_PASS:-kitismart_password}
+      - DB_CHARSET=${DB_CHARSET:-utf8mb4}
+      - MAIL_FROM=${MAIL_FROM:-noreply@example.com}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME:-KitiSmart}
+      - SMTP_HOST=${SMTP_HOST:-smtp.example.com}
+      - SMTP_PORT=${SMTP_PORT:-465}
+      - SMTP_USERNAME=${SMTP_USERNAME:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_ENCRYPTION=${SMTP_ENCRYPTION:-ssl}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - kitismart-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  db:
+    image: postgres:15-alpine
+    container_name: kitismart-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${DB_NAME:-kitismart}
+      - POSTGRES_USER=${DB_USER:-kitismart}
+      - POSTGRES_PASSWORD=${DB_PASS:-kitismart_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - kitismart-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-kitismart} -d ${DB_NAME:-kitismart}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  kitismart-network:
+    driver: bridge
