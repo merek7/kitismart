@@ -106,30 +106,24 @@ class NotificationController extends Controller
                 return;
             }
 
-            // Préparer les données pour l'email
+            // Préparer les données pour l'email (nombres bruts, le formatage se fait dans le template)
             $data = [
-                'user_name' => $user->nom,
                 'percentage' => round($percentage, 2),
-                'budget_initial' => number_format((float)$budget->initial_amount, 2, ',', ' '),
-                'budget_remaining' => number_format((float)$budget->remaining_amount, 2, ',', ' '),
-                'budget_spent' => number_format((float)$budget->initial_amount - (float)$budget->remaining_amount, 2, ',', ' '),
+                'budget_initial' => (float)$budget->initial_amount,
+                'budget_remaining' => (float)$budget->remaining_amount,
+                'budget_spent' => (float)$budget->initial_amount - (float)$budget->remaining_amount,
                 'is_over_budget' => $percentage > 100
             ];
 
-            $subject = $percentage >= 100 ?
-                '⚠️ Budget dépassé !' :
-                '⚠️ Alerte budget à ' . round($percentage) . '%';
+            // Envoyer l'email avec la bonne méthode
+            $mailer = new Mailer();
+            $result = $mailer->sendBudgetAlertEmail($user->email, $user->nom, $data);
 
-            // Envoyer l'email
-            Mailer::sendEmail(
-                $user->email,
-                $user->nom,
-                $subject,
-                'emails/budget_alert',
-                $data
-            );
-
-            error_log("✅ Email d'alerte budget envoyé à {$user->email}");
+            if ($result) {
+                error_log("✅ Email d'alerte budget envoyé à {$user->email}");
+            } else {
+                error_log("❌ Échec envoi email alerte budget à {$user->email}");
+            }
 
         } catch (\Exception $e) {
             error_log("❌ Erreur envoi alerte budget: " . $e->getMessage());
@@ -183,18 +177,15 @@ class NotificationController extends Controller
                 'budget_remaining' => $budget ? $budget->remaining_amount : null
             ];
 
-            $subject = '💰 Dépense importante enregistrée';
+            // Envoyer l'email avec la bonne méthode
+            $mailer = new Mailer();
+            $result = $mailer->sendExpenseAlertEmail($user->email, $user->nom, $data);
 
-            // Envoyer l'email
-            Mailer::sendEmail(
-                $user->email,
-                $user->nom,
-                $subject,
-                'emails/expense_alert',
-                $data
-            );
-
-            error_log("✅ Email de confirmation dépense envoyé à {$user->email}");
+            if ($result) {
+                error_log("✅ Email de confirmation dépense envoyé à {$user->email}");
+            } else {
+                error_log("❌ Échec envoi email alerte dépense à {$user->email}");
+            }
 
         } catch (\Exception $e) {
             error_log("❌ Erreur envoi alerte dépense: " . $e->getMessage());
@@ -304,18 +295,15 @@ class NotificationController extends Controller
                 'insights' => $insights
             ];
 
-            $subject = '📊 Récapitulatif mensuel - ' . $period;
+            // Envoyer l'email avec la bonne méthode
+            $mailer = new Mailer();
+            $result = $mailer->sendMonthlySummaryEmail($user->email, $user->nom, $data);
 
-            // Envoyer l'email
-            Mailer::sendEmail(
-                $user->email,
-                $user->nom,
-                $subject,
-                'emails/monthly_summary',
-                $data
-            );
-
-            error_log("✅ Récapitulatif mensuel envoyé à {$user->email}");
+            if ($result) {
+                error_log("✅ Récapitulatif mensuel envoyé à {$user->email}");
+            } else {
+                error_log("❌ Échec envoi récapitulatif mensuel à {$user->email}");
+            }
 
         } catch (\Exception $e) {
             error_log("❌ Erreur envoi récapitulatif mensuel: " . $e->getMessage());

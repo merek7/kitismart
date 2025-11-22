@@ -72,11 +72,6 @@ class Expense
             R::commit();
 
             // Déclencher les notifications après le commit
-            // DÉSACTIVÉ: Ne pas envoyer d'emails quand l'utilisateur est dans l'application
-            // Les notifications email devraient être envoyées via un cron job quotidien
-            // TODO: Implémenter un système de notifications in-app (toast/badge) au lieu d'emails
-            // TODO: Créer un cron job pour envoyer un résumé quotidien par email
-            /*
             try {
                 // Notification pour dépense importante
                 \App\Controllers\NotificationController::sendExpenseAlert($data['user_id'], $expense);
@@ -92,7 +87,6 @@ class Expense
                 error_log("Erreur lors de l'envoi des notifications: " . $e->getMessage());
                 // Ne pas faire échouer la création de la dépense si les notifications échouent
             }
-            */
 
             return $expense;
         } catch (\Exception $e) {

@@ -31,6 +31,7 @@ class Mailer {
         // Debug en mode dev (0 = off, 2 = verbose)
         if (($_ENV['APP_ENV'] ?? 'prod') === 'dev') {
             $this->mailer->SMTPDebug = 0; // Mettre à 2 pour debug verbose
+            $this->mailer->Debugoutput = 'error_log';
         }
 
         $this->mailer->CharSet = 'UTF-8';
@@ -61,20 +62,17 @@ class Mailer {
             $this->mailer->isHTML(true);
 
             $confirmationLink = $_ENV['APP_URL'] . "/confirmation/" . urlencode($token);
-            $safeName = $this->escape($name);
 
             $this->mailer->Subject = 'Confirmez votre compte KitiSmart';
-            $this->mailer->Body = "
-                <h2>Bonjour {$safeName},</h2>
-                <p>Merci de vous être inscrit sur KitiSmart. Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :</p>
-                <p><a href='{$confirmationLink}'>Confirmer mon compte</a></p>
-                <p>Ce lien est valable pendant 20 minutes.</p>
-                <p>Si vous n'avez pas créé de compte, ignorez cet email.</p>
-            ";
+
+            // Générer le contenu depuis le template
+            ob_start();
+            include dirname(__DIR__) . '/views/emails/confirmation.php';
+            $this->mailer->Body = ob_get_clean();
 
             return $this->mailer->send();
         } catch (Exception $e) {
-            error_log("Erreur d'envoi d'email: " . $e->getMessage());
+            error_log("Erreur d'envoi d'email confirmation: " . $e->getMessage());
             return false;
         }
     }
@@ -87,20 +85,17 @@ class Mailer {
             $this->mailer->isHTML(true);
 
             $resetLink = $_ENV['APP_URL'] . "/reset-password/" . urlencode($token);
-            $safeName = $this->escape($name);
 
-            $this->mailer->Subject = "Réinitialisation de votre mot de passe - KitiSmart";
-            $this->mailer->Body = "
-                <h2>Bonjour {$safeName},</h2>
-                <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
-                <p>Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe :</p>
-                <p><a href='{$resetLink}'>{$resetLink}</a></p>
-                <p>Ce lien expirera dans 1 heure.</p>
-            ";
+            $this->mailer->Subject = "Reinitialisation de votre mot de passe - KitiSmart";
+
+            // Générer le contenu depuis le template
+            ob_start();
+            include dirname(__DIR__) . '/views/emails/reset-password.php';
+            $this->mailer->Body = ob_get_clean();
 
             return $this->mailer->send();
         } catch (Exception $e) {
-            error_log("Erreur d'envoi d'email: " . $e->getMessage());
+            error_log("Erreur d'envoi d'email reset-password: " . $e->getMessage());
             return false;
         }
     }
