@@ -31,7 +31,7 @@ class EmailTestController extends Controller
             'csrfToken' => $csrfToken,
             'emailTypes' => $this->getEmailTypes(),
             'currentPage' => 'email-test',
-            'style' => 'dashboard/notification_settings.css'
+            'styles' => ['dashboard/notification_settings.css']
         ], 'dashboard');
     }
 
