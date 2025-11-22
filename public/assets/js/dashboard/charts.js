@@ -3,6 +3,33 @@
 // ===================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    // ===================================
+    // ANIMATION BARRE DE PROGRESSION
+    // ===================================
+    const progressBarFill = document.querySelector('.progress-bar-fill');
+    if (progressBarFill) {
+        const targetProgress = parseFloat(progressBarFill.dataset.progress) || 0;
+
+        // Animation avec délai pour effet visuel
+        setTimeout(() => {
+            progressBarFill.style.width = Math.min(targetProgress, 100) + '%';
+        }, 300);
+
+        // Animation des stats cards
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            const delay = card.dataset.delay || index * 100;
+            setTimeout(() => {
+                card.classList.add('animate-in');
+                const icon = card.querySelector('.stat-icon');
+                if (icon) {
+                    icon.classList.add('bounce');
+                    setTimeout(() => icon.classList.remove('bounce'), 600);
+                }
+            }, delay);
+        });
+    }
+
     // Détecter le mode sombre
     const isDarkMode = () => document.documentElement.getAttribute('data-theme') === 'dark';
 
