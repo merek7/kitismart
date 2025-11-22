@@ -7,6 +7,7 @@ use App\Exceptions\BudgetNotFoundException;
 use App\Models\Budget;
 use App\Models\Expense;
 use App\Models\ExpenseRecurrence;
+use App\Models\UserOnboarding;
 
 class HomeController extends Controller
 {
@@ -47,6 +48,11 @@ class HomeController extends Controller
 
             error_log("Budget summary: " . print_r($budgetSummary, true));
 
+            // Préparer les données d'onboarding
+            $onboarding = [
+                'stepsToShow' => UserOnboarding::getStepsForPage((int)$_SESSION['user_id'], 'dashboard')
+            ];
+
             return $this->view('dashboard/index', [
                 'title' => 'Dashboard - KitiSmart',
                 'userName' => $_SESSION['user_name'] ?? 'Utilisateur',
@@ -55,7 +61,8 @@ class HomeController extends Controller
                 'layout' => 'dashboard',
                 'activeBudget' => $activeBudget,
                 'budgetSummary' => $budgetSummary,
-                'upcomingRecurrences' => $upcomingRecurrences
+                'upcomingRecurrences' => $upcomingRecurrences,
+                'onboarding' => $onboarding
             ]);
 
         } catch (BudgetNotFoundException $e) {

@@ -101,25 +101,35 @@ class BudgetShare
      */
     public static function isValid($share): bool
     {
+        // Debug logging
+        error_log("BudgetShare::isValid() - Checking share");
+
         if (!$share || !$share->id) {
+            error_log("BudgetShare::isValid() - FAIL: share is null or no id");
             return false;
         }
 
-        // Vérifier si actif
-        if (!$share->is_active) {
+        error_log("BudgetShare::isValid() - share_id=" . $share->id . ", is_active=" . var_export($share->is_active, true) . ", type=" . gettype($share->is_active));
+
+        // Vérifier si actif (cast explicite pour éviter les problèmes de type string/int)
+        if ((int)$share->is_active !== 1) {
+            error_log("BudgetShare::isValid() - FAIL: is_active check failed, (int)is_active=" . (int)$share->is_active);
             return false;
         }
 
         // Vérifier l'expiration
         if ($share->expires_at && strtotime($share->expires_at) < time()) {
+            error_log("BudgetShare::isValid() - FAIL: expired, expires_at=" . $share->expires_at);
             return false;
         }
 
         // Vérifier le nombre max d'utilisations
-        if ($share->max_uses && $share->use_count >= $share->max_uses) {
+        if ($share->max_uses && (int)$share->use_count >= (int)$share->max_uses) {
+            error_log("BudgetShare::isValid() - FAIL: max_uses reached, use_count=" . $share->use_count . ", max_uses=" . $share->max_uses);
             return false;
         }
 
+        error_log("BudgetShare::isValid() - SUCCESS");
         return true;
     }
 
@@ -183,30 +193,36 @@ class BudgetShare
      */
     private static function isRateLimited(string $token, string $ipAddress): bool
     {
-        $rateLimit = R::findOne('budgetshare_rate_limit',
-            'share_token = ? AND ip_address = ?',
-            [$token, $ipAddress]
-        );
+        try {
+            $rateLimit = R::findOne('budgetshare_rate_limit',
+                'share_token = ? AND ip_address = ?',
+                [$token, $ipAddress]
+            );
 
-        if (!$rateLimit) {
+            if (!$rateLimit) {
+                return false;
+            }
+
+            // Vérifier si bloqué
+            if ($rateLimit->blocked_until && strtotime($rateLimit->blocked_until) > time()) {
+                return true;
+            }
+
+            // Vérifier le nombre de tentatives dans la fenêtre de temps
+            $timeWindow = date('Y-m-d H:i:s', strtotime('-15 minutes'));
+            if ($rateLimit->first_attempt_at > $timeWindow && $rateLimit->attempt_count >= self::MAX_ATTEMPTS) {
+                // Bloquer
+                $rateLimit->blocked_until = date('Y-m-d H:i:s', strtotime('+' . self::BLOCK_DURATION_MINUTES . ' minutes'));
+                R::store($rateLimit);
+                return true;
+            }
+
+            return false;
+        } catch (\Exception $e) {
+            // Rate limiting is optional - don't break if table doesn't exist
+            error_log("BudgetShare::isRateLimited warning: " . $e->getMessage());
             return false;
         }
-
-        // Vérifier si bloqué
-        if ($rateLimit->blocked_until && strtotime($rateLimit->blocked_until) > time()) {
-            return true;
-        }
-
-        // Vérifier le nombre de tentatives dans la fenêtre de temps
-        $timeWindow = date('Y-m-d H:i:s', strtotime('-15 minutes'));
-        if ($rateLimit->first_attempt_at > $timeWindow && $rateLimit->attempt_count >= self::MAX_ATTEMPTS) {
-            // Bloquer
-            $rateLimit->blocked_until = date('Y-m-d H:i:s', strtotime('+' . self::BLOCK_DURATION_MINUTES . ' minutes'));
-            R::store($rateLimit);
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -214,12 +230,15 @@ class BudgetShare
      */
     private static function getBlockedUntil(string $token, string $ipAddress): ?string
     {
-        $rateLimit = R::findOne('budgetshare_rate_limit',
-            'share_token = ? AND ip_address = ?',
-            [$token, $ipAddress]
-        );
-
-        return $rateLimit ? $rateLimit->blocked_until : null;
+        try {
+            $rateLimit = R::findOne('budgetshare_rate_limit',
+                'share_token = ? AND ip_address = ?',
+                [$token, $ipAddress]
+            );
+            return $rateLimit ? $rateLimit->blocked_until : null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
@@ -227,30 +246,34 @@ class BudgetShare
      */
     private static function recordFailedAttempt(string $token, string $ipAddress)
     {
-        $rateLimit = R::findOne('budgetshare_rate_limit',
-            'share_token = ? AND ip_address = ?',
-            [$token, $ipAddress]
-        );
+        try {
+            $rateLimit = R::findOne('budgetshare_rate_limit',
+                'share_token = ? AND ip_address = ?',
+                [$token, $ipAddress]
+            );
 
-        if (!$rateLimit) {
-            $rateLimit = R::dispense('budgetshare_rate_limit');
-            $rateLimit->share_token = $token;
-            $rateLimit->ip_address = $ipAddress;
-            $rateLimit->attempt_count = 1;
-            $rateLimit->first_attempt_at = date('Y-m-d H:i:s');
-        } else {
-            // Réinitialiser si hors de la fenêtre de temps
-            $timeWindow = date('Y-m-d H:i:s', strtotime('-15 minutes'));
-            if ($rateLimit->first_attempt_at < $timeWindow) {
+            if (!$rateLimit) {
+                $rateLimit = R::dispense('budgetshare_rate_limit');
+                $rateLimit->share_token = $token;
+                $rateLimit->ip_address = $ipAddress;
                 $rateLimit->attempt_count = 1;
                 $rateLimit->first_attempt_at = date('Y-m-d H:i:s');
             } else {
-                $rateLimit->attempt_count = (int)$rateLimit->attempt_count + 1;
+                // Réinitialiser si hors de la fenêtre de temps
+                $timeWindow = date('Y-m-d H:i:s', strtotime('-15 minutes'));
+                if ($rateLimit->first_attempt_at < $timeWindow) {
+                    $rateLimit->attempt_count = 1;
+                    $rateLimit->first_attempt_at = date('Y-m-d H:i:s');
+                } else {
+                    $rateLimit->attempt_count = (int)$rateLimit->attempt_count + 1;
+                }
             }
-        }
 
-        $rateLimit->last_attempt_at = date('Y-m-d H:i:s');
-        R::store($rateLimit);
+            $rateLimit->last_attempt_at = date('Y-m-d H:i:s');
+            R::store($rateLimit);
+        } catch (\Exception $e) {
+            error_log("BudgetShare::recordFailedAttempt warning: " . $e->getMessage());
+        }
     }
 
     /**
@@ -258,13 +281,17 @@ class BudgetShare
      */
     private static function resetFailedAttempts(string $token, string $ipAddress)
     {
-        $rateLimit = R::findOne('budgetshare_rate_limit',
-            'share_token = ? AND ip_address = ?',
-            [$token, $ipAddress]
-        );
+        try {
+            $rateLimit = R::findOne('budgetshare_rate_limit',
+                'share_token = ? AND ip_address = ?',
+                [$token, $ipAddress]
+            );
 
-        if ($rateLimit) {
-            R::trash($rateLimit);
+            if ($rateLimit) {
+                R::trash($rateLimit);
+            }
+        } catch (\Exception $e) {
+            // Silently ignore - optional feature
         }
     }
 
@@ -283,17 +310,22 @@ class BudgetShare
             return; // Ne pas logger si pas de share_id
         }
 
-        $log = R::dispense('budgetshare_log');
-        $log->share_id = $shareId;
-        $log->action = $action;
-        $log->ip_address = $ipAddress;
-        $log->user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
-        $log->success = $success ? 1 : 0;
-        $log->error_message = $errorMessage;
-        $log->metadata = $metadata ? json_encode($metadata) : null;
-        $log->created_at = date('Y-m-d H:i:s');
+        try {
+            $log = R::dispense('budgetshare_log');
+            $log->share_id = $shareId;
+            $log->action = $action;
+            $log->ip_address = $ipAddress;
+            $log->user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+            $log->success = $success ? 1 : 0;
+            $log->error_message = $errorMessage;
+            $log->metadata = $metadata ? json_encode($metadata) : null;
+            $log->created_at = date('Y-m-d H:i:s');
 
-        R::store($log);
+            R::store($log);
+        } catch (\Exception $e) {
+            // Logging is optional - don't break functionality if table doesn't exist
+            error_log("BudgetShare::logAccess warning: " . $e->getMessage());
+        }
     }
 
     /**
@@ -323,6 +355,17 @@ class BudgetShare
     {
         return R::find('budgetshare',
             'created_by_user_id = ? AND is_active = 1 ORDER BY created_at DESC',
+            [$userId]
+        );
+    }
+
+    /**
+     * Obtenir tous les partages d'un utilisateur (actifs et inactifs)
+     */
+    public static function getAllSharesByUser(int $userId)
+    {
+        return R::find('budgetshare',
+            'created_by_user_id = ? ORDER BY is_active DESC, created_at DESC',
             [$userId]
         );
     }

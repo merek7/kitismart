@@ -1,3 +1,20 @@
+# PWA Configuration
+<IfModule mod_mime.c>
+    # Service Worker
+    AddType application/javascript .js
+    <FilesMatch "service-worker\.js$">
+        Header set Service-Worker-Allowed "/"
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+
+    # Manifest
+    AddType application/manifest+json .json
+    <FilesMatch "manifest\.json$">
+        Header set Cache-Control "public, max-age=3600"
+    </FilesMatch>
+</IfModule>
+
+# URL Rewriting
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-d

@@ -231,6 +231,12 @@ class OfflineForms {
     const budgetForm = document.querySelector('form[action*="/budget"]');
     if (!budgetForm) return;
 
+    // NE PAS intercepter si on est sur la page budget/create qui a déjà son propre gestionnaire AJAX
+    if (window.location.pathname.includes('/budget/create')) {
+      console.log('[OfflineForms] Page budget/create détectée - interception désactivée (gestion AJAX native)');
+      return;
+    }
+
     console.log('[OfflineForms] Formulaire de budget trouvé');
 
     budgetForm.addEventListener('submit', async (e) => {

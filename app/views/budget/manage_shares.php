@@ -16,12 +16,17 @@
                     $totalShares = count($shares);
                     $activeShares = 0;
                     $expiredShares = 0;
+                    $revokedShares = 0;
                     $totalAccesses = 0;
 
                     foreach ($shares as $shareData) {
                         $share = $shareData['share'];
-                        $totalAccesses += $share->use_count;
-                        if ($shareData['is_expired'] || $shareData['is_max_uses_reached']) {
+                        $totalAccesses += (int)$share->use_count;
+                        $shareIsActive = (int)$share->is_active === 1;
+
+                        if (!$shareIsActive) {
+                            $revokedShares++;
+                        } elseif ($shareData['is_expired'] || $shareData['is_max_uses_reached']) {
                             $expiredShares++;
                         } else {
                             $activeShares++;
@@ -52,12 +57,12 @@
                 </div>
                 <div class="col-md-3">
                     <div class="stats-card">
-                        <div class="stats-icon text-warning">
-                            <i class="fas fa-clock"></i>
+                        <div class="stats-icon text-danger">
+                            <i class="fas fa-ban"></i>
                         </div>
                         <div class="stats-content">
-                            <div class="stats-label">Expirés</div>
-                            <div class="stats-value text-warning"><?= $expiredShares ?></div>
+                            <div class="stats-label">Inactifs</div>
+                            <div class="stats-value text-danger"><?= $expiredShares + $revokedShares ?></div>
                         </div>
                     </div>
                 </div>
@@ -80,7 +85,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-list"></i> Mes Partages Actifs
+                                <i class="fas fa-list"></i> Tous mes Partages
                             </h3>
                         </div>
                         <div class="card-body">
@@ -102,7 +107,9 @@
                                             $permissions = $shareData['permissions'];
                                             $isExpired = $shareData['is_expired'];
                                             $isMaxUsed = $shareData['is_max_uses_reached'];
-                                            $isActive = !$isExpired && !$isMaxUsed;
+                                            $shareIsActive = (int)$share->is_active === 1;
+                                            $isRevoked = !$shareIsActive;
+                                            $isActive = $shareIsActive && !$isExpired && !$isMaxUsed;
                                         ?>
                                         <div class="share-card <?= !$isActive ? 'share-inactive' : '' ?>"
                                              data-share-id="<?= $share->id ?>">
@@ -119,7 +126,11 @@
                                                     </p>
                                                 </div>
                                                 <div class="share-status-badge">
-                                                    <?php if ($isExpired): ?>
+                                                    <?php if ($isRevoked): ?>
+                                                        <span class="badge badge-secondary">
+                                                            <i class="fas fa-ban"></i> Révoqué
+                                                        </span>
+                                                    <?php elseif ($isExpired): ?>
                                                         <span class="badge badge-danger">
                                                             <i class="fas fa-clock"></i> Expiré
                                                         </span>

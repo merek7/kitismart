@@ -1,19 +1,12 @@
 <div class="content-wrapper">
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <h1><i class="fas fa-cog"></i> Paramètres</h1>
-                </div>
-                <div class="col-md-6">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a></li>
-                        <li class="breadcrumb-item active">Paramètres</li>
-                    </ol>
-                </div>
-            </div>
+    <div class="page-header">
+        <h1><i class="fas fa-cog"></i> Paramètres</h1>
+        <div class="breadcrumb">
+            <a href="/dashboard"><i class="fas fa-home"></i> Tableau de bord</a>
+            <span>/</span>
+            <span>Paramètres</span>
         </div>
-    </section>
+    </div>
 
     <section class="content">
         <div class="container">
@@ -49,20 +42,32 @@
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
                                 <div class="form-group">
-                                    <label for="nom"><i class="fas fa-user-circle"></i> Nom</label>
-                                    <input type="text" class="form-control" id="nom" name="nom"
-                                           value="<?= htmlspecialchars($user->nom) ?>" required>
+                                    <label for="nom">Nom</label>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-user-circle"></i>
+                                        <input type="text" class="form-control" id="nom" name="nom"
+                                               value="<?= htmlspecialchars($user->nom) ?>" required
+                                               placeholder="Votre nom">
+                                        <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                                    <input type="email" class="form-control" id="email" name="email"
-                                           value="<?= htmlspecialchars($user->email) ?>" required>
+                                    <label for="email">Email</label>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-envelope"></i>
+                                        <input type="email" class="form-control email-readonly" id="email" name="email"
+                                               value="<?= htmlspecialchars($user->email) ?>" readonly disabled>
+                                        <span class="validation-icon locked"><i class="fas fa-lock"></i></span>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle"></i> L'adresse email ne peut pas être modifiée
+                                    </small>
                                 </div>
 
                                 <div class="form-group mb-0">
-                                    <p class="text-muted small">
-                                        <i class="fas fa-info-circle"></i>
+                                    <p class="text-muted small member-since">
+                                        <i class="fas fa-calendar-alt"></i>
                                         Membre depuis le <?= date('d/m/Y', strtotime($user->created_at)) ?>
                                     </p>
                                 </div>
@@ -86,22 +91,36 @@
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
                                 <div class="form-group">
-                                    <label for="current_password"><i class="fas fa-lock"></i> Mot de passe actuel</label>
-                                    <input type="password" class="form-control" id="current_password"
-                                           name="current_password" required>
+                                    <label for="current_password">Mot de passe actuel</label>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-lock"></i>
+                                        <input type="password" class="form-control" id="current_password"
+                                               name="current_password" required placeholder="••••••••">
+                                        <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="new_password"><i class="fas fa-lock"></i> Nouveau mot de passe</label>
-                                    <input type="password" class="form-control" id="new_password"
-                                           name="new_password" required minlength="8">
-                                    <small class="form-text text-muted">Minimum 8 caractères</small>
+                                    <label for="new_password">Nouveau mot de passe</label>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-key"></i>
+                                        <input type="password" class="form-control" id="new_password"
+                                               name="new_password" required minlength="8" placeholder="••••••••">
+                                        <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle"></i> Minimum 8 caractères
+                                    </small>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="confirm_password"><i class="fas fa-lock"></i> Confirmer le nouveau mot de passe</label>
-                                    <input type="password" class="form-control" id="confirm_password"
-                                           name="confirm_password" required minlength="8">
+                                    <label for="confirm_password">Confirmer le nouveau mot de passe</label>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-check-double"></i>
+                                        <input type="password" class="form-control" id="confirm_password"
+                                               name="confirm_password" required minlength="8" placeholder="••••••••">
+                                        <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
+                                    </div>
                                 </div>
 
                                 <button type="submit" class="btn btn-warning btn-block">
@@ -121,7 +140,7 @@
                             <h5 class="mb-0"><i class="fas fa-palette"></i> Préférences d'affichage</h5>
                         </div>
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <h6><i class="fas fa-moon"></i> Mode sombre</h6>
                                     <p class="text-muted mb-0 small">
@@ -131,6 +150,24 @@
                                 <div class="custom-control custom-switch">
                                     <input type="checkbox" class="custom-control-input" id="darkModeToggle">
                                     <label class="custom-control-label" for="darkModeToggle"></label>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6><i class="fas fa-wifi"></i> Mode hors ligne (PWA)</h6>
+                                    <p class="text-muted mb-0 small">
+                                        Permet d'utiliser l'application sans connexion internet.
+                                        <br><span id="pwa-status" class="pwa-status"></span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <button type="button" id="pwa-enable-btn" class="btn btn-sm btn-outline-primary" onclick="PWAManager.enableOfflineMode()">
+                                        <i class="fas fa-download"></i> Activer
+                                    </button>
+                                    <button type="button" id="pwa-disable-btn" class="btn btn-sm btn-outline-secondary" style="display: none;" onclick="PWAManager.disableOfflineMode()">
+                                        <i class="fas fa-times"></i> Désactiver
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -219,9 +256,13 @@
 </div>
 
 <style>
+/* ================================
+   SETTINGS PAGE STYLES
+   ================================ */
 .card {
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     overflow: hidden;
+    border: 1px solid var(--border-color);
 }
 
 .card-header {
@@ -229,61 +270,178 @@
     padding: 1rem 1.5rem;
 }
 
+.card-header.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+}
+
+.card-header.bg-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+}
+
+.card-header.bg-info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+}
+
+.card-header.bg-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+}
+
 .card-body {
     padding: 1.5rem;
 }
 
-.breadcrumb {
-    background: transparent;
-    padding: 0;
-    margin-bottom: 0;
-    float: right;
-}
-
-.breadcrumb-item + .breadcrumb-item::before {
-    content: "›";
-    padding: 0 0.5rem;
-}
-
 .alert {
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     margin-bottom: 20px;
 }
 
-.form-control {
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    padding: 0.75rem;
+/* Email readonly styling */
+.email-readonly {
+    background-color: #f8fafc !important;
+    color: var(--text-secondary) !important;
+    cursor: not-allowed;
 }
 
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+/* Locked validation icon for email */
+.validation-icon.locked {
+    opacity: 1;
+    color: #94a3b8;
 }
 
-.btn {
-    border-radius: 6px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 500;
+.form-text {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.form-text i {
+    margin-right: 0.25rem;
+}
+
+.member-since {
+    background: rgba(13, 148, 136, 0.1);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--primary-color);
+}
+
+.member-since i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
 }
 
 .btn-block {
+    width: 100%;
     margin-top: 1rem;
 }
 
-.modal-content {
-    border-radius: 10px;
+.btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    color: white;
 }
 
-.content-header h1 {
-    font-size: 28px;
-    font-weight: 600;
-    color: #333;
+.btn-warning:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.modal-content {
+    border-radius: var(--radius-md);
 }
 
 .custom-control-input:checked ~ .custom-control-label::before {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
+}
+
+/* Custom Switch Styling */
+.custom-switch {
+    padding-left: 2.5rem;
+}
+
+.custom-switch .custom-control-label::before {
+    left: -2.5rem;
+    width: 2.5rem;
+    border-radius: 1.25rem;
+    background-color: #e5e7eb;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.custom-switch .custom-control-label::after {
+    top: calc(0.25rem + 2px);
+    left: calc(-2.5rem + 2px);
+    width: calc(1.25rem - 4px);
+    height: calc(1.25rem - 4px);
+    background-color: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--primary-color);
+}
+
+.custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+    transform: translateX(1.25rem);
+}
+
+/* PWA Status Indicator */
+.pwa-status {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+
+.pwa-status.active {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.pwa-status.inactive {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+[data-theme="dark"] .pwa-status.active {
+    background: #064e3b;
+    color: #6ee7b7;
+}
+
+[data-theme="dark"] .pwa-status.inactive {
+    background: #7f1d1d;
+    color: #fca5a5;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .card {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .email-readonly {
+    background-color: #374151 !important;
+}
+
+[data-theme="dark"] .member-since {
+    background: rgba(20, 184, 166, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+
+    .col-md-6 {
+        width: 100%;
+    }
 }
 </style>
 
@@ -319,6 +477,59 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             document.body.style.transition = '';
         }, 300);
+    });
+
+    // ================================
+    // Validation en temps réel des inputs
+    // ================================
+    const profileInputs = document.querySelectorAll('#nom');
+    const passwordInputs = document.querySelectorAll('#current_password, #new_password, #confirm_password');
+
+    // Validation du nom
+    profileInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const formGroup = this.closest('.form-group');
+            if (this.value.trim().length >= 2) {
+                formGroup.classList.add('valid');
+                formGroup.classList.remove('error');
+            } else {
+                formGroup.classList.remove('valid');
+            }
+        });
+
+        // Marquer comme valide si déjà rempli
+        if (input.value.trim().length >= 2) {
+            input.closest('.form-group').classList.add('valid');
+        }
+    });
+
+    // Validation des mots de passe
+    passwordInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const formGroup = this.closest('.form-group');
+            const confirmPassword = document.getElementById('confirm_password');
+            const newPassword = document.getElementById('new_password');
+
+            if (this.id === 'current_password' && this.value.length >= 1) {
+                formGroup.classList.add('valid');
+            } else if (this.id === 'new_password' && this.value.length >= 8) {
+                formGroup.classList.add('valid');
+                // Revalider la confirmation
+                if (confirmPassword.value === this.value && confirmPassword.value.length >= 8) {
+                    confirmPassword.closest('.form-group').classList.add('valid');
+                } else {
+                    confirmPassword.closest('.form-group').classList.remove('valid');
+                }
+            } else if (this.id === 'confirm_password') {
+                if (this.value === newPassword.value && this.value.length >= 8) {
+                    formGroup.classList.add('valid');
+                } else {
+                    formGroup.classList.remove('valid');
+                }
+            } else {
+                formGroup.classList.remove('valid');
+            }
+        });
     });
 });
 </script>

@@ -2,17 +2,23 @@
 // SERVICE WORKER - KitiSmart PWA
 // ===================================
 
-const CACHE_VERSION = 'kitismart-v1.1.0';
+const CACHE_VERSION = 'kitismart-v1.2.0';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
-// Fichiers à mettre en cache immédiatement
+// Fichiers à mettre en cache immédiatement (seulement les assets statiques, pas les pages authentifiées)
 const STATIC_ASSETS = [
-  '/dashboard',
   '/assets/css/dashboard/index.css',
   '/assets/js/dashboard/charts.js',
   '/assets/img/logo.svg',
   '/manifest.json'
+];
+
+// Pages qui ne doivent PAS être mises en cache (pages authentifiées)
+const NO_CACHE_PATTERNS = [
+  '/login',
+  '/register',
+  '/logout'
 ];
 
 // ===================================
@@ -64,6 +70,67 @@ self.addEventListener('activate', (event) => {
 });
 
 // ===================================
+// Fonctions utilitaires
+// ===================================
+
+/**
+ * Vérifie si une réponse indique une session expirée
+ */
+function isSessionExpired(response, url) {
+  // Vérifier le code HTTP
+  if (response.status === 401 || response.status === 403) {
+    return true;
+  }
+
+  // Vérifier si c'est une redirection vers /login
+  if (response.redirected && response.url.includes('/login')) {
+    return true;
+  }
+
+  // Vérifier le header X-Session-Expired personnalisé
+  if (response.headers.get('X-Session-Expired') === 'true') {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Notifie tous les clients que la session a expiré
+ */
+async function notifySessionExpired() {
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => {
+    client.postMessage({
+      type: 'SESSION_EXPIRED',
+      message: 'Votre session a expiré. Veuillez vous reconnecter.'
+    });
+  });
+}
+
+/**
+ * Nettoie le cache des pages authentifiées
+ */
+async function clearAuthenticatedPagesCache() {
+  const cache = await caches.open(DYNAMIC_CACHE);
+  const keys = await cache.keys();
+
+  for (const request of keys) {
+    const url = new URL(request.url);
+    // Supprimer les pages qui nécessitent une authentification
+    if (url.pathname.startsWith('/dashboard') ||
+        url.pathname.startsWith('/expenses') ||
+        url.pathname.startsWith('/budget') ||
+        url.pathname.startsWith('/categories') ||
+        url.pathname.startsWith('/settings') ||
+        url.pathname.startsWith('/recurrences')) {
+      await cache.delete(request);
+      console.log('[SW] Cache supprimé pour:', url.pathname);
+    }
+  }
+}
+
+// ===================================
 // Interception des requêtes (Fetch)
 // ===================================
 self.addEventListener('fetch', (event) => {
@@ -72,6 +139,11 @@ self.addEventListener('fetch', (event) => {
 
   // Ignorer les requêtes non-HTTP/HTTPS (chrome-extension, about, data, etc.)
   if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // Ne pas mettre en cache les pages d'authentification
+  if (NO_CACHE_PATTERNS.some(pattern => url.pathname.startsWith(pattern))) {
     return;
   }
 
@@ -91,6 +163,15 @@ self.addEventListener('fetch', (event) => {
 
     event.respondWith(
       fetch(request)
+        .then(async (response) => {
+          // Vérifier si la session a expiré (pour les requêtes POST/PUT/DELETE)
+          if (isSessionExpired(response, url)) {
+            console.log('[SW] Session expirée détectée sur requête POST');
+            await clearAuthenticatedPagesCache();
+            await notifySessionExpired();
+          }
+          return response;
+        })
         .catch(async () => {
           // Si la requête échoue (hors ligne), stocker dans IndexedDB via le client
           const requestData = {
@@ -128,21 +209,42 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Ignorer les requêtes API (laisser passer en ligne)
+  // Ignorer les requêtes API (laisser passer en ligne) - mais surveiller les erreurs d'auth
   if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(request).then(async (response) => {
+        if (isSessionExpired(response, url)) {
+          console.log('[SW] Session expirée détectée sur API');
+          await clearAuthenticatedPagesCache();
+          await notifySessionExpired();
+        }
+        return response;
+      })
+    );
     return;
   }
 
   // Stratégie: Network First, puis Cache (pour les pages dynamiques)
-  if (url.pathname.startsWith('/dashboard') || url.pathname.startsWith('/expenses') || url.pathname.startsWith('/budget')) {
+  if (url.pathname.startsWith('/dashboard') || url.pathname.startsWith('/expenses') || url.pathname.startsWith('/budget') || url.pathname.startsWith('/categories') || url.pathname.startsWith('/settings') || url.pathname.startsWith('/recurrences')) {
     event.respondWith(
       fetch(request)
-        .then((response) => {
-          // Cloner la réponse pour la mettre en cache
-          const responseClone = response.clone();
-          caches.open(DYNAMIC_CACHE).then((cache) => {
-            cache.put(request, responseClone);
-          });
+        .then(async (response) => {
+          // Vérifier si la session a expiré
+          if (isSessionExpired(response, url)) {
+            console.log('[SW] Session expirée détectée - redirection vers login');
+            await clearAuthenticatedPagesCache();
+            await notifySessionExpired();
+            // Retourner la réponse originale (qui est probablement une redirection vers /login)
+            return response;
+          }
+
+          // Ne mettre en cache que si la réponse est valide (pas de redirection vers login)
+          if (response.ok && !response.redirected) {
+            const responseClone = response.clone();
+            caches.open(DYNAMIC_CACHE).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
           return response;
         })
         .catch(() => {
@@ -328,8 +430,26 @@ self.addEventListener('message', (event) => {
     });
   }
 
+  if (event.data && event.data.type === 'CLEAR_AUTH_CACHE') {
+    event.waitUntil(clearAuthenticatedPagesCache());
+  }
+
   if (event.data && event.data.type === 'SYNC_NOW') {
     event.waitUntil(syncOfflineData());
+  }
+
+  if (event.data && event.data.type === 'LOGOUT') {
+    // Nettoyer le cache lors de la déconnexion
+    event.waitUntil(
+      Promise.all([
+        clearAuthenticatedPagesCache(),
+        // Aussi nettoyer le cache statique pour forcer le rechargement
+        caches.delete(STATIC_CACHE),
+        caches.delete(DYNAMIC_CACHE)
+      ]).then(() => {
+        console.log('[SW] Cache nettoyé après déconnexion');
+      })
+    );
   }
 });
 

@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
     <title><?= $title ?? 'KitiSmart - Gérez vos dépenses avec intelligence' ?></title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="KitiSmart">
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/assets/css/style.css" rel="stylesheet">
     <?php if (!empty($styles)): ?>
@@ -54,6 +62,10 @@
     </footer>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/assets/js/app.js"></script>
+
+    <!-- Service Worker - Désactivé (optionnel via Paramètres) -->
+    <!-- Le Service Worker n'est plus enregistré automatiquement -->
+
     <?php
     error_log("Scripts disponibles dans le layout: " . print_r($pageScripts ?? [], true));
     if (!empty($pageScripts)): ?>

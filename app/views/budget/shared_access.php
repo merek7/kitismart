@@ -30,7 +30,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -103,23 +103,50 @@
             font-size: 0.95rem;
         }
 
-        .password-input-group {
+        /* Input with icon pattern */
+        .input-with-icon {
             position: relative;
+            display: flex;
+            align-items: center;
         }
 
-        .password-input-group input {
+        .input-with-icon > i:first-child {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 1rem;
+            z-index: 1;
+        }
+
+        .input-with-icon input {
             width: 100%;
-            padding: 14px 45px 14px 15px;
+            padding: 14px 45px 14px 45px;
             border: 2px solid var(--border-color);
             border-radius: 10px;
             font-size: 1rem;
             transition: all 0.3s;
         }
 
-        .password-input-group input:focus {
+        .input-with-icon input:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+
+        .input-with-icon .validation-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .form-group.valid .validation-icon {
+            opacity: 1;
         }
 
         .toggle-password {
@@ -133,6 +160,7 @@
             cursor: pointer;
             font-size: 1.2rem;
             transition: color 0.3s;
+            z-index: 2;
         }
 
         .toggle-password:hover {
@@ -270,51 +298,85 @@
             </div>
 
             <div class="card-body">
-                <div class="welcome-text">
-                    <p>Entrez le mot de passe pour accéder au budget partagé</p>
-                </div>
-
-                <div id="message-container"></div>
-
-                <form id="access-form">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
-                    <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
-
-                    <div class="form-group">
-                        <label for="password">
-                            <i class="fas fa-key"></i> Mot de passe
-                        </label>
-                        <div class="password-input-group">
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                required
-                                placeholder="Entrez le mot de passe"
-                                autocomplete="off">
-                            <button type="button" class="toggle-password" id="togglePassword">
-                                <i class="fas fa-eye" id="passwordIcon"></i>
-                            </button>
+                <?php if (isset($invalid) && $invalid): ?>
+                    <!-- Partage invalide ou désactivé -->
+                    <div class="text-center">
+                        <div style="font-size: 4rem; color: #dc3545; margin-bottom: 20px;">
+                            <i class="fas fa-unlink"></i>
+                        </div>
+                        <h3 style="color: #dc3545; margin-bottom: 15px;">Lien Invalide</h3>
+                        <p style="color: #666; margin-bottom: 25px;">
+                            <?= htmlspecialchars($error ?? 'Ce lien de partage n\'est plus valide.') ?>
+                        </p>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Le propriétaire du budget a peut-être révoqué ce partage ou le lien a expiré.</span>
                         </div>
                     </div>
+                <?php else: ?>
+                    <!-- Formulaire d'accès normal -->
+                    <div class="welcome-text">
+                        <p>Identifiez-vous pour accéder au budget partagé</p>
+                    </div>
 
-                    <button type="submit" class="btn-access" id="submitBtn">
-                        <div class="spinner"></div>
-                        <span class="btn-text">
-                            <i class="fas fa-sign-in-alt"></i>
-                            Accéder au budget
-                        </span>
-                    </button>
-                </form>
+                    <div id="message-container"></div>
 
-                <div class="security-info">
-                    <i class="fas fa-shield-alt"></i>
-                    <p>
-                        <strong>Connexion sécurisée</strong><br>
-                        Vos données sont protégées et votre accès est limité<br>
-                        aux permissions définies par le propriétaire du budget
-                    </p>
-                </div>
+                    <form id="access-form">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                        <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
+
+                        <div class="form-group">
+                            <label for="guest_name">Votre nom</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input
+                                    type="text"
+                                    id="guest_name"
+                                    name="guest_name"
+                                    required
+                                    placeholder="Entrez votre nom"
+                                    autocomplete="name"
+                                    minlength="2"
+                                    maxlength="100">
+                                <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Mot de passe</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-key"></i>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    required
+                                    placeholder="Entrez le mot de passe"
+                                    autocomplete="off">
+                                <button type="button" class="toggle-password" id="togglePassword">
+                                    <i class="fas fa-eye" id="passwordIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-access" id="submitBtn">
+                            <div class="spinner"></div>
+                            <span class="btn-text">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Accéder au budget
+                            </span>
+                        </button>
+                    </form>
+
+                    <div class="security-info">
+                        <i class="fas fa-shield-alt"></i>
+                        <p>
+                            <strong>Connexion sécurisée</strong><br>
+                            Vos données sont protégées et votre accès est limité<br>
+                            aux permissions définies par le propriétaire du budget
+                        </p>
+                    </div>
+                <?php endif; ?>
 
                 <div class="back-home">
                     <a href="/">
@@ -326,6 +388,7 @@
     </div>
 
     <script>
+        <?php if (!isset($invalid) || !$invalid): ?>
         // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
@@ -348,7 +411,20 @@
 
             const submitBtn = document.getElementById('submitBtn');
             const messageContainer = document.getElementById('message-container');
+            const guestNameInput = document.getElementById('guest_name');
             const passwordInput = document.getElementById('password');
+
+            // Validation du nom
+            if (guestNameInput.value.trim().length < 2) {
+                messageContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Veuillez entrer votre nom (minimum 2 caractères)</span>
+                    </div>
+                `;
+                guestNameInput.focus();
+                return;
+            }
 
             // Disable button and show loading
             submitBtn.disabled = true;
@@ -357,6 +433,7 @@
 
             const formData = {
                 csrf_token: document.querySelector('input[name="csrf_token"]').value,
+                guest_name: guestNameInput.value.trim(),
                 password: passwordInput.value
             };
 
@@ -408,10 +485,30 @@
             }
         });
 
-        // Focus on password field on load
+        // Focus on guest name field on load
         window.addEventListener('load', function() {
-            document.getElementById('password').focus();
+            document.getElementById('guest_name').focus();
         });
+
+        // Real-time validation
+        document.getElementById('guest_name').addEventListener('input', function() {
+            const formGroup = this.closest('.form-group');
+            if (this.value.trim().length >= 2) {
+                formGroup.classList.add('valid');
+            } else {
+                formGroup.classList.remove('valid');
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            const formGroup = this.closest('.form-group');
+            if (this.value.length >= 1) {
+                formGroup.classList.add('valid');
+            } else {
+                formGroup.classList.remove('valid');
+            }
+        });
+        <?php endif; ?>
     </script>
 </body>
 </html>

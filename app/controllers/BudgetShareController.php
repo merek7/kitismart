@@ -6,6 +6,8 @@ use App\Core\Controller;
 use App\Models\Budget;
 use App\Models\BudgetShare;
 use App\Models\Expense;
+use App\Models\Categorie;
+use App\Models\CustomCategory;
 use App\Utils\Csrf;
 use App\Exceptions\TokenInvalidOrExpiredException;
 
@@ -141,6 +143,20 @@ class BudgetShareController extends Controller
      */
     public function showGuestAccess($token)
     {
+        // Vérifier si le partage existe et est valide
+        $share = BudgetShare::findByToken($token);
+        if (!$share || !BudgetShare::isValid($share)) {
+            $this->view('budget/shared_access', [
+                'title' => 'Lien Invalide',
+                'token' => $token,
+                'error' => 'Ce lien de partage est invalide, expiré ou a été désactivé.',
+                'invalid' => true,
+                'csrfToken' => '',
+                'layout' => 'guest'
+            ]);
+            return;
+        }
+
         // Si déjà authentifié comme invité avec ce token, rediriger vers le dashboard
         if (isset($_SESSION['guest_share_token']) && $_SESSION['guest_share_token'] === $token) {
             header('Location: /budget/shared/dashboard');
@@ -181,6 +197,15 @@ class BudgetShareController extends Controller
                 throw new TokenInvalidOrExpiredException();
             }
 
+            // Validation du nom de l'invité
+            $guestName = trim($data['guest_name'] ?? '');
+            if (strlen($guestName) < 2 || strlen($guestName) > 100) {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'message' => 'Veuillez entrer un nom valide (2-100 caractères)'
+                ], 400);
+            }
+
             $password = $data['password'] ?? '';
             $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
@@ -204,6 +229,15 @@ class BudgetShareController extends Controller
             $_SESSION['guest_budget_id'] = (int)$share->budget_id;
             $_SESSION['guest_permissions'] = $permissions;
             $_SESSION['guest_authenticated_at'] = time();
+            $_SESSION['guest_name'] = $guestName;
+
+            // Logger l'accès avec le nom de l'invité
+            BudgetShare::logAccess(
+                (int)$share->id,
+                BudgetShare::ACTION_ACCESS_SUCCESS,
+                $ipAddress,
+                ['guest_name' => $guestName]
+            );
 
             return $this->jsonResponse([
                 'success' => true,
@@ -279,6 +313,18 @@ class BudgetShareController extends Controller
 
         $csrfToken = Csrf::generateToken();
 
+        // Récupérer les catégories si permission d'ajouter
+        $categories = [];
+        $customCategories = [];
+        if (BudgetShare::hasPermission($permissions, 'add')) {
+            $categories = Categorie::getDefaultCategories();
+            // Récupérer les catégories personnalisées du propriétaire du budget
+            $share = \RedBeanPHP\R::load('budgetshare', $_SESSION['guest_share_id']);
+            if ($share->created_by_user_id) {
+                $customCategories = CustomCategory::findByUser((int)$share->created_by_user_id);
+            }
+        }
+
         $this->view('budget/shared_dashboard', [
             'title' => 'Budget Partagé',
             'currentPage' => 'shared_budget',
@@ -286,7 +332,10 @@ class BudgetShareController extends Controller
             'expenses' => $expenses,
             'stats' => $stats,
             'permissions' => $permissions,
+            'categories' => $categories,
+            'customCategories' => $customCategories,
             'csrfToken' => $csrfToken,
+            'guestName' => $_SESSION['guest_name'] ?? 'Invité',
             'layout' => 'guest'
         ]);
     }
@@ -322,9 +371,19 @@ class BudgetShareController extends Controller
                 throw new TokenInvalidOrExpiredException();
             }
 
-            // Ajouter le budget_id
+            // Récupérer le share pour obtenir le user_id du propriétaire
+            $share = \RedBeanPHP\R::load('budgetshare', $shareId);
+            if (!$share || !$share->id) {
+                return $this->jsonResponse(['success' => false, 'message' => 'Partage non trouvé'], 404);
+            }
+
+            // Ajouter le budget_id et le user_id du propriétaire (requis pour la validation)
             $data['budget_id'] = $budgetId;
-            $data['user_id'] = null; // Dépense créée par un invité
+            $data['user_id'] = (int)$share->created_by_user_id;
+
+            // Ajouter les informations de l'invité pour traçabilité
+            $data['guest_name'] = $_SESSION['guest_name'] ?? 'Invité';
+            $data['guest_share_id'] = $shareId;
 
             // Créer la dépense
             $expense = Expense::create($data);
@@ -334,7 +393,11 @@ class BudgetShareController extends Controller
                 $shareId,
                 BudgetShare::ACTION_EXPENSE_CREATED,
                 $_SERVER['REMOTE_ADDR'] ?? null,
-                ['expense_id' => (int)$expense->id, 'amount' => (float)$expense->amount]
+                [
+                    'expense_id' => (int)$expense->id,
+                    'amount' => (float)$expense->amount,
+                    'guest_name' => $_SESSION['guest_name'] ?? 'Invité'
+                ]
             );
 
             return $this->jsonResponse([
@@ -422,8 +485,8 @@ class BudgetShareController extends Controller
 
         $userId = (int)$_SESSION['user_id'];
 
-        // Récupérer tous les partages actifs
-        $shares = BudgetShare::getActiveSharesByUser($userId);
+        // Récupérer tous les partages (actifs et inactifs)
+        $shares = BudgetShare::getAllSharesByUser($userId);
 
         // Enrichir avec les informations du budget
         $sharesData = [];
@@ -472,7 +535,11 @@ class BudgetShareController extends Controller
      */
     private function isGuestAuthenticated(): bool
     {
+        error_log("isGuestAuthenticated() - Checking...");
+        error_log("isGuestAuthenticated() - SESSION: " . json_encode($_SESSION));
+
         if (!isset($_SESSION['guest_authenticated']) || $_SESSION['guest_authenticated'] !== true) {
+            error_log("isGuestAuthenticated() - FAIL: guest_authenticated not set or not true");
             return false;
         }
 
@@ -480,18 +547,22 @@ class BudgetShareController extends Controller
         $sessionTimeout = 2 * 60 * 60; // 2 heures en secondes
         if (isset($_SESSION['guest_authenticated_at'])) {
             if ((time() - $_SESSION['guest_authenticated_at']) > $sessionTimeout) {
+                error_log("isGuestAuthenticated() - FAIL: session timeout");
                 return false;
             }
         }
 
         // Vérifier que le partage est toujours valide
         if (isset($_SESSION['guest_share_id'])) {
+            error_log("isGuestAuthenticated() - Loading share id: " . $_SESSION['guest_share_id']);
             $share = \RedBeanPHP\R::load('budgetshare', $_SESSION['guest_share_id']);
             if (!BudgetShare::isValid($share)) {
+                error_log("isGuestAuthenticated() - FAIL: share not valid");
                 return false;
             }
         }
 
+        error_log("isGuestAuthenticated() - SUCCESS");
         return true;
     }
 }

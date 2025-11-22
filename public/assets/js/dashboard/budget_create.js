@@ -95,7 +95,34 @@ $(document).ready(function () {
                     showGlobalMessage(response.message || 'Une erreur est survenue');
                 }
             },
-            error: function (xhr) {
+            error: async function (xhr) {
+                // En cas d'erreur réseau ou serveur, essayer de sauvegarder hors ligne
+                if (xhr.status === 0 || xhr.status >= 500) {
+                    console.log('[BudgetCreate] Erreur réseau/serveur - tentative de sauvegarde hors ligne');
+
+                    // Vérifier si le stockage hors ligne est disponible
+                    if (window.offlineStorage) {
+                        try {
+                            await window.offlineStorage.saveOfflineBudget(budget);
+
+                            // Mettre à jour le badge de synchronisation
+                            if (window.syncManager) {
+                                await window.syncManager.updateSyncBadge();
+                            }
+
+                            showGlobalMessage('Budget enregistré hors ligne. Il sera synchronisé automatiquement.', 'success');
+
+                            setTimeout(() => {
+                                window.location.href = '/dashboard';
+                            }, 2000);
+                            return;
+                        } catch (offlineError) {
+                            console.error('[BudgetCreate] Erreur sauvegarde hors ligne:', offlineError);
+                        }
+                    }
+                }
+
+                // Afficher l'erreur du serveur
                 try {
                     const response = JSON.parse(xhr.responseText);
                     if (response.errors) {
