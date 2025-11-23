@@ -2821,3 +2821,238 @@ body {
     display: none;
   }
 }
+
+/* ================================
+   RESPONSIVE PETIT MOBILE (< 480px)
+   Page création dépenses
+   ================================ */
+@media (max-width: 480px) {
+  /* Page header */
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .page-header .breadcrumb {
+    font-size: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Content wrapper */
+  .content-wrapper {
+    padding: 0.75rem;
+  }
+
+  .page-content .container {
+    padding: 0;
+  }
+
+  /* Expense summary card - empiler verticalement */
+  .expense-summary-card {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .expense-summary-card .summary-item {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(13, 148, 136, 0.05);
+    border-radius: 8px;
+  }
+
+  .expense-summary-card .summary-item i {
+    font-size: 1.25rem;
+    padding: 0.75rem;
+  }
+
+  .expense-summary-card .summary-value {
+    font-size: 1.1rem;
+  }
+
+  .expense-summary-card .summary-label {
+    font-size: 0.75rem;
+  }
+
+  .budget-status {
+    font-size: 0.7rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
+
+  /* Card header */
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .card-header .card-title {
+    font-size: 1rem;
+  }
+
+  .card-tools {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .card-tools .btn-action {
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Card body */
+  .card-body {
+    padding: 1rem;
+  }
+
+  /* Expense item */
+  .expense-item {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .expense-header {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Form groups - full width */
+  .expense-item .row {
+    margin: 0;
+    flex-direction: column;
+  }
+
+  .expense-item .col-md-6 {
+    width: 100%;
+    padding: 0;
+    margin-bottom: 0;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .form-control {
+    padding: 0.625rem;
+    font-size: 0.9rem;
+  }
+
+  .input-with-icon input,
+  .input-with-icon select,
+  .input-with-icon textarea {
+    padding-left: 2.75rem;
+    font-size: 0.9rem;
+  }
+
+  .input-with-icon > i[class*="fa-"] {
+    left: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  /* Card footer */
+  .card-footer {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .card-footer .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  /* Modal responsive */
+  .modal-overlay .modal-dialog,
+  .modal-overlay .modal-container {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+    width: calc(100% - 1rem);
+  }
+
+  .modal-content {
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-header .modal-title {
+    font-size: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-body p {
+    font-size: 0.9rem;
+  }
+
+  .confirmation-list {
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .confirmation-list li {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+
+  .modal-footer {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+    margin: 0;
+  }
+
+  /* Select2 mobile */
+  .select2-container--default .select2-selection--single {
+    min-height: 42px;
+    padding: 0.5rem 2rem 0.5rem 2.75rem;
+  }
+
+  /* Dashboard stats mobile */
+  .dashboard-stats {
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
+  /* Dashboard actions mobile */
+  .dashboard-actions {
+    flex-direction: column;
+  }
+
+  .dashboard-actions .btn-action {
+    min-width: 100%;
+  }
+}

@@ -57,17 +57,30 @@ $(document).ready(function () {
             .show();
     }
 
+    // Fonction pour obtenir la valeur brute d'un champ montant (avec ou sans formatage)
+    function getAmountValue(expenseItem) {
+        // Chercher d'abord le champ hidden créé par amount-formatter
+        const hiddenInput = expenseItem.find('input[type="hidden"][name="amount[]"]');
+        if (hiddenInput.length) {
+            return parseFloat(hiddenInput.val()) || 0;
+        }
+        // Sinon chercher le champ visible
+        const visibleInput = expenseItem.find('.amount-input');
+        return parseFloat(visibleInput.val()) || 0;
+    }
+
     // Validation du formulaire de dépense
     function validateForm() {
         let isValid = true;
 
         $('.expense-item').each(function (index) {
-            const amount = parseFloat($(this).find('input[name="amount[]"]').val());
+            const amount = getAmountValue($(this));
+            const amountInput = $(this).find('.amount-input');
             if (isNaN(amount) || amount <= 0) {
-                showError($(this).find('input[name="amount[]"]'), 'Veuillez entrer un montant valide supérieur à 0');
+                showError(amountInput, 'Veuillez entrer un montant valide supérieur à 0');
                 isValid = false;
             } else {
-                hideError($(this).find('input[name="amount[]"]'));
+                hideError(amountInput);
             }
 
             const expenseDate = $(this).find('input[name="date[]"]').val();
@@ -149,8 +162,8 @@ $(document).ready(function () {
         // Calculer le total et le nombre de dépenses
         const expenseCount = $('.expense-item').length;
         let totalAmount = 0;
-        $('.amount-input').each(function() {
-            totalAmount += parseFloat($(this).val()) || 0;
+        $('.expense-item').each(function() {
+            totalAmount += getAmountValue($(this));
         });
 
         // Sauvegarder le formulaire pour soumission après confirmation
@@ -168,12 +181,11 @@ $(document).ready(function () {
         const expense = [];
         $('.expense-item').each(function (index) {
             expense.push({
-                amount: parseFloat($(this).find('input[name="amount[]"]').val()),
+                amount: getAmountValue($(this)),
                 payment_date: $(this).find('input[name="date[]"]').val(),
                 status: $(this).find('select[name="status[]"]').val(),
                 category_type: $(this).find('select[name="category[]"]').val(),
                 description: $(this).find('textarea[name="description[]"]').val().trim(),
-
             });
         });
 
@@ -272,6 +284,15 @@ $(document).ready(function () {
         expenseItem.find('.select2-container').remove();
         expenseItem.find('select').removeClass('select2-hidden-accessible');
 
+        // Supprimer les champs hidden générés par amount-formatter
+        expenseItem.find('input[type="hidden"][name="amount[]"]').remove();
+
+        // Recréer le champ montant proprement
+        const amountInput = expenseItem.find('.amount-input');
+        amountInput.attr('type', 'number');
+        amountInput.attr('name', 'amount[]');
+        amountInput.removeAttr('data-amount-field');
+
         // Réinitialiser et personnaliser le nouvel élément
         expenseItem.find('input, select, textarea').val('');
         expenseItem.find('.expense-number').text(`#${expenseCount}`);
@@ -287,6 +308,11 @@ $(document).ready(function () {
         expenseItem.find('select[name="status[]"]').each(function() {
             initializeSelect2(this, 'Choisir un statut');
         });
+
+        // Initialiser le formatage des montants sur le nouveau champ
+        if (window.AmountFormatter) {
+            window.AmountFormatter.initField(amountInput[0]);
+        }
 
         // Animer l'apparition
         expenseItem.animate({
@@ -322,14 +348,13 @@ $(document).ready(function () {
     // Animation du résumé des dépenses
     function updateExpenseSummaryWithAnimation() {
         const oldCount = parseInt($('#expense-count').text());
-        const oldAmount = parseFloat($('#total-amount').text());
-        
+        const oldAmount = parseFloat($('#total-amount').text().replace(/\s/g, '').replace(',', '.')) || 0;
+
         const newCount = $('.expense-item').length;
         let newAmount = 0;
-        
+
         $('.expense-item').each(function() {
-            const amount = parseFloat($(this).find('input[name="amount[]"]').val()) || 0;
-            newAmount += amount;
+            newAmount += getAmountValue($(this));
         });
 
         // Animer le compteur
@@ -363,9 +388,8 @@ $(document).ready(function () {
     // Fonction pour mettre à jour le résumé du budget
     function updateBudgetSummary() {
         let totalExpenses = 0;
-        $('.amount-input').each(function() {
-            const amount = parseFloat($(this).val()) || 0;
-            totalExpenses += amount;
+        $('.expense-item').each(function() {
+            totalExpenses += getAmountValue($(this));
         });
 
         // Calcul du budget restant
@@ -400,8 +424,8 @@ $(document).ready(function () {
         }
     }
 
-    // Écouter les changements sur les champs de montant
-    $(document).on('input', '.amount-input', function() {
+    // Écouter les changements sur les champs de montant (input et change pour le hidden)
+    $(document).on('input change', '.amount-input, input[type="hidden"][name="amount[]"]', function() {
         updateBudgetSummary();
     });
 

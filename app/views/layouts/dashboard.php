@@ -163,6 +163,9 @@
     <script src="/assets/js/sync-manager.js?v=<?= time() ?>"></script>
     <script src="/assets/js/offline-forms.js?v=<?= time() ?>"></script>
 
+    <!-- Formatage des montants avec séparateur de milliers -->
+    <script src="/assets/js/amount-formatter.js?v=<?= time() ?>"></script>
+
     <!-- Script pour le toggle du navbar mobile -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
