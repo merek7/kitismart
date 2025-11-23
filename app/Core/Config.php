@@ -5,7 +5,7 @@ use Dotenv\Dotenv;
 
 class Config {
     // Version des assets - incrémentez à chaque déploiement pour invalider le cache
-    public const ASSETS_VERSION = '1.0.1';
+    public const ASSETS_VERSION = '1.0.3';
 
     public static function init() {
         $envPath = __DIR__.'/../../';

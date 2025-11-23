@@ -214,14 +214,38 @@
   gap: 0.5rem;
 }
 
+.export-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .btn-export {
   background-color: var(--accent-color, #facc15);
   color: #2c3e50;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
 .btn-export:hover {
   background-color: #f59e0b;
   color: #2c3e50;
+  transform: translateY(-2px);
+}
+
+.btn-export.btn-pdf {
+  background-color: #ef4444;
+  color: white;
+}
+
+.btn-export.btn-pdf:hover {
+  background-color: #dc2626;
+  color: white;
 }
 
 .budgets-grid {

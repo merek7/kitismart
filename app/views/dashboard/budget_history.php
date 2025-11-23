@@ -123,9 +123,14 @@
     <div class="container">
       <div class="section-header">
         <h3><i class="fas fa-list"></i> Tous les budgets</h3>
-        <a href="/budgets/history/export" class="btn btn-export">
-          <i class="fas fa-download"></i> Exporter (CSV)
-        </a>
+        <div class="export-buttons">
+          <a href="/budgets/history/export" class="btn btn-export">
+            <i class="fas fa-file-csv"></i> CSV
+          </a>
+          <a href="/budgets/history/export-pdf" class="btn btn-export btn-pdf" target="_blank">
+            <i class="fas fa-file-pdf"></i> PDF
+          </a>
+        </div>
       </div>
 
       <div class="budgets-grid">
@@ -136,8 +141,10 @@
         <?php else: ?>
           <?php foreach ($budgets as $budget): ?>
             <?php
-              $spent = $budget->initial_amount - $budget->remaining_amount;
-              $usagePercent = round(($spent / $budget->initial_amount) * 100, 2);
+              $initialAmount = (float)$budget->initial_amount;
+              $remainingAmount = (float)$budget->remaining_amount;
+              $spent = $initialAmount - $remainingAmount;
+              $usagePercent = $initialAmount > 0 ? round(($spent / $initialAmount) * 100, 2) : 0;
               $statusClass = $budget->status === 'actif' ? 'active' : 'closed';
               $statusLabel = $budget->status === 'actif' ? 'Actif' : 'Clôturé';
             ?>
@@ -156,7 +163,7 @@
               <div class="budget-amounts">
                 <div class="amount-item">
                   <span class="amount-label">Budget initial</span>
-                  <span class="amount-value"><?= number_format($budget->initial_amount, 2, ',', ' ') ?> FCFA</span>
+                  <span class="amount-value"><?= number_format($initialAmount, 2, ',', ' ') ?> FCFA</span>
                 </div>
                 <div class="amount-item">
                   <span class="amount-label">Dépensé</span>
@@ -164,7 +171,7 @@
                 </div>
                 <div class="amount-item">
                   <span class="amount-label">Restant</span>
-                  <span class="amount-value remaining"><?= number_format($budget->remaining_amount, 2, ',', ' ') ?> FCFA</span>
+                  <span class="amount-value remaining"><?= number_format($remainingAmount, 2, ',', ' ') ?> FCFA</span>
                 </div>
               </div>
 
@@ -206,6 +213,9 @@
         </div>
       </div>
       <div class="modal-footer bg-light">
+        <a href="#" id="exportBudgetPdf" class="btn btn-danger" target="_blank">
+          <i class="fas fa-file-pdf"></i> Exporter PDF
+        </a>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           <i class="fas fa-times"></i> Fermer
         </button>

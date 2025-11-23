@@ -25,6 +25,8 @@ return [
     ['GET', '/budgets/[i:id]', 'BudgetHistoryController#show', 'budget_show'],
     ['GET', '/budgets/history/data', 'BudgetHistoryController#getData', 'budget_history_data'],
     ['GET', '/budgets/history/export', 'BudgetHistoryController#exportCsv', 'budget_history_export'],
+    ['GET', '/budgets/history/export-pdf', 'BudgetHistoryController#exportPdf', 'budget_history_export_pdf'],
+    ['GET', '/budgets/[i:id]/export-pdf', 'BudgetHistoryController#exportBudgetPdf', 'budget_detail_export_pdf'],
     ['GET','/expenses/create','ExpenseController#showCreateExpenseForm','expense_form'],
     ['POST','/expenses/create','ExpenseController#create','expense_submit'],
     ['GET', '/expenses/list', 'ExpenseController#listPaginated', 'expense_list'],

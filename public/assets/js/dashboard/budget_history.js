@@ -128,6 +128,9 @@ $(document).ready(function () {
     const modal = new bootstrap.Modal(document.getElementById('budgetDetailModal'));
     modal.show();
 
+    // Mettre à jour le lien d'export PDF
+    $('#exportBudgetPdf').attr('href', `/budgets/${budgetId}/export-pdf`);
+
     // Réinitialiser le contenu
     $('#modal-content').html(`
       <div class="text-center">
