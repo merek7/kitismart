@@ -174,6 +174,7 @@ class SettingsController extends Controller
 
         $password = $_POST['password'] ?? '';
         $confirmation = $_POST['confirmation'] ?? '';
+        $isGoogleUser = ($_POST['is_google_user'] ?? '0') === '1';
 
         if ($confirmation !== 'SUPPRIMER') {
             $_SESSION['error'] = "Veuillez taper 'SUPPRIMER' pour confirmer";
@@ -187,10 +188,12 @@ class SettingsController extends Controller
             return $this->redirect('/settings');
         }
 
-        // Vérifier le mot de passe
-        if (!password_verify($password, $user->password)) {
-            $_SESSION['error'] = "Mot de passe incorrect";
-            return $this->redirect('/settings');
+        // Vérifier le mot de passe uniquement pour les comptes non-Google
+        if (empty($user->google_id)) {
+            if (!password_verify($password, $user->password)) {
+                $_SESSION['error'] = "Mot de passe incorrect";
+                return $this->redirect('/settings');
+            }
         }
 
         try {

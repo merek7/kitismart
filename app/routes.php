@@ -8,6 +8,10 @@ return [
     ['GET', '/login', 'LoginController#showLoginForm', 'login_form'],
     ['POST', '/login', 'LoginController#login', 'login_submit'],
     ['GET', '/logout', 'AuthController#logout', 'logout'],
+
+    // Google OAuth Routes
+    ['GET', '/auth/google', 'GoogleAuthController#redirectToGoogle', 'google_auth'],
+    ['GET', '/auth/google/callback', 'GoogleAuthController#callback', 'google_callback'],
     ['GET', '/confirmation/[*:token]', 'ConfirmationController#confirm', 'confirmation'],
     ['GET', '/forgot-password', 'PasswordController#showForgotForm', 'forgot_password'],
     ['POST', '/forgot-password', 'PasswordController#sendResetLink', 'forgot_password_submit'],
