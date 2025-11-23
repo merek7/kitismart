@@ -456,8 +456,66 @@ button[type="submit"]:disabled {
 .error-message {
   color: #c62828;
   font-size: 0.9em;
-  display: none; /* Masqué par défaut */
+  display: none; /* Masque par defaut */
 }
+
+/* ================================
+   GOOGLE OAUTH BUTTON
+   ================================ */
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #e5e7eb;
+}
+
+.auth-divider span {
+  padding: 0 1rem;
+}
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.btn-google:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-google:active {
+  transform: scale(0.98);
+}
+
+.btn-google svg {
+  flex-shrink: 0;
+}
+
 /* Styles pour le dashboard */
 .dashboard-container {
   padding: 20px;
