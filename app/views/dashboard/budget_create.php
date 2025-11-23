@@ -91,6 +91,37 @@
                 <div class="card-body">
                     <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
 
+                    <!-- Type de budget -->
+                    <div class="form-group">
+                        <label>Type de budget</label>
+                        <div class="budget-type-selector">
+                            <label class="budget-type-option">
+                                <input type="radio" name="type" value="principal" checked>
+                                <div class="budget-type-card">
+                                    <div class="budget-type-icon" style="background: rgba(13, 148, 136, 0.15); color: #0d9488;">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                    <div class="budget-type-info">
+                                        <strong>Budget Principal</strong>
+                                        <span>Remplace votre budget actuel (salaire mensuel)</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="budget-type-option">
+                                <input type="radio" name="type" value="secondaire">
+                                <div class="budget-type-card">
+                                    <div class="budget-type-icon" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+                                        <i class="fas fa-folder-plus"></i>
+                                    </div>
+                                    <div class="budget-type-info">
+                                        <strong>Budget Annexe</strong>
+                                        <span>Projet à part (travaux, voyage, etc.)</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="name">Nom du Budget</label>
@@ -120,6 +151,35 @@
                                     required>
                                 <span class="validation-icon"><i class="fas fa-check-circle"></i></span>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Couleur du budget -->
+                    <div class="form-group">
+                        <label>Couleur du budget</label>
+                        <div class="color-selector">
+                            <?php
+                            $colors = [
+                                '#0d9488' => 'Teal',
+                                '#3b82f6' => 'Bleu',
+                                '#8b5cf6' => 'Violet',
+                                '#ec4899' => 'Rose',
+                                '#f59e0b' => 'Orange',
+                                '#10b981' => 'Vert',
+                                '#ef4444' => 'Rouge',
+                                '#6366f1' => 'Indigo',
+                            ];
+                            $first = true;
+                            foreach ($colors as $hex => $name):
+                            ?>
+                                <label class="color-option" title="<?= $name ?>">
+                                    <input type="radio" name="color" value="<?= $hex ?>" <?= $first ? 'checked' : '' ?>>
+                                    <span class="color-dot" style="background-color: <?= $hex ?>"></span>
+                                </label>
+                            <?php
+                            $first = false;
+                            endforeach;
+                            ?>
                         </div>
                     </div>
 

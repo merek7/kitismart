@@ -22,6 +22,7 @@ class OnboardingController extends Controller
         $validSteps = [
             UserOnboarding::STEP_WELCOME,
             UserOnboarding::STEP_BUDGET_CREATION,
+            UserOnboarding::STEP_BUDGET_SWITCH,
             UserOnboarding::STEP_DASHBOARD_TOUR,
             UserOnboarding::STEP_EXPENSE_CREATION,
             UserOnboarding::STEP_CATEGORIES,
@@ -61,6 +62,7 @@ class OnboardingController extends Controller
         $validSteps = [
             UserOnboarding::STEP_WELCOME,
             UserOnboarding::STEP_BUDGET_CREATION,
+            UserOnboarding::STEP_BUDGET_SWITCH,
             UserOnboarding::STEP_DASHBOARD_TOUR,
             UserOnboarding::STEP_EXPENSE_CREATION,
             UserOnboarding::STEP_CATEGORIES,

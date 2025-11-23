@@ -12,22 +12,46 @@ class Budget {
     const STATUS_ACTIVE = 'actif';
     const STATUS_CLOSED = 'cloturer';
 
+    const TYPE_PRIMARY = 'principal';
+    const TYPE_SECONDARY = 'secondaire';
+
+    // Couleurs prédéfinies pour les budgets
+    const COLORS = [
+        '#0d9488' => 'Teal',
+        '#3b82f6' => 'Bleu',
+        '#8b5cf6' => 'Violet',
+        '#ec4899' => 'Rose',
+        '#f59e0b' => 'Orange',
+        '#10b981' => 'Vert',
+        '#ef4444' => 'Rouge',
+        '#6366f1' => 'Indigo',
+    ];
+
     public static function create(array $data) {
 
         self::validateBudgetData($data);
 
+        // Déterminer le type de budget (principal par défaut)
+        $type = $data['type'] ?? self::TYPE_PRIMARY;
 
         R::begin();
         try {
-            $previousBudget = self::getActiveBudget($data['user_id']);
-            if($previousBudget) {
-                self::closeBudget($previousBudget, $data['start_date']);
+            $previousBudget = null;
+
+            // Seulement clôturer l'ancien si c'est un budget principal
+            if ($type === self::TYPE_PRIMARY) {
+                $previousBudget = self::getActivePrimaryBudget($data['user_id']);
+                if($previousBudget) {
+                    self::closeBudget($previousBudget, $data['start_date']);
+                }
             }
 
             $budget = R::dispense('budget');
             $budget->user_id = $data['user_id'];
             $budget->name = $data['name'] ?? 'Budget';
             $budget->description = $data['description'] ?? null;
+            $budget->color = $data['color'] ?? '#0d9488';
+            $budget->type = $type;
             $budget->start_date = $data['start_date'];
             $budget->end_date = null;
             $budget->initial_amount = $data['initial_amount'];
@@ -37,8 +61,8 @@ class Budget {
 
             R::store($budget);
 
-            // Call the static method
-            if ($previousBudget) {
+            // Répliquer les charges fixes seulement pour les budgets principaux
+            if ($previousBudget && $type === self::TYPE_PRIMARY) {
                 self::replicateFixedCharges($previousBudget, $budget);
                 ExpenseAudit::log(
                     'Budget',[
@@ -69,8 +93,79 @@ class Budget {
         }
     }
 
+    /**
+     * Récupère le budget actuellement sélectionné (via session) ou le budget actif par défaut
+     * C'est LA méthode à utiliser partout pour respecter le switch de budget
+     */
+    public static function getCurrentBudget($userId) {
+        // Si un budget est sélectionné en session, le retourner
+        if (isset($_SESSION['current_budget_id'])) {
+            $budget = self::getById($_SESSION['current_budget_id'], $userId);
+            // Vérifier que le budget existe et est actif
+            if ($budget && $budget->status === self::STATUS_ACTIVE) {
+                return $budget;
+            }
+            // Si le budget n'est plus valide, nettoyer la session
+            unset($_SESSION['current_budget_id']);
+        }
+
+        // Par défaut, retourner le budget principal actif
+        return self::getActiveBudget($userId);
+    }
+
+    /**
+     * Récupère le budget actif (pour rétrocompatibilité - retourne le principal ou le premier actif)
+     */
     public static function getActiveBudget($userId) {
+        // D'abord chercher un budget principal actif
+        $primary = self::getActivePrimaryBudget($userId);
+        if ($primary) {
+            return $primary;
+        }
+        // Sinon retourner n'importe quel budget actif
         return R::findOne('budget', 'user_id = ? AND status = ? ORDER BY start_date DESC', [$userId, self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Récupère le budget principal actif
+     */
+    public static function getActivePrimaryBudget($userId) {
+        return R::findOne('budget',
+            'user_id = ? AND status = ? AND (type = ? OR type IS NULL) ORDER BY start_date DESC',
+            [$userId, self::STATUS_ACTIVE, self::TYPE_PRIMARY]
+        );
+    }
+
+    /**
+     * Récupère tous les budgets actifs d'un utilisateur (principal + secondaires)
+     */
+    public static function getAllActiveBudgets($userId) {
+        return R::find('budget',
+            'user_id = ? AND status = ? ORDER BY type ASC, start_date DESC',
+            [$userId, self::STATUS_ACTIVE]
+        );
+    }
+
+    /**
+     * Récupère un budget par son ID (avec vérification user)
+     */
+    public static function getById($budgetId, $userId) {
+        return R::findOne('budget', 'id = ? AND user_id = ?', [$budgetId, $userId]);
+    }
+
+    /**
+     * Clôturer manuellement un budget secondaire
+     */
+    public static function closeSecondaryBudget($budgetId, $userId) {
+        $budget = self::getById($budgetId, $userId);
+        if (!$budget) {
+            throw new \Exception('Budget non trouvé');
+        }
+        if ($budget->type === self::TYPE_PRIMARY) {
+            throw new \Exception('Impossible de clôturer manuellement un budget principal');
+        }
+        self::closeBudget($budget, date('Y-m-d'));
+        return $budget;
     }
 
     private static function closeBudget($budget, $endDate) {
@@ -124,20 +219,60 @@ class Budget {
             throw new \Exception('Budget non trouvé');
         }
 
-       $expenses = R::getAll(
-        'select category, SUM(amount) as total,
-        count(*) as count
-        FROM expense
-        WHERE budget_id = ?
-        GROUP BY category',
-        [$budgetId]
-       );
+        // Récupérer les dépenses groupées par catégorie par défaut (fixe, diver, epargne)
+        $defaultCategories = R::getAll(
+            'SELECT c.type as category, SUM(e.amount) as total, COUNT(*) as count
+            FROM expense e
+            INNER JOIN categorie c ON e.categorie_id = c.id
+            WHERE e.budget_id = ? AND e.categorie_id IS NOT NULL
+            GROUP BY c.type',
+            [$budgetId]
+        );
 
-       return [
-        'budget' => $budget,
-        'expenses_categories' => $expenses,
-        'montant_restant' => $budget->remaining_amount,
-       ];
+        // Récupérer les dépenses par catégorie personnalisée
+        $customCategories = R::getAll(
+            'SELECT cc.name as category, SUM(e.amount) as total, COUNT(*) as count
+            FROM expense e
+            INNER JOIN customcategory cc ON e.custom_category_id = cc.id
+            WHERE e.budget_id = ? AND e.custom_category_id IS NOT NULL
+            GROUP BY cc.id, cc.name',
+            [$budgetId]
+        );
+
+        // Construire le résultat avec les types par défaut
+        $result = [
+            'fixe' => 0,
+            'diver' => 0,
+            'epargne' => 0,
+            'total' => 0
+        ];
+
+        foreach ($defaultCategories as $cat) {
+            $type = $cat['category'] ?? 'diver';
+            $result[$type] = (float)$cat['total'];
+            $result['total'] += (float)$cat['total'];
+        }
+
+        // Ajouter les catégories personnalisées (on les groupe dans "diver" pour le graphique principal)
+        // mais on les retourne aussi séparément pour une utilisation détaillée
+        $customCategoriesResult = [];
+        foreach ($customCategories as $cat) {
+            $customCategoriesResult[$cat['category']] = (float)$cat['total'];
+            $result['diver'] += (float)$cat['total']; // Les catégories perso comptent dans "diver"
+            $result['total'] += (float)$cat['total'];
+        }
+
+        return [
+            'budget' => $budget,
+            'expenses_categories' => $result,
+            'custom_categories' => $customCategoriesResult,
+            'montant_restant' => $budget->remaining_amount,
+            // Format simplifié pour le graphique (clés directes)
+            'fixe' => $result['fixe'],
+            'diver' => $result['diver'],
+            'epargne' => $result['epargne'],
+            'total' => $result['total']
+        ];
     }
 
     /**

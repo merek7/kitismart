@@ -41,8 +41,9 @@ $(document).ready(function () {
             hideError($('#name'));
         }
 
-        // Validation du montant
-        const amount = parseFloat($('#amount').val());
+        // Validation du montant (récupérer du champ hidden si formaté, sinon du champ visible)
+        const amountRaw = $('#amount_raw').val() || $('#amount').val();
+        const amount = parseFloat(amountRaw.toString().replace(/\s/g, '').replace(',', '.'));
         if (isNaN(amount) || amount <= 0) {
             showError($('#amount'), 'Veuillez entrer un montant valide supérieur à 0');
             isValid = false;
@@ -71,12 +72,18 @@ $(document).ready(function () {
             return;
         }
 
+        // Récupérer le montant du champ hidden (valeur brute) ou du champ visible
+        const amountValue = $('#amount_raw').val() || $('#amount').val();
+        const parsedAmount = parseFloat(amountValue.toString().replace(/\s/g, '').replace(',', '.'));
+
         const budget = {
             name: $('#name').val().trim(),
-            amount: parseFloat($('#amount').val()),
-            initial_amount: parseFloat($('#amount').val()),
+            amount: parsedAmount,
+            initial_amount: parsedAmount,
             start_date: $('#start_date').val(),
             description: $('#description').val().trim(),
+            type: $('input[name="type"]:checked').val() || 'principal',
+            color: $('input[name="color"]:checked').val() || '#0d9488',
             csrf_token: $('input[name="csrf_token"]').val()
         };
 

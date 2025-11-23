@@ -21,7 +21,7 @@ class RecurrenceController extends Controller
 
         try {
             // Récupérer le budget actif
-            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+            $activeBudget = Budget::getCurrentBudget($_SESSION['user_id']);
 
             if (!$activeBudget) {
                 return $this->redirect('/budget/create');
@@ -81,7 +81,7 @@ class RecurrenceController extends Controller
             }
 
             // Récupérer le budget actif
-            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+            $activeBudget = Budget::getCurrentBudget($_SESSION['user_id']);
 
             if (!$activeBudget) {
                 return $this->jsonResponse(['success' => false, 'message' => 'Aucun budget actif'], 400);
@@ -154,7 +154,7 @@ class RecurrenceController extends Controller
             }
 
             // Vérifier que la récurrence appartient au budget de l'utilisateur
-            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+            $activeBudget = Budget::getCurrentBudget($_SESSION['user_id']);
             if ($recurrence->budget_id != $activeBudget->id) {
                 return $this->jsonResponse(['success' => false, 'message' => 'Accès non autorisé'], 403);
             }
@@ -202,7 +202,7 @@ class RecurrenceController extends Controller
             }
 
             // Vérifier ownership
-            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+            $activeBudget = Budget::getCurrentBudget($_SESSION['user_id']);
             if ($recurrence->budget_id != $activeBudget->id) {
                 return $this->jsonResponse(['success' => false, 'message' => 'Accès non autorisé'], 403);
             }
@@ -270,7 +270,7 @@ class RecurrenceController extends Controller
             }
 
             // Vérifier ownership
-            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+            $activeBudget = Budget::getCurrentBudget($_SESSION['user_id']);
             if ($recurrence->budget_id != $activeBudget->id) {
                 return $this->jsonResponse(['success' => false, 'message' => 'Accès non autorisé'], 403);
             }

@@ -26,20 +26,54 @@ class KitiSmartOnboarding {
         this.steps.welcome = [
             {
                 id: 'welcome-intro',
-                title: 'Bienvenue sur KitiSmart !',
-                text: 'Nous allons vous guider à travers les principales fonctionnalités de l\'application pour vous aider à gérer votre budget efficacement.',
+                title: '👋 Bienvenue sur KitiSmart !',
+                text: `
+                    <div class="onboarding-welcome">
+                        <p>Nous allons vous guider à travers les principales fonctionnalités pour gérer votre budget efficacement.</p>
+                        <div class="onboarding-features">
+                            <div class="feature-item"><i class="fas fa-wallet"></i> Gérer plusieurs budgets</div>
+                            <div class="feature-item"><i class="fas fa-chart-pie"></i> Suivre vos dépenses</div>
+                            <div class="feature-item"><i class="fas fa-sync"></i> Automatiser les récurrences</div>
+                        </div>
+                        <p class="onboarding-hint">Ce guide dure environ 2 minutes.</p>
+                    </div>
+                `,
                 buttons: [
                     {
-                        text: 'Passer',
+                        text: 'Passer le tour',
                         action: () => this.skipTour('welcome'),
                         classes: 'btn-skip'
                     },
                     {
-                        text: 'Commencer',
+                        text: 'Commencer <i class="fas fa-arrow-right"></i>',
                         action: () => this.currentTour.next(),
                         classes: 'btn-primary'
                     }
                 ]
+            }
+        ];
+
+        // Tour du switch de budget
+        this.steps.budget_switch = [
+            {
+                id: 'budget-switcher',
+                attachTo: {
+                    element: '.budget-switcher',
+                    on: 'bottom'
+                },
+                title: 'Changer de budget',
+                text: 'Vous pouvez gérer plusieurs budgets ! Cliquez ici pour basculer entre votre budget principal et vos budgets annexes (projets, famille...).',
+                buttons: this.getNavButtons()
+            },
+            {
+                id: 'budget-types',
+                attachTo: {
+                    element: '.budget-switcher',
+                    on: 'bottom'
+                },
+                title: 'Types de budgets',
+                text: '<strong>Budget Principal</strong> : votre budget mensuel (se clôture automatiquement).<br><br><strong>Budget Annexe</strong> : pour des projets ponctuels (clôture manuelle).',
+                buttons: this.getNavButtons(true)
             }
         ];
 
@@ -217,30 +251,55 @@ class KitiSmartOnboarding {
     /**
      * Retourne les boutons de navigation standard
      */
-    getNavButtons(isLast = false) {
-        const buttons = [
-            {
-                text: 'Passer',
-                action: () => this.skipCurrentTour(),
-                classes: 'btn-skip'
-            }
-        ];
+    getNavButtons(isLast = false, isFirst = false) {
+        const buttons = [];
 
+        // Bouton Passer (toujours présent)
+        buttons.push({
+            text: 'Passer le tour',
+            action: () => this.skipCurrentTour(),
+            classes: 'btn-skip'
+        });
+
+        // Bouton Précédent (si pas première étape)
+        if (!isFirst) {
+            buttons.push({
+                text: '<i class="fas fa-arrow-left"></i> Précédent',
+                action: () => this.currentTour.back(),
+                classes: 'btn-secondary'
+            });
+        }
+
+        // Bouton Suivant ou Terminer
         if (!isLast) {
             buttons.push({
-                text: 'Suivant',
+                text: 'Suivant <i class="fas fa-arrow-right"></i>',
                 action: () => this.currentTour.next(),
                 classes: 'btn-primary'
             });
         } else {
             buttons.push({
-                text: 'Terminer',
+                text: '<i class="fas fa-check"></i> Terminer',
                 action: () => this.completeTour(),
                 classes: 'btn-success'
             });
         }
 
         return buttons;
+    }
+
+    /**
+     * Retourne les boutons pour la première étape
+     */
+    getFirstStepButtons() {
+        return this.getNavButtons(false, true);
+    }
+
+    /**
+     * Retourne les boutons pour la dernière étape
+     */
+    getLastStepButtons() {
+        return this.getNavButtons(true, false);
     }
 
     /**
@@ -264,6 +323,8 @@ class KitiSmartOnboarding {
         }
 
         this.currentTourName = tourName;
+        this.totalSteps = validSteps.length;
+
         this.currentTour = new Shepherd.Tour({
             useModalOverlay: true,
             defaultStepOptions: {
@@ -271,11 +332,18 @@ class KitiSmartOnboarding {
                 scrollTo: { behavior: 'smooth', block: 'center' },
                 cancelIcon: {
                     enabled: true
+                },
+                when: {
+                    show: () => this.updateStepIndicator()
                 }
             }
         });
 
-        validSteps.forEach(step => {
+        // Ajouter les étapes avec indicateur
+        validSteps.forEach((step, index) => {
+            // Ajouter l'indicateur d'étapes au texte
+            const stepIndicator = `<div class="step-indicator">Étape ${index + 1} sur ${validSteps.length}</div>`;
+            step.text = stepIndicator + (step.text || '');
             this.currentTour.addStep(step);
         });
 
@@ -283,6 +351,23 @@ class KitiSmartOnboarding {
         this.currentTour.on('cancel', () => this.onTourCancel());
 
         this.currentTour.start();
+    }
+
+    /**
+     * Met à jour l'indicateur d'étapes
+     */
+    updateStepIndicator() {
+        const currentStep = this.currentTour.getCurrentStep();
+        if (currentStep) {
+            const index = this.currentTour.steps.indexOf(currentStep);
+            const progress = ((index + 1) / this.totalSteps) * 100;
+
+            // Mettre à jour la barre de progression si elle existe
+            const progressBar = document.querySelector('.onboarding-step-progress');
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+            }
+        }
     }
 
     /**

@@ -74,10 +74,14 @@ $(document).ready(function () {
         // Désactiver le bouton
         $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Enregistrement...');
 
+        // Récupérer le montant du champ hidden (valeur brute) ou du champ visible
+        const amountValue = $('#recurrence-amount_raw').val() || $('#recurrence-amount').val();
+        const parsedAmount = parseFloat(amountValue.toString().replace(/\s/g, '').replace(',', '.'));
+
         const formData = {
             csrf_token: csrfToken,
             description: $('#recurrence-description').val(),
-            amount: parseFloat($('#recurrence-amount').val()),
+            amount: parsedAmount,
             category_type: $('#recurrence-category').val(),
             frequency: $('#recurrence-frequency').val(),
             start_date: $('#recurrence-start-date').val()

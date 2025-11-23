@@ -45,6 +45,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/css/shepherd.css" />
     <link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/onboarding/onboarding.css') ?>" />
 
+    <!-- App Update Modal -->
+    <link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/app-update.css') ?>" />
+
 </head>
 <body>
     <!-- Navbar -->
@@ -52,6 +55,28 @@
         <div class="nav-container">
             <div class="nav-brand">
                 <img src="/assets/img/logo.svg" alt="KitiSmart" class="nav-logo">
+            </div>
+
+            <!-- Sélecteur de budget -->
+            <div class="budget-switcher" id="budgetSwitcher">
+                <button class="budget-switcher-btn" id="budgetSwitcherBtn" title="Changer de budget">
+                    <span class="budget-color-dot" id="currentBudgetColor"></span>
+                    <span class="budget-name" id="currentBudgetName">Chargement...</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="budget-switcher-dropdown" id="budgetSwitcherDropdown">
+                    <div class="budget-switcher-header">
+                        <span>Mes budgets</span>
+                    </div>
+                    <div class="budget-list" id="budgetList">
+                        <!-- Chargé dynamiquement -->
+                    </div>
+                    <div class="budget-switcher-footer">
+                        <a href="/budget/create" class="add-budget-btn">
+                            <i class="fas fa-plus"></i> Nouveau budget
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- Bouton hamburger pour mobile -->
@@ -165,6 +190,12 @@
 
     <!-- Formatage des montants avec séparateur de milliers -->
     <script src="/assets/js/amount-formatter.js?v=<?= time() ?>"></script>
+
+    <!-- Budget Switcher -->
+    <script src="/assets/js/budget-switcher.js?v=<?= time() ?>"></script>
+
+    <!-- App Update Notification -->
+    <script src="/assets/js/app-update.js?v=<?= time() ?>"></script>
 
     <!-- Script pour le toggle du navbar mobile -->
     <script>

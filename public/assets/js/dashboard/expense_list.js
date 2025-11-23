@@ -201,9 +201,13 @@ $(document).ready(function () {
         // Désactiver le bouton
         $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Enregistrement...');
 
+        // Récupérer le montant du champ hidden (valeur brute) ou du champ visible
+        const amountValue = $('#edit-amount_raw').val() || $('#edit-amount').val();
+        const parsedAmount = parseFloat(amountValue.toString().replace(/\s/g, '').replace(',', '.'));
+
         const formData = {
             description: $('#edit-description').val(),
-            amount: parseFloat($('#edit-amount').val()),
+            amount: parsedAmount,
             category_type: $('#edit-category').val(),
             payment_date: $('#edit-date').val(),
             status: $('#edit-status').val()

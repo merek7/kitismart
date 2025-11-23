@@ -24,8 +24,8 @@ class ExpenseController extends Controller
         $categories = Categorie::getDefaultCategories();
         $customCategories = CustomCategory::findByUser($userId);
 
-        // Récupérer le budget actif
-        $activeBudget = Budget::getActiveBudget($userId);
+        // Récupérer le budget sélectionné (ou actif par défaut)
+        $activeBudget = Budget::getCurrentBudget($userId);
 
         if (!$activeBudget) {
             $_SESSION['error'] = "Vous devez d'abord créer un budget";
@@ -76,8 +76,8 @@ class ExpenseController extends Controller
                     // Ajouter l'ID utilisateur à chaque dépense
                     $expenseData['user_id'] = $_SESSION['user_id'];
 
-                    // Récupérer le budget actif pour l'utilisateur
-                    $activeBudget = Budget::getActiveBudget((int)$_SESSION['user_id']);
+                    // Récupérer le budget sélectionné (ou actif par défaut)
+                    $activeBudget = Budget::getCurrentBudget((int)$_SESSION['user_id']);
                     if (!$activeBudget || !$activeBudget->id) {
                         throw new \Exception("Aucun budget actif trouvé pour l'utilisateur");
                     }
@@ -116,8 +116,8 @@ class ExpenseController extends Controller
                 // Traitement d'une seule dépense (code existant)
                 $data['user_id'] = $_SESSION['user_id'];
 
-                // Récupérer le budget actif pour l'utilisateur
-                $activeBudget = Budget::getActiveBudget((int)$_SESSION['user_id']);
+                // Récupérer le budget sélectionné (ou actif par défaut)
+                $activeBudget = Budget::getCurrentBudget((int)$_SESSION['user_id']);
                 if (!$activeBudget || !$activeBudget->id) {
                     throw new \Exception("Aucun budget actif trouvé pour l'utilisateur");
                 }
@@ -234,8 +234,8 @@ class ExpenseController extends Controller
             // Récupérer l'ID de l'utilisateur connecté
             $userId = $_SESSION['user_id'];
 
-            // Récupérer le budget actif
-            $activeBudget = Budget::getActiveBudget($userId);
+            // Récupérer le budget sélectionné (ou actif par défaut)
+            $activeBudget = Budget::getCurrentBudget($userId);
 
             if (!$activeBudget) {
                 throw new \Exception("Aucun budget actif trouvé");
@@ -247,7 +247,7 @@ class ExpenseController extends Controller
                 throw new \Exception("Budget actif invalide (ID manquant ou incorrect)");
             }
 
-            // Récupérer les dépenses de l'utilisateur pour le budget actif
+            // Récupérer les dépenses de l'utilisateur pour le budget sélectionné
             $expenses = Expense::getExpensesByUser($budgetId, $userId);
 
             // Récupérer les catégories pour le filtre
@@ -308,8 +308,8 @@ class ExpenseController extends Controller
             error_log("=== ExpenseController::listPaginated ===");
             error_log("userId from session: $userId (type: " . gettype($userId) . ")");
 
-            // Récupérer le budget actif
-            $activeBudget = Budget::getActiveBudget($userId);
+            // Récupérer le budget sélectionné (ou actif par défaut)
+            $activeBudget = Budget::getCurrentBudget($userId);
             if (!$activeBudget) {
                 throw new \Exception("Aucun budget actif trouvé");
             }

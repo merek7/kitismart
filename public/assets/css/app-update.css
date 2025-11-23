@@ -1,0 +1,215 @@
+/* App Update Modal */
+.update-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    padding: 1rem;
+}
+
+.update-modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.update-modal {
+    background: white;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.update-modal-overlay.visible .update-modal {
+    transform: scale(1) translateY(0);
+}
+
+.update-modal-header {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.update-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.update-badge i {
+    font-size: 1rem;
+}
+
+.update-modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.update-version {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.update-modal-body {
+    padding: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.update-features {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.update-feature {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.update-feature:hover {
+    background: #f1f5f9;
+    transform: translateX(5px);
+}
+
+.update-feature-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.update-feature-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.25rem 0;
+}
+
+.update-feature-content p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.update-modal-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    text-align: center;
+}
+
+.update-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.update-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
+}
+
+.update-btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Dark mode */
+[data-theme="dark"] .update-modal {
+    background: #1f2937;
+}
+
+[data-theme="dark"] .update-feature {
+    background: #374151;
+}
+
+[data-theme="dark"] .update-feature:hover {
+    background: #4b5563;
+}
+
+[data-theme="dark"] .update-feature-content h4 {
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .update-feature-content p {
+    color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .update-modal {
+        border-radius: 16px;
+    }
+
+    .update-modal-header {
+        padding: 1.5rem;
+    }
+
+    .update-modal-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .update-modal-body {
+        padding: 1rem;
+    }
+
+    .update-feature {
+        padding: 0.75rem;
+    }
+
+    .update-feature-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .update-feature-content h4 {
+        font-size: 0.9rem;
+    }
+
+    .update-feature-content p {
+        font-size: 0.8rem;
+    }
+}

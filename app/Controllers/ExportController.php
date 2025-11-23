@@ -22,7 +22,7 @@ class ExportController extends Controller
             $userId = $_SESSION['user_id'];
 
             // Récupérer le budget actif
-            $activeBudget = Budget::getActiveBudget($userId);
+            $activeBudget = Budget::getCurrentBudget($userId);
 
             if (!$activeBudget) {
                 $_SESSION['error'] = "Aucun budget actif trouvé";
@@ -89,7 +89,7 @@ class ExportController extends Controller
             $userId = $_SESSION['user_id'];
 
             // Récupérer le budget actif
-            $activeBudget = Budget::getActiveBudget($userId);
+            $activeBudget = Budget::getCurrentBudget($userId);
 
             if (!$activeBudget) {
                 $_SESSION['error'] = "Aucun budget actif trouvé";

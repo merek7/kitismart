@@ -20,8 +20,8 @@ class BudgetController extends Controller {
         $csrfToken = Csrf::generateToken();
 
         try{
-            $activeBudget = Budget::getActiveBudget($userId);
-            $depense= $activeBudget ? Budget::getBudgetSummary($activeBudget->id) : null;
+            $activeBudget = Budget::getCurrentBudget($userId);
+            $depense = $activeBudget ? Budget::getBudgetSummary($activeBudget->id) : null;
             $previousBudgets = Budget::getPreviousBudgets($userId, 50);
 
             // Préparer les données d'onboarding
@@ -99,7 +99,7 @@ class BudgetController extends Controller {
                 return $this->jsonResponse(['success' => false, 'message' => 'Non authentifié'], 401);
             }
 
-            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+            $activeBudget = Budget::getCurrentBudget($_SESSION['user_id']);
 
             if (!$activeBudget) {
                 return $this->jsonResponse([

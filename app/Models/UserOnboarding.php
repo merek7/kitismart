@@ -12,6 +12,7 @@ class UserOnboarding
     // Étapes de l'onboarding
     const STEP_WELCOME = 'welcome';
     const STEP_BUDGET_CREATION = 'budget_creation';
+    const STEP_BUDGET_SWITCH = 'budget_switch';
     const STEP_DASHBOARD_TOUR = 'dashboard_tour';
     const STEP_EXPENSE_CREATION = 'expense_creation';
     const STEP_CATEGORIES = 'categories';
@@ -99,6 +100,7 @@ class UserOnboarding
         $steps = [
             self::STEP_WELCOME,
             self::STEP_BUDGET_CREATION,
+            self::STEP_BUDGET_SWITCH,
             self::STEP_DASHBOARD_TOUR,
             self::STEP_EXPENSE_CREATION,
             self::STEP_CATEGORIES,
@@ -123,7 +125,7 @@ class UserOnboarding
     public static function getStepsForPage(int $userId, string $page): array
     {
         $pageSteps = [
-            'dashboard' => [self::STEP_WELCOME, self::STEP_DASHBOARD_TOUR],
+            'dashboard' => [self::STEP_WELCOME, self::STEP_BUDGET_SWITCH, self::STEP_DASHBOARD_TOUR],
             'budget_create' => [self::STEP_BUDGET_CREATION],
             'expense_create' => [self::STEP_EXPENSE_CREATION],
             'categories' => [self::STEP_CATEGORIES],
@@ -147,7 +149,7 @@ class UserOnboarding
      */
     public static function getCompletionPercentage(int $userId): int
     {
-        $totalSteps = 6;
+        $totalSteps = 7;
         $completedCount = R::count('useronboarding',
             'user_id = ? AND (completed_at IS NOT NULL OR skipped = 1)',
             [$userId]

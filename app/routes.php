@@ -21,6 +21,15 @@ return [
     ['POST', '/budget/create', 'BudgetController#create', 'create_budget'],
     ['GET', '/budget/active', 'BudgetController#getActiveBudget', 'get_active_budget'],
     ['GET', '/budget/[i:id]/summary', 'BudgetController#getBudgetSummary', 'budget_summary'],
+
+    // Budget Switch Routes
+    ['GET', '/budget/switch/list', 'BudgetSwitchController#getActiveBudgets', 'budget_switch_list'],
+    ['POST', '/budget/switch', 'BudgetSwitchController#switchBudget', 'budget_switch'],
+    ['POST', '/budget/close', 'BudgetSwitchController#closeBudget', 'budget_close'],
+
+    // App Update Routes
+    ['GET', '/app/update/check', 'AppUpdateController#check', 'app_update_check'],
+    ['POST', '/app/update/seen', 'AppUpdateController#markSeen', 'app_update_seen'],
     ['GET', '/budgets/history', 'BudgetHistoryController#index', 'budget_history'],
     ['GET', '/budgets/[i:id]', 'BudgetHistoryController#show', 'budget_show'],
     ['GET', '/budgets/history/data', 'BudgetHistoryController#getData', 'budget_history_data'],

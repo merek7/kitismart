@@ -29,9 +29,23 @@ class HomeController extends Controller
         }
 
         try {
-            // Vérifier si l'utilisateur a un budget actif
-            
-            $activeBudget = Budget::getActiveBudget($_SESSION['user_id']);
+            $userId = (int)$_SESSION['user_id'];
+
+            // Vérifier si un budget est sélectionné en session
+            $activeBudget = null;
+            if (isset($_SESSION['current_budget_id'])) {
+                $activeBudget = Budget::getById($_SESSION['current_budget_id'], $userId);
+                // Vérifier que le budget est toujours actif
+                if ($activeBudget && $activeBudget->status !== Budget::STATUS_ACTIVE) {
+                    unset($_SESSION['current_budget_id']);
+                    $activeBudget = null;
+                }
+            }
+
+            // Si pas de budget sélectionné, prendre le budget actif par défaut
+            if (!$activeBudget) {
+                $activeBudget = Budget::getCurrentBudget($userId);
+            }
             
             // Si pas de budget actif, rediriger vers la création de budget
             if (!$activeBudget) {

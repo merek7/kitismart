@@ -156,7 +156,7 @@ class NotificationController extends Controller
             }
 
             // Récupérer le budget actif
-            $budget = Budget::getActiveBudget($userId);
+            $budget = Budget::getCurrentBudget($userId);
 
             // Récupérer la catégorie
             $categoryName = null;
@@ -213,7 +213,7 @@ class NotificationController extends Controller
             }
 
             // Récupérer le budget actif
-            $budget = Budget::getActiveBudget($userId);
+            $budget = Budget::getCurrentBudget($userId);
             if (!$budget) {
                 return;
             }
