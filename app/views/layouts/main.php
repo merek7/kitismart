@@ -24,31 +24,37 @@
     <nav class="navbar">
         <div class="nav-content">
             <div class="logo">
-            <a href="/" class="nav-links">
-                KitiSmart
-            </a>    
-        </div>
-            <?php if (!isset($_SESSION['user_id'])): ?>
-                <div class="nav-links">
-                  <a href="#features">Fonctionnalités</a>
-                  <a href="#how-it-works">Comment ça marche</a>
-                  <a href="#testimonials">Témoignages</a>
-                </div>
-                <div class="auth-buttons">
-                    <a href="/login" class="login-btn">Connexion</a>
-                    <a href="/register" class="register-btn">Inscription</a>
-                </div>
-            <?php else: ?>
-                <div class="nav-links">
-                    <a href="/dashboard">Tableau de bord</a>
-                    <a href="/expenses">Dépenses</a>
-                    <a href="/profile">Profil</a>
-                    <?php if (($_ENV['APP_ENV'] ?? 'prod') === 'dev'): ?>
-                        <a href="/admin/email-test" style="color: #facc15;">Test Emails</a>
-                    <?php endif; ?>
-                    <a href="/logout">Déconnexion</a>
-                </div>
-            <?php endif; ?>
+                <a href="/">KitiSmart</a>
+            </div>
+
+            <!-- Hamburger menu button for mobile -->
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+
+            <div class="nav-menu" id="navMenu">
+                <?php if (!isset($_SESSION['user_id'])): ?>
+                    <div class="nav-links">
+                        <a href="#features">Fonctionnalites</a>
+                        <a href="#how-it-works">Comment ca marche</a>
+                        <a href="#testimonials">Temoignages</a>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="/login" class="login-btn">Connexion</a>
+                        <a href="/register" class="register-btn">Inscription</a>
+                    </div>
+                <?php else: ?>
+                    <div class="nav-links">
+                        <a href="/dashboard">Tableau de bord</a>
+                        <a href="/expenses">Depenses</a>
+                        <a href="/profile">Profil</a>
+                        <?php if (($_ENV['APP_ENV'] ?? 'prod') === 'dev'): ?>
+                            <a href="/admin/email-test" style="color: #facc15;">Test Emails</a>
+                        <?php endif; ?>
+                        <a href="/logout">Deconnexion</a>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </nav>
     <?= $content ?>
@@ -66,8 +72,42 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/assets/js/app.js"></script>
 
-    <!-- Service Worker - Désactivé (optionnel via Paramètres) -->
-    <!-- Le Service Worker n'est plus enregistré automatiquement -->
+    <!-- Mobile Navigation Toggle -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', function() {
+                navToggle.classList.toggle('active');
+                navMenu.classList.toggle('active');
+                document.body.classList.toggle('nav-open');
+            });
+
+            // Close menu when clicking on a link
+            navMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function() {
+                    navToggle.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    document.body.classList.remove('nav-open');
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
+                    navToggle.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    document.body.classList.remove('nav-open');
+                }
+            });
+        }
+    });
+    </script>
+
+    <!-- Service Worker - Desactive (optionnel via Parametres) -->
+    <!-- Le Service Worker n'est plus enregistre automatiquement -->
 
     <?php
     error_log("Scripts disponibles dans le layout: " . print_r($pageScripts ?? [], true));
