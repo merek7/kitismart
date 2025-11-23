@@ -287,10 +287,29 @@ body {
   background: #374151;
 }
 
+/* Nav user - versions desktop et mobile */
 .nav-user {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+}
+
+/* Par défaut, cacher le menu mobile et afficher le desktop */
+.nav-user-mobile {
+  display: none;
+}
+
+.nav-user-desktop {
+  display: flex;
+}
+
+/* Éléments visibles uniquement en desktop ou mobile */
+.nav-mobile-only {
+  display: none;
+}
+
+.nav-desktop-only {
+  display: block;
 }
 
 .user-menu {
@@ -446,6 +465,10 @@ body {
     padding: 0;
   }
 
+  [data-theme="dark"] .nav-menu {
+    background-color: var(--bg-card);
+  }
+
   /* Menu actif (ouvert) */
   .nav-menu.nav-menu-active {
     max-height: calc(100vh - 65px);
@@ -466,8 +489,89 @@ body {
     border-bottom: none;
   }
 
-  .nav-user {
+  /* Dropdown "Plus" en mode mobile */
+  .nav-dropdown {
+    width: 100%;
+  }
+
+  .nav-dropdown-toggle {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .nav-dropdown-menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    border-radius: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: rgba(0, 0, 0, 0.02);
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-theme="dark"] .nav-dropdown-menu {
+    background: rgba(255, 255, 255, 0.02);
+    border: none;
+  }
+
+  .nav-dropdown.open .nav-dropdown-menu {
+    max-height: 500px;
+    padding: 0.5rem 0;
+  }
+
+  .dropdown-item {
+    padding: 0.875rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .dropdown-item:last-child {
+    border-bottom: none;
+  }
+
+  .dropdown-divider {
+    margin: 0;
+  }
+
+  /* Inverser desktop/mobile */
+  .nav-desktop-only {
+    display: none !important;
+  }
+
+  .nav-mobile-only {
+    display: flex !important;
+  }
+
+  .nav-user-desktop {
     display: none;
+  }
+
+  .nav-user-mobile {
+    display: flex;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border-top: 2px solid var(--border-color);
+    margin-top: 0.5rem;
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  [data-theme="dark"] .nav-user-mobile {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .nav-user-mobile .user-menu {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .nav-user-mobile .user-name {
+    display: block;
   }
 
   .dashboard-main {
