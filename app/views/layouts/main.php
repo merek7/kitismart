@@ -13,10 +13,10 @@
     <meta name="apple-mobile-web-app-title" content="KitiSmart">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="/assets/css/style.css" rel="stylesheet">
+    <link href="<?= \App\Core\Config::asset('/assets/css/style.css') ?>" rel="stylesheet">
     <?php if (!empty($styles)): ?>
         <?php foreach ($styles as $style): ?>
-            <link href="/assets/css/<?= htmlspecialchars($style) ?>" rel="stylesheet">
+            <link href="<?= \App\Core\Config::asset('/assets/css/' . htmlspecialchars($style)) ?>" rel="stylesheet">
         <?php endforeach; ?>
     <?php endif; ?>
 </head>

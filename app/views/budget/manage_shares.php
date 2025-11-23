@@ -230,5 +230,5 @@
 
 <input type="hidden" id="csrf-token" value="<?= htmlspecialchars($csrfToken) ?>">
 
-<link rel="stylesheet" href="/assets/css/budget/manage_shares.css">
+<link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/budget/manage_shares.css') ?>">
 <script src="/assets/js/budget/manage_shares.js"></script>

@@ -4,6 +4,9 @@ namespace App\Core;
 use Dotenv\Dotenv;
 
 class Config {
+    // Version des assets - incrémentez à chaque déploiement pour invalider le cache
+    public const ASSETS_VERSION = '1.0.1';
+
     public static function init() {
         $envPath = __DIR__.'/../../';
 
@@ -20,5 +23,14 @@ class Config {
 
     public static function get($key, $default = null) {
         return $_ENV[$key] ?? getenv($key) ?: $default;
+    }
+
+    /**
+     * Retourne l'URL d'un asset avec version pour cache busting
+     * @param string $path Chemin de l'asset (ex: /assets/css/style.css)
+     * @return string URL avec paramètre de version
+     */
+    public static function asset(string $path): string {
+        return $path . '?v=' . self::ASSETS_VERSION;
     }
 }

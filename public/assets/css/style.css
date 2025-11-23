@@ -629,6 +629,78 @@ button[type="submit"]:disabled {
   flex-shrink: 0;
 }
 
+/* Mise en évidence du bouton Google */
+.btn-google.pulse-highlight {
+  animation: pulse-google 1.5s infinite;
+  border-color: #4285F4;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.3);
+}
+
+@keyframes pulse-google {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(66, 133, 244, 0.1);
+  }
+}
+
+/* Alerte inscription Google requise */
+.google-required-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  border: 1px solid #93C5FD;
+  border-radius: 8px;
+  border-left: 4px solid #4285F4;
+  animation: slideDown 0.3s ease;
+}
+
+.google-required-alert i {
+  font-size: 1.5rem;
+  color: #4285F4;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.google-required-alert strong {
+  display: block;
+  color: #1E40AF;
+  margin-bottom: 0.25rem;
+}
+
+.google-required-alert p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #3B82F6;
+}
+
+/* Form group désactivé */
+.form-group.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.form-group.disabled label::after {
+  content: " (non requis)";
+  font-size: 0.75rem;
+  color: #9CA3AF;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Styles pour le dashboard */
 .dashboard-container {
   padding: 20px;

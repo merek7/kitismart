@@ -9,10 +9,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/assets/css/dashboard/index.css">
+    <link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/dashboard/index.css') ?>">
     <?php if (!empty($styles)): ?>
         <?php foreach ($styles as $style): ?>
-            <link rel="stylesheet" href="/assets/css/<?= htmlspecialchars($style) ?>">
+            <link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/' . htmlspecialchars($style)) ?>">
         <?php endforeach; ?>
     <?php endif; ?>
 

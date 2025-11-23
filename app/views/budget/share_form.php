@@ -283,5 +283,5 @@
     </div>
 </div>
 
-<link rel="stylesheet" href="/assets/css/budget/share.css">
+<link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/budget/share.css') ?>">
 <script src="/assets/js/budget/share.js"></script>

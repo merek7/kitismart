@@ -35,6 +35,39 @@ $(document).ready(function () {
         }
     });
 
+    // Fonction pour détecter si c'est un email Google
+    function isGoogleEmail(email) {
+        const googleDomains = ['gmail.com', 'googlemail.com'];
+        const domain = email.split('@')[1]?.toLowerCase();
+        return googleDomains.includes(domain);
+    }
+
+    // Fonction pour afficher le message d'utiliser Google
+    function showGoogleRequired(show) {
+        if (show) {
+            if (!$('#google-required-message').length) {
+                const message = `
+                    <div id="google-required-message" class="google-required-alert">
+                        <i class="fab fa-google"></i>
+                        <div>
+                            <strong>Compte Google détecté</strong>
+                            <p>Pour les adresses Gmail, veuillez utiliser le bouton "S'inscrire avec Google" ci-dessous pour une expérience optimale.</p>
+                        </div>
+                    </div>
+                `;
+                $('#email').closest('.form-group').after(message);
+            }
+            // Désactiver les champs de mot de passe
+            $('#password, #confirm_password').prop('disabled', true).closest('.form-group').addClass('disabled');
+            // Mettre en évidence le bouton Google
+            $('.btn-google').addClass('pulse-highlight');
+        } else {
+            $('#google-required-message').remove();
+            $('#password, #confirm_password').prop('disabled', false).closest('.form-group').removeClass('disabled');
+            $('.btn-google').removeClass('pulse-highlight');
+        }
+    }
+
     // Validation de l'email en temps réel
     $('#email').on('input blur', function() {
         const email = $(this).val().trim();
@@ -45,12 +78,21 @@ $(document).ready(function () {
         if (email === '') {
             formGroup.removeClass('valid error');
             errorElement.hide();
+            showGoogleRequired(false);
         } else if (emailRegex.test(email)) {
             formGroup.removeClass('error').addClass('valid');
             errorElement.hide();
+
+            // Vérifier si c'est un email Google
+            if (isGoogleEmail(email)) {
+                showGoogleRequired(true);
+            } else {
+                showGoogleRequired(false);
+            }
         } else {
             formGroup.removeClass('valid').addClass('error');
             errorElement.text('Veuillez entrer une adresse e-mail valide.').show();
+            showGoogleRequired(false);
         }
     });
 
@@ -147,6 +189,11 @@ $(document).ready(function () {
         if (!emailPattern.test(email)) {
             $('#email').closest('.form-group').addClass('error');
             $('#email-error').text('Veuillez entrer une adresse e-mail valide.').show();
+            isValid = false;
+        } else if (isGoogleEmail(email)) {
+            $('#email').closest('.form-group').addClass('error');
+            $('#email-error').text('Veuillez utiliser le bouton "S\'inscrire avec Google" pour les adresses Gmail.').show();
+            showGoogleRequired(true);
             isValid = false;
         }
 

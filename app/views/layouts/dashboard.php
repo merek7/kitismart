@@ -28,10 +28,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/assets/css/dashboard/index.css">
+    <link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/dashboard/index.css') ?>">
     <?php if (!empty($styles)): ?>
         <?php foreach ($styles as $style): ?>
-            <link rel="stylesheet" href="/assets/css/<?= htmlspecialchars($style) ?>" rel="stylesheet">
+            <link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/' . htmlspecialchars($style)) ?>">
         <?php endforeach; ?>
     <?php endif; ?>
 
@@ -43,7 +43,7 @@
 
     <!-- Shepherd.js CSS pour l'onboarding -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/css/shepherd.css" />
-    <link rel="stylesheet" href="/assets/css/onboarding/onboarding.css" />
+    <link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/onboarding/onboarding.css') ?>" />
 
 </head>
 <body>
