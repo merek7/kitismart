@@ -101,15 +101,27 @@ class RegisterController extends Controller {
 
             // Essai de création de l'utilisateur.
             // Si l'utilisateur existe déjà, le modèle lance une UserAlreadyExistsException.
-            $user = User::create([
+            $userId = User::create([
                 'nom'      => $data['name'],
                 'email'    => $data['email'],
                 'password' => $data['password']
             ]);
 
             // Vérification que l'utilisateur a bien été créé (si null, on peut lever une exception de base de données)
-            if ($user === null) {
+            if ($userId === null) {
                 throw new UserAlreadyExistsException();
+            }
+
+            // Récupérer l'utilisateur complet pour l'envoi d'email
+            $user = User::findById($userId);
+            if (!$user) {
+                throw new \Exception("Erreur lors de la récupération de l'utilisateur créé");
+            }
+
+            // Envoyer l'email de confirmation
+            $emailSent = $this->sendConfirmationEmail($user);
+            if (!$emailSent) {
+                error_log("Erreur: Email de confirmation non envoyé pour " . $user->email);
             }
 
             // Inscription réussie - Réinitialiser le compteur
@@ -117,7 +129,7 @@ class RegisterController extends Controller {
 
             // Log de l'audit utilisateur
             $audit = UserAudit::log(
-                $user,
+                $user->id,
                 'register',
                 [
                     'source'     => 'web',
@@ -128,7 +140,7 @@ class RegisterController extends Controller {
 
             return $this->jsonResponse([
                 'success' => true,
-                'message' => 'Inscription réussie.'
+                'message' => 'Inscription réussie. Un email de confirmation vous a été envoyé.'
             ], 200);
 
         }catch (TooManyAttemptsException $e) {

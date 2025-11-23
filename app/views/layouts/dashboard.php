@@ -73,8 +73,8 @@
                     <i class="fas fa-tags"></i> Catégories
                 </a>
 
-                <!-- Menu déroulant "Plus" -->
-                <div class="nav-dropdown">
+                <!-- Menu déroulant "Plus" (visible uniquement en desktop) -->
+                <div class="nav-dropdown nav-desktop-only">
                     <button class="nav-link nav-dropdown-toggle <?= in_array($currentPage, ['budgets', 'recurrences', 'shares', 'notifications', 'settings']) ? 'active' : '' ?>">
                         <i class="fas fa-ellipsis-h"></i> Plus <i class="fas fa-chevron-down dropdown-arrow"></i>
                     </button>
@@ -103,8 +103,37 @@
                         <?php endif; ?>
                     </div>
                 </div>
+
+                <!-- Liens directs (visible uniquement en mobile) -->
+                <a href="/budgets/history" class="nav-link nav-mobile-only <?= $currentPage === 'budgets' ? 'active' : '' ?>">
+                    <i class="fas fa-history"></i> Historique
+                </a>
+                <a href="/expenses/recurrences" class="nav-link nav-mobile-only <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
+                    <i class="fas fa-sync-alt"></i> Récurrences
+                </a>
+                <a href="/budget/shares/manage" class="nav-link nav-mobile-only <?= $currentPage === 'shares' ? 'active' : '' ?>">
+                    <i class="fas fa-share-nodes"></i> Partages
+                </a>
+                <a href="/notifications/settings" class="nav-link nav-mobile-only <?= $currentPage === 'notifications' ? 'active' : '' ?>">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+                <a href="/settings" class="nav-link nav-mobile-only <?= $currentPage === 'settings' ? 'active' : '' ?>">
+                    <i class="fas fa-cog"></i> Paramètres
+                </a>
+
+                <!-- User menu (visible en mobile dans le menu) -->
+                <div class="nav-user nav-user-mobile">
+                    <div class="user-menu">
+                        <span class="user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Utilisateur') ?></span>
+                        <a href="#" id="logoutBtnMobile" class="btn-logout" onclick="event.preventDefault(); if(window.cleanLogout) window.cleanLogout(); else window.location.href='/logout';">
+                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="nav-user">
+
+            <!-- User menu desktop (hors du nav-menu) -->
+            <div class="nav-user nav-user-desktop">
                 <div class="user-menu">
                     <span class="user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Utilisateur') ?></span>
                     <a href="#" id="logoutBtn" class="btn-logout" onclick="event.preventDefault(); if(window.cleanLogout) window.cleanLogout(); else window.location.href='/logout';">
