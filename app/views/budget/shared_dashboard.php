@@ -144,9 +144,13 @@
                                 <div class="expenses-list">
                                     <?php foreach ($expenses as $expense): ?>
                                         <div class="expense-item" data-id="<?= $expense->id ?>">
+                                            <?php
+                                            $moisFr = ['', 'jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc'];
+                                            $moisNum = (int)date('n', strtotime($expense->payment_date));
+                                            ?>
                                             <div class="expense-date">
                                                 <span class="date-day"><?= date('d', strtotime($expense->payment_date)) ?></span>
-                                                <span class="date-month"><?= (new IntlDateFormatter('fr_FR', IntlDateFormatter::NONE, IntlDateFormatter::NONE, null, null, 'MMM'))->format(strtotime($expense->payment_date)) ?></span>
+                                                <span class="date-month"><?= $moisFr[$moisNum] ?></span>
                                             </div>
                                             <div class="expense-details">
                                                 <div class="expense-description">
