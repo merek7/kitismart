@@ -114,6 +114,9 @@
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-list-ul"></i> Liste des Dépenses
+                                <?php if (!empty($expenses)): ?>
+                                <span class="expenses-count"><?= count($expenses) ?></span>
+                                <?php endif; ?>
                             </h3>
                             <?php if ($permissions['can_add']): ?>
                             <div class="card-tools">
@@ -143,7 +146,7 @@
                                         <div class="expense-item" data-id="<?= $expense->id ?>">
                                             <div class="expense-date">
                                                 <span class="date-day"><?= date('d', strtotime($expense->payment_date)) ?></span>
-                                                <span class="date-month"><?= strftime('%b', strtotime($expense->payment_date)) ?></span>
+                                                <span class="date-month"><?= (new IntlDateFormatter('fr_FR', IntlDateFormatter::NONE, IntlDateFormatter::NONE, null, null, 'MMM'))->format(strtotime($expense->payment_date)) ?></span>
                                             </div>
                                             <div class="expense-details">
                                                 <div class="expense-description">

@@ -20,21 +20,18 @@ class AppUpdateController extends Controller
             }
 
             $userId = (int)$_SESSION['user_id'];
-            $hasSeen = AppUpdate::hasSeenUpdate($userId);
 
-            if ($hasSeen) {
-                return $this->jsonResponse(['show' => false]);
-            }
+            // Récupérer toutes les versions non vues
+            $unseenUpdates = AppUpdate::getUnseenUpdates($userId);
 
-            $updateInfo = AppUpdate::getCurrentUpdateInfo();
-            if (!$updateInfo) {
+            if (empty($unseenUpdates)) {
                 return $this->jsonResponse(['show' => false]);
             }
 
             return $this->jsonResponse([
                 'show' => true,
                 'version' => AppUpdate::getCurrentVersion(),
-                'update' => $updateInfo
+                'updates' => $unseenUpdates
             ]);
 
         } catch (\Exception $e) {
@@ -44,7 +41,7 @@ class AppUpdateController extends Controller
     }
 
     /**
-     * Marque la mise à jour comme vue
+     * Marque toutes les mises à jour comme vues
      */
     public function markSeen()
     {
@@ -54,7 +51,9 @@ class AppUpdateController extends Controller
             }
 
             $userId = (int)$_SESSION['user_id'];
-            AppUpdate::markAsSeen($userId);
+
+            // Marquer toutes les versions comme vues
+            AppUpdate::markAllAsSeen($userId);
 
             return $this->jsonResponse(['success' => true]);
 

@@ -7,10 +7,36 @@ use RedBeanPHP\R as R;
 class AppUpdate
 {
     // Version actuelle de l'application - à incrémenter à chaque mise à jour importante
-    public const CURRENT_VERSION = '1.1.0';
+    public const CURRENT_VERSION = '1.2.0';
 
     // Changelog des versions
     public const CHANGELOG = [
+        '1.2.0' => [
+            'title' => 'Partage amélioré & UX mobile',
+            'date' => '2025-11-24',
+            'features' => [
+                [
+                    'icon' => 'fa-share-alt',
+                    'title' => 'Partage de budget corrigé',
+                    'description' => 'Les dépenses du budget partagé sont maintenant correctement affichées pour vos invités.'
+                ],
+                [
+                    'icon' => 'fa-mobile-alt',
+                    'title' => 'Interface mobile améliorée',
+                    'description' => 'Les filtres et la liste des dépenses sont désormais mieux adaptés aux petits écrans.'
+                ],
+                [
+                    'icon' => 'fa-scroll',
+                    'title' => 'Liste des dépenses scrollable',
+                    'description' => 'Naviguez facilement dans vos dépenses avec un scroll fluide et un compteur visible.'
+                ],
+                [
+                    'icon' => 'fa-graduation-cap',
+                    'title' => 'Onboarding enrichi',
+                    'description' => 'Le guide de démarrage explique maintenant le switch de budget et permet de revenir en arrière.'
+                ]
+            ]
+        ],
         '1.1.0' => [
             'title' => 'Multi-budgets & Export PDF',
             'date' => '2025-11-23',
@@ -49,6 +75,32 @@ class AppUpdate
     }
 
     /**
+     * Vérifie si l'utilisateur a vu une version spécifique
+     */
+    public static function hasSeenVersion(int $userId, string $version): bool
+    {
+        $record = R::findOne('userappupdate', 'user_id = ? AND version = ?', [$userId, $version]);
+        return $record !== null;
+    }
+
+    /**
+     * Récupère toutes les versions non vues par l'utilisateur
+     */
+    public static function getUnseenUpdates(int $userId): array
+    {
+        $unseenUpdates = [];
+
+        // Parcourir toutes les versions du changelog
+        foreach (self::CHANGELOG as $version => $info) {
+            if (!self::hasSeenVersion($userId, $version)) {
+                $unseenUpdates[$version] = $info;
+            }
+        }
+
+        return $unseenUpdates;
+    }
+
+    /**
      * Marque la mise à jour comme vue par l'utilisateur
      */
     public static function markAsSeen(int $userId): void
@@ -63,6 +115,22 @@ class AppUpdate
         $record->version = self::CURRENT_VERSION;
         $record->seen_at = date('Y-m-d H:i:s');
         R::store($record);
+    }
+
+    /**
+     * Marque toutes les versions comme vues par l'utilisateur
+     */
+    public static function markAllAsSeen(int $userId): void
+    {
+        foreach (array_keys(self::CHANGELOG) as $version) {
+            if (!self::hasSeenVersion($userId, $version)) {
+                $record = R::dispense('userappupdate');
+                $record->user_id = $userId;
+                $record->version = $version;
+                $record->seen_at = date('Y-m-d H:i:s');
+                R::store($record);
+            }
+        }
     }
 
     /**

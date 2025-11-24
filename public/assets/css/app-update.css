@@ -177,6 +177,78 @@
     color: #9ca3af;
 }
 
+/* Multi-version styles */
+.update-modal-multi {
+    max-width: 550px;
+}
+
+.update-modal-multi .update-modal-body {
+    max-height: 500px;
+}
+
+.update-version-section {
+    margin-bottom: 1.5rem;
+}
+
+.update-version-section:last-child {
+    margin-bottom: 0;
+}
+
+.update-version-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.update-version-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.update-version-badge {
+    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.update-version-older {
+    padding-top: 1.5rem;
+    border-top: 1px dashed #d1d5db;
+}
+
+.update-version-older .update-version-header {
+    border-bottom-color: #d1d5db;
+}
+
+.update-version-older .update-version-badge {
+    background: #6b7280;
+}
+
+.update-version-older .update-feature-icon {
+    background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+}
+
+/* Dark mode multi-version */
+[data-theme="dark"] .update-version-header {
+    border-bottom-color: #4b5563;
+}
+
+[data-theme="dark"] .update-version-header h3 {
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .update-version-older {
+    border-top-color: #4b5563;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
     .update-modal {

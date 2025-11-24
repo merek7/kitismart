@@ -173,11 +173,21 @@ class Expense
         }
     }
 
-    public static function getExpensesByUser($budgetId, $userId)
+    public static function getExpensesByUser($budgetId, $userId = null)
     {
+        // Si userId est null (accès invité), récupérer directement par budget_id
+        if ($userId === null) {
+            return R::find(
+                'expense',
+                'budget_id = ? ORDER BY payment_date DESC',
+                [$budgetId]
+            );
+        }
+
+        // Sinon, vérifier que le budget appartient à l'utilisateur
         return R::find(
             'expense',
-            'budget_id = ? AND budget_id IN (SELECT id FROM budget WHERE user_id = ?)',
+            'budget_id = ? AND budget_id IN (SELECT id FROM budget WHERE user_id = ?) ORDER BY payment_date DESC',
             [$budgetId, $userId]
         );
     }
