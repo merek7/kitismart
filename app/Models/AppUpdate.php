@@ -7,10 +7,62 @@ use RedBeanPHP\R as R;
 class AppUpdate
 {
     // Version actuelle de l'application - à incrémenter à chaque mise à jour importante
-    public const CURRENT_VERSION = '1.2.0';
+    public const CURRENT_VERSION = '1.4.0';
 
     // Changelog des versions
     public const CHANGELOG = [
+        '1.4.0' => [
+            'title' => 'Objectifs d\'épargne',
+            'date' => '2025-11-24',
+            'features' => [
+                [
+                    'icon' => 'fa-bullseye',
+                    'title' => 'Objectifs d\'épargne',
+                    'description' => 'Définissez vos objectifs financiers (voyage, voiture, maison...) et suivez votre progression.'
+                ],
+                [
+                    'icon' => 'fa-piggy-bank',
+                    'title' => 'Suivi des contributions',
+                    'description' => 'Ajoutez facilement de l\'épargne à vos objectifs et visualisez l\'historique de vos contributions.'
+                ],
+                [
+                    'icon' => 'fa-calculator',
+                    'title' => 'Suggestions mensuelles',
+                    'description' => 'L\'application calcule automatiquement combien épargner par mois pour atteindre vos objectifs.'
+                ],
+                [
+                    'icon' => 'fa-file-pdf',
+                    'title' => 'Export PDF comparaison',
+                    'description' => 'Exportez vos rapports de comparaison de budgets en PDF pour vos archives.'
+                ]
+            ]
+        ],
+        '1.3.0' => [
+            'title' => 'Comparaison de budgets',
+            'date' => '2025-11-24',
+            'features' => [
+                [
+                    'icon' => 'fa-balance-scale',
+                    'title' => 'Comparez vos budgets',
+                    'description' => 'Nouvelle fonctionnalité pour comparer jusqu\'à 4 budgets côte à côte avec graphiques et statistiques.'
+                ],
+                [
+                    'icon' => 'fa-chart-bar',
+                    'title' => 'Graphiques comparatifs',
+                    'description' => 'Visualisez les différences entre budgets avec des graphiques en barres, par catégorie et radar.'
+                ],
+                [
+                    'icon' => 'fa-exchange-alt',
+                    'title' => 'Analyse des évolutions',
+                    'description' => 'Voyez l\'évolution de vos dépenses entre deux périodes avec les pourcentages de variation.'
+                ],
+                [
+                    'icon' => 'fa-spider',
+                    'title' => 'Analyse radar',
+                    'description' => 'Comparez vos habitudes de dépenses sur plusieurs critères avec le graphique radar.'
+                ]
+            ]
+        ],
         '1.2.0' => [
             'title' => 'Partage amélioré & UX mobile',
             'date' => '2025-11-24',

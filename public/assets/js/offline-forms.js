@@ -237,6 +237,12 @@ class OfflineForms {
       return;
     }
 
+    // NE PAS intercepter le formulaire de comparaison (utilise GET natif)
+    if (budgetForm.action.includes('/budget/comparison') || budgetForm.hasAttribute('data-no-sync')) {
+      console.log('[OfflineForms] Formulaire de comparaison ou data-no-sync détecté - interception désactivée');
+      return;
+    }
+
     console.log('[OfflineForms] Formulaire de budget trouvé');
 
     budgetForm.addEventListener('submit', async (e) => {

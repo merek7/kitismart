@@ -169,6 +169,42 @@
                                                         placeholder="Détails de la dépense..."></textarea>
                                             </div>
                                         </div>
+
+                                        <!-- Sélecteur d'objectif d'épargne (affiché seulement si catégorie = epargne) -->
+                                        <?php if (!empty($savingsGoals)): ?>
+                                        <div class="form-group savings-goal-selector" style="display: none;">
+                                            <label><i class="fas fa-bullseye"></i> Lier à un objectif d'épargne</label>
+                                            <div class="savings-goals-list">
+                                                <label class="savings-goal-option">
+                                                    <input type="radio" name="savings_goal_id[]" value="" checked>
+                                                    <div class="goal-option-content">
+                                                        <span class="goal-option-name">Ne pas lier à un objectif</span>
+                                                        <span class="goal-option-desc">L'épargne ne sera pas suivie</span>
+                                                    </div>
+                                                </label>
+                                                <?php foreach ($savingsGoals as $goal):
+                                                    $progress = $goal->target_amount > 0 ? round(($goal->current_amount / $goal->target_amount) * 100, 1) : 0;
+                                                    $remaining = max(0, $goal->target_amount - $goal->current_amount);
+                                                ?>
+                                                <label class="savings-goal-option">
+                                                    <input type="radio" name="savings_goal_id[]" value="<?= $goal->id ?>">
+                                                    <div class="goal-option-content" style="--goal-color: <?= htmlspecialchars($goal->color ?? '#0d9488') ?>">
+                                                        <div class="goal-option-icon">
+                                                            <i class="fas <?= htmlspecialchars($goal->icon ?? 'fa-piggy-bank') ?>"></i>
+                                                        </div>
+                                                        <div class="goal-option-info">
+                                                            <span class="goal-option-name"><?= htmlspecialchars($goal->name ?? '') ?></span>
+                                                            <span class="goal-option-progress"><?= $progress ?>% - Reste <?= number_format($remaining, 0, ',', ' ') ?> FCFA</span>
+                                                        </div>
+                                                        <div class="goal-option-bar">
+                                                            <div class="goal-bar-fill" style="width: <?= $progress ?>%"></div>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>

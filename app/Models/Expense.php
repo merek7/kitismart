@@ -62,13 +62,21 @@ class Expense
                 'paid_at' => null,
                 // Champs pour les dépenses créées par un invité
                 'guest_name' => $data['guest_name'] ?? null,
-                'guest_share_id' => $data['guest_share_id'] ?? null
+                'guest_share_id' => $data['guest_share_id'] ?? null,
+                // Liaison avec un objectif d'épargne
+                'savings_goal_id' => $data['savings_goal_id'] ?? null
             ]);
 
             $budget->remaining_amount -= $data['amount'];
 
             R::store($expense);
             R::store($budget);
+
+            // Si la dépense est liée à un objectif d'épargne, mettre à jour l'objectif
+            if (!empty($data['savings_goal_id'])) {
+                self::updateSavingsGoal((int)$data['savings_goal_id'], (float)$data['amount'], $data['user_id']);
+            }
+
             R::commit();
 
             // Déclencher les notifications après le commit
@@ -297,12 +305,33 @@ class Expense
 
     public static function delete($id)
     {
-        $expense = self::findById($id);
-        if (!$expense) {
-            throw new ExpenseNotFoundException();
-        }
+        R::begin();
+        try {
+            $expense = self::findById($id);
+            if (!$expense) {
+                throw new ExpenseNotFoundException();
+            }
 
-        R::trash($expense);
+            // Si la dépense est liée à un objectif d'épargne, annuler la contribution
+            if (!empty($expense->savings_goal_id)) {
+                self::revertSavingsGoal((int)$id);
+            }
+
+            // Rembourser le budget si la dépense est déjà payée
+            if ($expense->budget_id) {
+                $budget = R::load('budget', $expense->budget_id);
+                if ($budget && $budget->id) {
+                    $budget->remaining_amount += $expense->amount;
+                    R::store($budget);
+                }
+            }
+
+            R::trash($expense);
+            R::commit();
+        } catch (\Exception $e) {
+            R::rollback();
+            throw new \Exception('Erreur lors de la suppression de la dépense: ' . $e->getMessage());
+        }
     }
 
     public static function getTotalPendingExpensesByUser($budgetId, $userId)
@@ -348,4 +377,91 @@ class Expense
            throw new \Exception('Erreur lors du calcul des dépenses en attente: ' . $e->getMessage());
        }
    }
+
+    /**
+     * Mettre à jour un objectif d'épargne lors de la création d'une dépense épargne
+     */
+    private static function updateSavingsGoal(int $goalId, float $amount, int $userId): void
+    {
+        try {
+            $goal = R::findOne('savingsgoal', 'id = ? AND user_id = ? AND status = ?',
+                [$goalId, $userId, SavingsGoal::STATUS_ACTIVE]);
+
+            if (!$goal) {
+                error_log("Objectif d'épargne non trouvé: $goalId pour user $userId");
+                return;
+            }
+
+            // Enregistrer la contribution
+            $contribution = R::dispense('savingscontribution');
+            $contribution->import([
+                'goal_id' => $goalId,
+                'user_id' => $userId,
+                'amount' => $amount,
+                'note' => 'Dépense épargne automatique',
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            R::store($contribution);
+
+            // Mettre à jour le montant actuel de l'objectif
+            $goal->current_amount = (float)$goal->current_amount + $amount;
+
+            // Vérifier si l'objectif est atteint
+            if ($goal->current_amount >= $goal->target_amount) {
+                $goal->status = SavingsGoal::STATUS_COMPLETED;
+                $goal->completed_at = date('Y-m-d H:i:s');
+            }
+
+            $goal->updated_at = date('Y-m-d H:i:s');
+            R::store($goal);
+
+        } catch (\Exception $e) {
+            error_log("Erreur mise à jour objectif épargne: " . $e->getMessage());
+            // Ne pas faire échouer la création de la dépense
+        }
+    }
+
+    /**
+     * Annuler la contribution à un objectif d'épargne (lors de suppression de dépense)
+     */
+    public static function revertSavingsGoal(int $expenseId): void
+    {
+        try {
+            $expense = R::load('expense', $expenseId);
+            if (!$expense || !$expense->savings_goal_id) {
+                return;
+            }
+
+            $goal = R::load('savingsgoal', $expense->savings_goal_id);
+            if (!$goal || !$goal->id) {
+                return;
+            }
+
+            // Réduire le montant de l'objectif
+            $goal->current_amount = max(0, (float)$goal->current_amount - (float)$expense->amount);
+
+            // Si l'objectif était complété, le remettre actif
+            if ($goal->status === SavingsGoal::STATUS_COMPLETED && $goal->current_amount < $goal->target_amount) {
+                $goal->status = SavingsGoal::STATUS_ACTIVE;
+                $goal->completed_at = null;
+            }
+
+            $goal->updated_at = date('Y-m-d H:i:s');
+            R::store($goal);
+
+            // Enregistrer le retrait dans l'historique
+            $contribution = R::dispense('savingscontribution');
+            $contribution->import([
+                'goal_id' => $expense->savings_goal_id,
+                'user_id' => $goal->user_id,
+                'amount' => -(float)$expense->amount,
+                'note' => 'Annulation dépense épargne',
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            R::store($contribution);
+
+        } catch (\Exception $e) {
+            error_log("Erreur annulation objectif épargne: " . $e->getMessage());
+        }
+    }
 }

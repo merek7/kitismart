@@ -28,6 +28,39 @@ $(document).ready(function () {
         initializeSelect2(this, 'Choisir un statut');
     });
 
+    // ===================================
+    // GESTION SÉLECTEUR OBJECTIF D'ÉPARGNE
+    // ===================================
+
+    // Fonction pour afficher/masquer le sélecteur d'objectif d'épargne
+    function toggleSavingsGoalSelector(categorySelect) {
+        const expenseItem = $(categorySelect).closest('.expense-item');
+        const savingsGoalSelector = expenseItem.find('.savings-goal-selector');
+
+        if (savingsGoalSelector.length) {
+            const selectedCategory = $(categorySelect).val();
+
+            // Afficher le sélecteur si la catégorie est "epargne"
+            if (selectedCategory === 'epargne') {
+                savingsGoalSelector.slideDown(300);
+            } else {
+                savingsGoalSelector.slideUp(300);
+                // Réinitialiser la sélection à "Ne pas lier"
+                savingsGoalSelector.find('input[type="radio"][value=""]').prop('checked', true);
+            }
+        }
+    }
+
+    // Écouter les changements de catégorie sur tous les selects
+    $(document).on('change', '.category-select', function() {
+        toggleSavingsGoalSelector(this);
+    });
+
+    // Initialiser l'état au chargement de la page
+    $('.category-select').each(function() {
+        toggleSavingsGoalSelector(this);
+    });
+
     // Fonctions utilitaires de gestion des erreurs
     function showError(input, message) {
         const formGroup = input.closest('.form-group');
@@ -180,17 +213,27 @@ $(document).ready(function () {
 
         const expense = [];
         $('.expense-item').each(function (index) {
-            expense.push({
+            const selectedGoal = $(this).find('input[name="savings_goal_id[]"]:checked').val();
+
+            console.log(`[Expense #${index}] Selected goal radio value:`, selectedGoal);
+
+            const expenseData = {
                 amount: getAmountValue($(this)),
                 payment_date: $(this).find('input[name="date[]"]').val(),
                 status: $(this).find('select[name="status[]"]').val(),
                 category_type: $(this).find('select[name="category[]"]').val(),
                 description: $(this).find('textarea[name="description[]"]').val().trim(),
-            });
+                savings_goal_id: selectedGoal && selectedGoal !== '' ? parseInt(selectedGoal) : null
+            };
+
+            console.log(`[Expense #${index}] Data to send:`, expenseData);
+            expense.push(expenseData);
         });
 
         const csrfToken = $('input[name="csrf_token"]').val();
         const dataToSend = { expenses: expense, csrf_token: csrfToken };
+
+        console.log('[Submit] Final data to send:', dataToSend);
 
         // Vérifier si on est hors ligne
         if (!navigator.onLine) {
@@ -296,6 +339,13 @@ $(document).ready(function () {
         // Réinitialiser et personnaliser le nouvel élément
         expenseItem.find('input, select, textarea').val('');
         expenseItem.find('.expense-number').text(`#${expenseCount}`);
+
+        // Réinitialiser le sélecteur d'objectif d'épargne
+        const savingsGoalSelector = expenseItem.find('.savings-goal-selector');
+        if (savingsGoalSelector.length) {
+            savingsGoalSelector.hide(); // Masquer par défaut
+            savingsGoalSelector.find('input[type="radio"][value=""]').prop('checked', true); // Sélectionner "Ne pas lier"
+        }
 
         // Ajouter une classe pour l'animation
         expenseItem.css('opacity', 0);

@@ -32,12 +32,16 @@ class ExpenseController extends Controller
             return $this->redirect('/budget/create');
         }
 
+        // Récupérer les objectifs d'épargne actifs de l'utilisateur
+        $savingsGoals = \App\Models\SavingsGoal::findActiveByUser($userId);
+
         try {
             $this->view('dashboard/expense_create', [
                 'title' => 'Nouvelle Dépense',
                 'currentPage' => 'expenses',
                 'categories' => $categories,
                 'customCategories' => $customCategories,
+                'savingsGoals' => $savingsGoals,
                 'layout' => 'dashboard',
                 'budget' => $activeBudget->remaining_amount,
                 'csrfToken' => $csrfToken
@@ -73,6 +77,9 @@ class ExpenseController extends Controller
                 $errors = [];
 
                 foreach ($data['expenses'] as $index => $expenseData) {
+                    // LOG: Afficher les données reçues pour debug
+                    error_log("📥 Données reçues pour dépense #{$index}: " . json_encode($expenseData));
+
                     // Ajouter l'ID utilisateur à chaque dépense
                     $expenseData['user_id'] = $_SESSION['user_id'];
 
@@ -82,6 +89,9 @@ class ExpenseController extends Controller
                         throw new \Exception("Aucun budget actif trouvé pour l'utilisateur");
                     }
                     $expenseData['budget_id'] = (int)$activeBudget->id;
+
+                    // LOG: Afficher savings_goal_id spécifiquement
+                    error_log("💰 savings_goal_id reçu: " . var_export($expenseData['savings_goal_id'] ?? 'NOT SET', true));
 
                     try {
                         // Validation pour chaque dépense

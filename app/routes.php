@@ -36,6 +36,20 @@ return [
     ['GET', '/budgets/history/export', 'BudgetHistoryController#exportCsv', 'budget_history_export'],
     ['GET', '/budgets/history/export-pdf', 'BudgetHistoryController#exportPdf', 'budget_history_export_pdf'],
     ['GET', '/budgets/[i:id]/export-pdf', 'BudgetHistoryController#exportBudgetPdf', 'budget_detail_export_pdf'],
+
+    // Budget Comparison Routes
+    ['GET', '/budget/comparison', 'BudgetComparisonController#index', 'budget_comparison'],
+    ['POST', '/budget/comparison/compare', 'BudgetComparisonController#compare', 'budget_comparison_api'],
+    ['GET', '/budget/comparison/export-pdf', 'BudgetComparisonController#exportPdf', 'budget_comparison_export_pdf'],
+
+    // Savings Goals Routes
+    ['GET', '/savings/goals', 'SavingsGoalController#index', 'savings_goals'],
+    ['POST', '/savings/goals/create', 'SavingsGoalController#create', 'savings_goals_create'],
+    ['POST', '/savings/goals/[i:id]/update', 'SavingsGoalController#update', 'savings_goals_update'],
+    ['POST', '/savings/goals/[i:id]/add', 'SavingsGoalController#addSavings', 'savings_goals_add'],
+    ['POST', '/savings/goals/[i:id]/withdraw', 'SavingsGoalController#withdraw', 'savings_goals_withdraw'],
+    ['POST', '/savings/goals/[i:id]/delete', 'SavingsGoalController#delete', 'savings_goals_delete'],
+    ['GET', '/savings/goals/[i:id]/history', 'SavingsGoalController#getHistory', 'savings_goals_history'],
     ['GET','/expenses/create','ExpenseController#showCreateExpenseForm','expense_form'],
     ['POST','/expenses/create','ExpenseController#create','expense_submit'],
     ['GET', '/expenses/list', 'ExpenseController#listPaginated', 'expense_list'],

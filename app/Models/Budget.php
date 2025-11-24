@@ -405,4 +405,209 @@ class Budget {
     public static function findById(int $id, int $userId) {
         return R::findOne('budget', 'id = ? AND user_id = ?', [$id, $userId]);
     }
+
+    /**
+     * Comparer plusieurs budgets
+     * @param array $budgetIds IDs des budgets à comparer
+     * @param int $userId ID de l'utilisateur
+     * @param mixed $defaultCategories Catégories par défaut
+     * @param mixed $customCategories Catégories personnalisées de l'utilisateur
+     * @return array Données de comparaison
+     */
+    public static function compareBudgets(array $budgetIds, int $userId, $defaultCategories = [], $customCategories = []): array {
+        $budgets = [];
+        $comparisonData = [];
+
+        foreach ($budgetIds as $budgetId) {
+            $budget = self::findById((int)$budgetId, $userId);
+            if (!$budget) {
+                continue;
+            }
+
+            $summary = self::getBudgetSummary($budget->id);
+            $spent = $budget->initial_amount - $budget->remaining_amount;
+            $usagePercent = $budget->initial_amount > 0
+                ? round(($spent / $budget->initial_amount) * 100, 1)
+                : 0;
+
+            $budgets[] = $budget;
+            $comparisonData[] = [
+                'budget' => $budget,
+                'initial' => (float)$budget->initial_amount,
+                'spent' => $spent,
+                'remaining' => (float)$budget->remaining_amount,
+                'usage_percent' => $usagePercent,
+                'categories' => [
+                    'fixe' => $summary['fixe'],
+                    'diver' => $summary['diver'],
+                    'epargne' => $summary['epargne']
+                ],
+                'custom_categories' => $summary['custom_categories'] ?? [],
+                'expense_count' => self::getExpenseCount($budget->id),
+                'period' => self::formatPeriod($budget)
+            ];
+        }
+
+        // Calculer les différences si on compare 2 budgets
+        $differences = [];
+        if (count($comparisonData) === 2) {
+            $differences = self::calculateDifferences($comparisonData[0], $comparisonData[1]);
+        }
+
+        return [
+            'budgets' => $budgets,
+            'data' => $comparisonData,
+            'differences' => $differences,
+            'chart_data' => self::prepareComparisonChartData($comparisonData, $defaultCategories, $customCategories)
+        ];
+    }
+
+    /**
+     * Calculer les différences entre deux budgets
+     */
+    private static function calculateDifferences(array $budget1, array $budget2): array {
+        $calcDiff = function($val1, $val2) {
+            $diff = $val2 - $val1;
+            $percent = $val1 > 0 ? round((($val2 - $val1) / $val1) * 100, 1) : 0;
+            return ['value' => $diff, 'percent' => $percent];
+        };
+
+        return [
+            'initial' => $calcDiff($budget1['initial'], $budget2['initial']),
+            'spent' => $calcDiff($budget1['spent'], $budget2['spent']),
+            'remaining' => $calcDiff($budget1['remaining'], $budget2['remaining']),
+            'usage_percent' => [
+                'value' => round($budget2['usage_percent'] - $budget1['usage_percent'], 1),
+                'percent' => 0
+            ],
+            'categories' => [
+                'fixe' => $calcDiff($budget1['categories']['fixe'], $budget2['categories']['fixe']),
+                'diver' => $calcDiff($budget1['categories']['diver'], $budget2['categories']['diver']),
+                'epargne' => $calcDiff($budget1['categories']['epargne'], $budget2['categories']['epargne'])
+            ]
+        ];
+    }
+
+    /**
+     * Préparer les données pour les graphiques de comparaison
+     */
+    private static function prepareComparisonChartData(array $comparisonData, $defaultCategories = [], $customCategories = []): array {
+        $labels = [];
+        $initialData = [];
+        $spentData = [];
+        $remainingData = [];
+
+        // Préparer les données pour les catégories par défaut
+        $defaultCatData = [];
+        if (!empty($defaultCategories)) {
+            foreach ($defaultCategories as $cat) {
+                $type = $cat->type;
+                $defaultCatData[$type] = [
+                    'id' => $cat->id,
+                    'name' => $cat->name ?? ucfirst($type),
+                    'type' => $type,
+                    'values' => []
+                ];
+            }
+        } else {
+            // Fallback si pas de catégories en base
+            $defaultCatData = [
+                'fixe' => ['id' => 1, 'name' => 'Charges Fixes', 'type' => 'fixe', 'values' => []],
+                'diver' => ['id' => 2, 'name' => 'Divers', 'type' => 'diver', 'values' => []],
+                'epargne' => ['id' => 3, 'name' => 'Épargne', 'type' => 'epargne', 'values' => []]
+            ];
+        }
+
+        // Préparer les données pour les catégories personnalisées
+        $customCatData = [];
+        if (!empty($customCategories)) {
+            foreach ($customCategories as $cat) {
+                $customCatData[$cat->id] = [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'icon' => $cat->icon ?? 'fa-tag',
+                    'color' => $cat->color ?? '#6b7280',
+                    'values' => []
+                ];
+            }
+        }
+
+        foreach ($comparisonData as $data) {
+            $labels[] = $data['budget']->name;
+            $initialData[] = $data['initial'];
+            $spentData[] = $data['spent'];
+            $remainingData[] = $data['remaining'];
+
+            // Ajouter les valeurs des catégories par défaut
+            foreach ($defaultCatData as $type => &$catInfo) {
+                $catInfo['values'][] = $data['categories'][$type] ?? 0;
+            }
+
+            // Ajouter les valeurs des catégories personnalisées
+            foreach ($customCatData as $catId => &$catInfo) {
+                $catName = $catInfo['name'];
+                $catInfo['values'][] = $data['custom_categories'][$catName] ?? 0;
+            }
+        }
+
+        return [
+            'labels' => $labels,
+            'datasets' => [
+                'overview' => [
+                    'initial' => $initialData,
+                    'spent' => $spentData,
+                    'remaining' => $remainingData
+                ],
+                'default_categories' => $defaultCatData,
+                'custom_categories' => $customCatData
+            ]
+        ];
+    }
+
+    /**
+     * Compter le nombre de dépenses d'un budget
+     */
+    private static function getExpenseCount(int $budgetId): int {
+        return (int) R::count('expense', 'budget_id = ?', [$budgetId]);
+    }
+
+    /**
+     * Formater la période d'un budget
+     */
+    private static function formatPeriod($budget): string {
+        $start = (new \DateTime($budget->start_date))->format('d/m/Y');
+        if ($budget->end_date) {
+            $end = (new \DateTime($budget->end_date))->format('d/m/Y');
+            return "$start - $end";
+        }
+        return "$start - En cours";
+    }
+
+    /**
+     * Récupérer tous les budgets d'un utilisateur pour la sélection
+     */
+    public static function getAllBudgetsForComparison(int $userId, int $limit = 24): array {
+        $budgets = R::find('budget',
+            'user_id = ? ORDER BY start_date DESC LIMIT ?',
+            [$userId, $limit]
+        );
+
+        $result = [];
+        foreach ($budgets as $budget) {
+            $spent = $budget->initial_amount - $budget->remaining_amount;
+            $result[] = [
+                'id' => $budget->id,
+                'name' => $budget->name,
+                'type' => $budget->type,
+                'status' => $budget->status,
+                'color' => $budget->color,
+                'period' => self::formatPeriod($budget),
+                'initial' => (float)$budget->initial_amount,
+                'spent' => $spent,
+                'start_date' => $budget->start_date
+            ];
+        }
+
+        return $result;
+    }
 } 

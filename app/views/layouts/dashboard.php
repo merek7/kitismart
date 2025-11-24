@@ -100,12 +100,18 @@
 
                 <!-- Menu déroulant "Plus" (visible uniquement en desktop) -->
                 <div class="nav-dropdown nav-desktop-only">
-                    <button class="nav-link nav-dropdown-toggle <?= in_array($currentPage, ['budgets', 'recurrences', 'shares', 'notifications', 'settings']) ? 'active' : '' ?>">
+                    <button class="nav-link nav-dropdown-toggle <?= in_array($currentPage, ['budgets', 'comparison', 'savings', 'recurrences', 'shares', 'notifications', 'settings']) ? 'active' : '' ?>">
                         <i class="fas fa-ellipsis-h"></i> Plus <i class="fas fa-chevron-down dropdown-arrow"></i>
                     </button>
                     <div class="nav-dropdown-menu">
                         <a href="/budgets/history" class="dropdown-item <?= $currentPage === 'budgets' ? 'active' : '' ?>">
                             <i class="fas fa-history"></i> Historique
+                        </a>
+                        <a href="/budget/comparison" class="dropdown-item <?= $currentPage === 'comparison' ? 'active' : '' ?>">
+                            <i class="fas fa-balance-scale"></i> Comparaison
+                        </a>
+                        <a href="/savings/goals" class="dropdown-item <?= $currentPage === 'savings' ? 'active' : '' ?>">
+                            <i class="fas fa-bullseye"></i> Objectifs d'épargne
                         </a>
                         <a href="/expenses/recurrences" class="dropdown-item <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
                             <i class="fas fa-sync-alt"></i> Récurrences
@@ -120,6 +126,9 @@
                         <a href="/settings" class="dropdown-item <?= $currentPage === 'settings' ? 'active' : '' ?>">
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
+                        <a href="#" id="restart-onboarding" class="dropdown-item">
+                            <i class="fas fa-graduation-cap"></i> Tour guidé
+                        </a>
                         <?php if (($_ENV['APP_ENV'] ?? 'prod') === 'dev'): ?>
                             <div class="dropdown-divider"></div>
                             <a href="/admin/email-test" class="dropdown-item <?= $currentPage === 'email-test' ? 'active' : '' ?>" style="color: #facc15;">
@@ -133,6 +142,12 @@
                 <a href="/budgets/history" class="nav-link nav-mobile-only <?= $currentPage === 'budgets' ? 'active' : '' ?>">
                     <i class="fas fa-history"></i> Historique
                 </a>
+                <a href="/budget/comparison" class="nav-link nav-mobile-only <?= $currentPage === 'comparison' ? 'active' : '' ?>">
+                    <i class="fas fa-balance-scale"></i> Comparaison
+                </a>
+                <a href="/savings/goals" class="nav-link nav-mobile-only <?= $currentPage === 'savings' ? 'active' : '' ?>">
+                    <i class="fas fa-bullseye"></i> Objectifs
+                </a>
                 <a href="/expenses/recurrences" class="nav-link nav-mobile-only <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
                     <i class="fas fa-sync-alt"></i> Récurrences
                 </a>
@@ -144,6 +159,9 @@
                 </a>
                 <a href="/settings" class="nav-link nav-mobile-only <?= $currentPage === 'settings' ? 'active' : '' ?>">
                     <i class="fas fa-cog"></i> Paramètres
+                </a>
+                <a href="#" id="restart-onboarding-mobile" class="nav-link nav-mobile-only">
+                    <i class="fas fa-graduation-cap"></i> Tour guidé
                 </a>
 
                 <!-- User menu (visible en mobile dans le menu) -->
@@ -255,6 +273,56 @@
                         dropdown.classList.remove('open');
                     });
                 });
+            }
+
+            // Bouton "Tour guidé" - Desktop et Mobile
+            const restartOnboardingBtn = document.getElementById('restart-onboarding');
+            const restartOnboardingBtnMobile = document.getElementById('restart-onboarding-mobile');
+
+            function restartOnboarding(e) {
+                e.preventDefault();
+
+                // Afficher un message de chargement
+                const loadingToast = document.createElement('div');
+                loadingToast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #0d9488; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+                loadingToast.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chargement du tour guidé...';
+                document.body.appendChild(loadingToast);
+
+                // Reset l'onboarding via API
+                fetch('/api/onboarding/reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Supprimer le toast de chargement
+                        loadingToast.remove();
+
+                        // Rediriger vers le dashboard si on n'y est pas déjà
+                        if (window.location.pathname !== '/dashboard' && window.location.pathname !== '/') {
+                            window.location.href = '/dashboard';
+                        } else {
+                            // Si on est déjà sur le dashboard, recharger la page
+                            window.location.reload();
+                        }
+                    } else {
+                        loadingToast.remove();
+                        alert('Erreur lors du reset de l\'onboarding');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    loadingToast.remove();
+                    alert('Erreur lors du reset de l\'onboarding');
+                });
+            }
+
+            if (restartOnboardingBtn) {
+                restartOnboardingBtn.addEventListener('click', restartOnboarding);
+            }
+            if (restartOnboardingBtnMobile) {
+                restartOnboardingBtnMobile.addEventListener('click', restartOnboarding);
             }
         });
     </script>
