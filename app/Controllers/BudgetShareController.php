@@ -336,7 +336,8 @@ class BudgetShareController extends Controller
             'customCategories' => $customCategories,
             'csrfToken' => $csrfToken,
             'guestName' => $_SESSION['guest_name'] ?? 'Invité',
-            'layout' => 'guest'
+            'layout' => 'guest',
+            'styles' => ['budget/shared_dashboard.css']
         ]);
     }
 
