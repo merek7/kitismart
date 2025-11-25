@@ -8,11 +8,19 @@
     <!-- PWA Meta Tags -->
     <meta name="description" content="Application de gestion de budget personnel intelligente">
     <meta name="theme-color" content="#0d9488">
+
+    <!-- iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="KitiSmart">
-    <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/assets/img/icons/icon-192x192.png">
+
+    <!-- Android/Chrome Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="KitiSmart">
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
 
     <!-- Charger le mode sombre immédiatement (éviter le flash) -->
     <script>

@@ -2,12 +2,14 @@
   "name": "KitiSmart - Gestion Budget",
   "short_name": "KitiSmart",
   "description": "Application de gestion de budget personnel intelligente",
-  "start_url": "/dashboard",
+  "start_url": "/dashboard?source=pwa",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
   "background_color": "#0d9488",
   "theme_color": "#0d9488",
   "orientation": "portrait-primary",
   "scope": "/",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/assets/img/icons/icon-72x72.png",

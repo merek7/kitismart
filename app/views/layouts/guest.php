@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Budget Partagé - KitiSmart' ?></title>
 
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Application de gestion de budget personnel intelligente">
+    <meta name="theme-color" content="#0d9488">
+
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="KitiSmart">
+    <link rel="apple-touch-icon" href="/assets/img/icons/icon-192x192.png">
+
+    <!-- Android/Chrome Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="KitiSmart">
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 

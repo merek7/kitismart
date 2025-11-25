@@ -3,14 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#4CAF50">
     <title><?= $title ?? 'KitiSmart - Gérez vos dépenses avec intelligence' ?></title>
 
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.json">
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Application de gestion de budget personnel intelligente">
+    <meta name="theme-color" content="#0d9488">
+
+    <!-- iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="KitiSmart">
+    <link rel="apple-touch-icon" href="/assets/img/icons/icon-192x192.png">
+
+    <!-- Android/Chrome Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="KitiSmart">
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="<?= \App\Core\Config::asset('/assets/css/style.css') ?>" rel="stylesheet">
