@@ -379,6 +379,7 @@ footer {
     transition: right 0.3s ease;
     z-index: 1000;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll sur iOS */
   }
 
   .nav-menu.active {

@@ -234,6 +234,12 @@
                     navMenu.classList.toggle('nav-menu-active');
                     navToggle.classList.toggle('active');
                     document.body.classList.toggle('nav-open');
+
+                    // Force le scroll sur mobile
+                    if (navMenu.classList.contains('nav-menu-active')) {
+                        navMenu.style.overflowY = 'scroll';
+                        navMenu.style.webkitOverflowScrolling = 'touch';
+                    }
                 });
 
                 // Fermer le menu quand on clique sur un lien

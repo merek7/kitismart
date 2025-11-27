@@ -195,8 +195,14 @@ class ExpenseController extends Controller
 
             // Vérification que la dépense appartient à l'utilisateur
             $expense = Expense::findById($id);
-            if (!$expense || $expense->user_id !== $_SESSION['user_id']) {
+            if (!$expense || !$expense->id) {
                 return $this->jsonResponse(['success' => false, 'message' => 'Dépense non trouvée'], 404);
+            }
+
+            // Vérifier que le budget de la dépense appartient à l'utilisateur
+            $budget = \App\Models\Budget::findById($expense->budget_id);
+            if (!$budget || $budget->user_id != $_SESSION['user_id']) {
+                return $this->jsonResponse(['success' => false, 'message' => 'Non autorisé'], 403);
             }
 
             Expense::delete($id);
