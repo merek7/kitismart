@@ -82,14 +82,23 @@ class Budget {
     }
 
     private static function validateBudgetData(array $data) {
-        $required = ['user_id', 'start_date', 'initial_amount'];
+        // Vérifier les champs requis de base
+        $required = ['user_id', 'start_date'];
         foreach ($required as $field) {
             if (!isset($data[$field])) {
                 throw new \Exception("Le champ $field est requis");
             }
         }
-        if (!is_numeric($data['initial_amount']) || $data['initial_amount'] <= 0) {
-            throw new \Exception("Le montant initial doit être un nombre positif");
+
+        // Si le budget n'est pas illimité, valider le montant
+        $isUnlimited = isset($data['is_unlimited']) && $data['is_unlimited'] === true;
+        if (!$isUnlimited) {
+            if (!isset($data['initial_amount'])) {
+                throw new \Exception("Le champ initial_amount est requis");
+            }
+            if (!is_numeric($data['initial_amount']) || $data['initial_amount'] <= 0) {
+                throw new \Exception("Le montant initial doit être un nombre positif");
+            }
         }
     }
 

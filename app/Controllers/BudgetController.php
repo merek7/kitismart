@@ -66,9 +66,17 @@ class BudgetController extends Controller {
             $data = json_decode(file_get_contents('php://input'), true);
             $data['user_id'] = $_SESSION['user_id'];
 
-            // Mapper 'amount' vers 'initial_amount' si nécessaire
-            if (isset($data['amount']) && !isset($data['initial_amount'])) {
-                $data['initial_amount'] = $data['amount'];
+            // Gérer les budgets indéfinis
+            if (isset($data['unlimited_budget']) && $data['unlimited_budget'] === true) {
+                $data['initial_amount'] = 0;
+                $data['remaining_amount'] = 0;
+                $data['is_unlimited'] = true;
+            } else {
+                // Mapper 'amount' vers 'initial_amount' si nécessaire
+                if (isset($data['amount']) && !isset($data['initial_amount'])) {
+                    $data['initial_amount'] = $data['amount'];
+                }
+                $data['is_unlimited'] = false;
             }
 
             // Validation CSRF

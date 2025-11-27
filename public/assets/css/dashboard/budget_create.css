@@ -145,3 +145,119 @@
     height: 32px;
   }
 }
+
+/* ===================================
+   TOGGLE SWITCH POUR BUDGET INDÉFINI
+   ================================== */
+
+.budget-limit-toggle {
+  margin-bottom: 1rem;
+}
+
+.toggle-container {
+  margin-bottom: 0.75rem;
+}
+
+.toggle-input {
+  display: none;
+}
+
+.toggle-label {
+  display: block;
+  cursor: pointer;
+}
+
+.toggle-switch {
+  display: flex;
+  background: var(--bg-primary, #f9fafb);
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 4px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.toggle-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  color: var(--text-secondary, #6b7280);
+}
+
+.toggle-option i {
+  font-size: 1.1rem;
+}
+
+/* État par défaut : Montant défini sélectionné */
+.toggle-input:not(:checked) ~ .toggle-label .toggle-limited {
+  background: var(--primary-color, #0d9488);
+  color: white;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
+}
+
+/* État coché : Montant indéfini sélectionné */
+.toggle-input:checked ~ .toggle-label .toggle-unlimited {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.toggle-input:checked ~ .toggle-label .toggle-limited {
+  color: var(--text-secondary, #6b7280);
+}
+
+.toggle-input:not(:checked) ~ .toggle-label .toggle-unlimited {
+  color: var(--text-secondary, #6b7280);
+}
+
+/* Hint text */
+.toggle-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  margin-top: 0.5rem;
+}
+
+.toggle-hint i {
+  color: var(--primary-color, #0d9488);
+  font-size: 0.875rem;
+}
+
+/* Animation du champ montant */
+#amount-field {
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+#amount-field.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Mode sombre */
+[data-theme="dark"] .toggle-switch {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .toggle-option span {
+    font-size: 0.85rem;
+  }
+
+  .toggle-option {
+    padding: 0.6rem 0.75rem;
+  }
+}

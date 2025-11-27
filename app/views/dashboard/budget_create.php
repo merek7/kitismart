@@ -138,8 +138,34 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="amount">Montant Total</label>
-                            <div class="input-with-icon">
+                            <label for="amount">Montant du Budget</label>
+
+                            <!-- Toggle Switch pour budget indéfini -->
+                            <div class="budget-limit-toggle">
+                                <div class="toggle-container">
+                                    <input type="checkbox" id="unlimited-budget" name="unlimited_budget" class="toggle-input">
+                                    <label for="unlimited-budget" class="toggle-label">
+                                        <div class="toggle-switch">
+                                            <span class="toggle-option toggle-limited">
+                                                <i class="fas fa-wallet"></i>
+                                                <span>Montant défini</span>
+                                            </span>
+                                            <span class="toggle-option toggle-unlimited">
+                                                <i class="fas fa-infinity"></i>
+                                                <span>Montant indéfini</span>
+                                            </span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <small class="toggle-hint">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="hint-limited">Fixez un budget à ne pas dépasser</span>
+                                    <span class="hint-unlimited" style="display: none;">Utile si le coût final est inconnu (rénovations, projets évolutifs...)</span>
+                                </small>
+                            </div>
+
+                            <!-- Champ montant -->
+                            <div class="input-with-icon" id="amount-field">
                                 <i class="fas fa-coins"></i>
                                 <input type="number"
                                     class="form-control"

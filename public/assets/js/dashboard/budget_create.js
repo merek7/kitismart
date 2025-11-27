@@ -41,13 +41,19 @@ $(document).ready(function () {
             hideError($('#name'));
         }
 
-        // Validation du montant (récupérer du champ hidden si formaté, sinon du champ visible)
-        const amountRaw = $('#amount_raw').val() || $('#amount').val();
-        const amount = parseFloat(amountRaw.toString().replace(/\s/g, '').replace(',', '.'));
-        if (isNaN(amount) || amount <= 0) {
-            showError($('#amount'), 'Veuillez entrer un montant valide supérieur à 0');
-            isValid = false;
+        // Validation du montant (sauf si budget indéfini)
+        const isUnlimited = $('#unlimited-budget').is(':checked');
+        if (!isUnlimited) {
+            const amountRaw = $('#amount_raw').val() || $('#amount').val();
+            const amount = parseFloat(amountRaw.toString().replace(/\s/g, '').replace(',', '.'));
+            if (isNaN(amount) || amount <= 0) {
+                showError($('#amount'), 'Veuillez entrer un montant valide supérieur à 0');
+                isValid = false;
+            } else {
+                hideError($('#amount'));
+            }
         } else {
+            // Budget indéfini : pas de validation du montant
             hideError($('#amount'));
         }
 
@@ -72,20 +78,27 @@ $(document).ready(function () {
             return;
         }
 
-        // Récupérer le montant du champ hidden (valeur brute) ou du champ visible
-        const amountValue = $('#amount_raw').val() || $('#amount').val();
-        const parsedAmount = parseFloat(amountValue.toString().replace(/\s/g, '').replace(',', '.'));
+        // Vérifier si le budget est illimité
+        const isUnlimited = $('#unlimited-budget').is(':checked');
 
+        // Construire l'objet budget
         const budget = {
             name: $('#name').val().trim(),
-            amount: parsedAmount,
-            initial_amount: parsedAmount,
             start_date: $('#start_date').val(),
             description: $('#description').val().trim(),
             type: $('input[name="type"]:checked').val() || 'principal',
             color: $('input[name="color"]:checked').val() || '#0d9488',
-            csrf_token: $('input[name="csrf_token"]').val()
+            csrf_token: $('input[name="csrf_token"]').val(),
+            unlimited_budget: isUnlimited
         };
+
+        // Ajouter le montant seulement si ce n'est pas un budget illimité
+        if (!isUnlimited) {
+            const amountValue = $('#amount_raw').val() || $('#amount').val();
+            const parsedAmount = parseFloat(amountValue.toString().replace(/\s/g, '').replace(',', '.'));
+            budget.amount = parsedAmount;
+            budget.initial_amount = parsedAmount;
+        }
 
         $.ajax({
             url: '/budget/create',
@@ -302,6 +315,41 @@ $(document).ready(function () {
             formGroup.addClass('valid').removeClass('error');
         } else {
             formGroup.removeClass('valid');
+        }
+    });
+
+    // ===================================
+    // GESTION DU BUDGET INDÉFINI (TOGGLE)
+    // ===================================
+
+    $('#unlimited-budget').on('change', function() {
+        const isUnlimited = $(this).is(':checked');
+        const $amountInput = $('#amount');
+        const $amountField = $('#amount-field');
+        const $hintLimited = $('.hint-limited');
+        const $hintUnlimited = $('.hint-unlimited');
+
+        if (isUnlimited) {
+            // Désactiver le champ montant
+            $amountInput.prop('required', false);
+            $amountInput.prop('disabled', true);
+            $amountInput.val('');
+            $amountField.addClass('disabled');
+            $amountInput.attr('placeholder', 'Aucun montant requis');
+
+            // Changer le texte d'aide
+            $hintLimited.hide();
+            $hintUnlimited.show();
+        } else {
+            // Réactiver le champ montant
+            $amountInput.prop('required', true);
+            $amountInput.prop('disabled', false);
+            $amountField.removeClass('disabled');
+            $amountInput.attr('placeholder', '0.00');
+
+            // Changer le texte d'aide
+            $hintLimited.show();
+            $hintUnlimited.hide();
         }
     });
 });

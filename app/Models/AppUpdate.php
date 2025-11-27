@@ -12,8 +12,8 @@ class AppUpdate
     // Changelog des versions
     public const CHANGELOG = [
         '1.4.0' => [
-            'title' => 'Objectifs d\'épargne',
-            'date' => '2025-11-24',
+            'title' => 'Objectifs d\'épargne & Budgets flexibles',
+            'date' => '2025-01-27',
             'features' => [
                 [
                     'icon' => 'fa-bullseye',
@@ -29,6 +29,16 @@ class AppUpdate
                     'icon' => 'fa-calculator',
                     'title' => 'Suggestions mensuelles',
                     'description' => 'L\'application calcule automatiquement combien épargner par mois pour atteindre vos objectifs.'
+                ],
+                [
+                    'icon' => 'fa-infinity',
+                    'title' => 'Budgets indéfinis',
+                    'description' => 'Créez des budgets sans montant fixe pour vos projets à coût variable (rénovations, projets évolutifs...).'
+                ],
+                [
+                    'icon' => 'fa-mobile-alt',
+                    'title' => 'Navigation mobile améliorée',
+                    'description' => 'Le menu hamburger mobile est maintenant scrollable pour un accès facile à toutes les fonctionnalités.'
                 ],
                 [
                     'icon' => 'fa-file-pdf',
