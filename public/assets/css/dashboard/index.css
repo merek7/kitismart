@@ -22,8 +22,46 @@
 
 /* Empêcher le scroll horizontal global */
 html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw;
+  position: relative;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Empêcher tous les conteneurs de déborder */
+.content-wrapper,
+.page-content,
+.dashboard-main,
+.container,
+.row {
   overflow-x: hidden;
   max-width: 100%;
+}
+
+/* Forcer tous les éléments à respecter la largeur de l'écran */
+img, video, iframe, embed, object {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Empêcher les tables de déborder sur mobile */
+@media (max-width: 768px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  /* Réduire padding et margins sur mobile */
+  .card-body,
+  .page-content {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
 }
 
 /* ================================

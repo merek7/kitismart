@@ -78,6 +78,11 @@ $(document).ready(function () {
             return;
         }
 
+        // Désactiver le bouton et afficher le loader
+        const $submitBtn = $(this).find('button[type="submit"]');
+        const originalBtnText = $submitBtn.html();
+        $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Création en cours...');
+
         // Vérifier si le budget est illimité
         const isUnlimited = $('#unlimited-budget').is(':checked');
 
@@ -105,13 +110,37 @@ $(document).ready(function () {
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(budget),
+            beforeSend: function() {
+                // Afficher un overlay de chargement
+                $('body').append('<div class="loading-overlay"><div class="loading-spinner"><i class="fas fa-spinner fa-spin fa-3x"></i><p>Création du budget...</p></div></div>');
+            },
             success: function (response) {
                 if (response.success) {
                     showGlobalMessage('Budget créé avec succès ! Redirection...', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 2000);
+
+                    // Switch automatique vers le nouveau budget
+                    if (response.budget && response.budget.id) {
+                        // Stocker l'ID du nouveau budget dans la session
+                        $.ajax({
+                            url: '/budget/switch',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ budget_id: response.budget.id }),
+                            complete: function() {
+                                // Rediriger vers le dashboard après le switch
+                                setTimeout(() => {
+                                    window.location.href = '/dashboard';
+                                }, 1000);
+                            }
+                        });
+                    } else {
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 1000);
+                    }
                 } else {
+                    $('.loading-overlay').remove();
+                    $submitBtn.prop('disabled', false).html(originalBtnText);
                     showGlobalMessage(response.message || 'Une erreur est survenue');
                 }
             },
@@ -141,6 +170,10 @@ $(document).ready(function () {
                         }
                     }
                 }
+
+                // Retirer l'overlay et réactiver le bouton
+                $('.loading-overlay').remove();
+                $submitBtn.prop('disabled', false).html(originalBtnText);
 
                 // Afficher l'erreur du serveur
                 try {

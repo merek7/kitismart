@@ -185,7 +185,8 @@ class Budget {
     }
 
     private static function replicateFixedCharges($oldBudget, $newBudget) {
-        $fixedCharges = R::find('expense', 'budget_id = ? AND is_fixed = TRUE', [$oldBudget->id]);
+        // Récupérer les charges fixes (is_fixed = 1 ou true) de l'ancien budget
+        $fixedCharges = R::find('expense', 'budget_id = ? AND is_fixed = 1', [$oldBudget->id]);
 
         foreach ($fixedCharges as $charge) {
             $newDate = self::calculateNewPaymentDate(

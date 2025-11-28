@@ -159,7 +159,7 @@
                                 </div>
                                 <small class="toggle-hint">
                                     <i class="fas fa-info-circle"></i>
-                                    <span class="hint-limited">Fixez un budget à ne pas dépasser</span>
+                                    <span class="hint-limited">Indiquez le montant prévu pour ce budget</span>
                                     <span class="hint-unlimited" style="display: none;">Utile si le coût final est inconnu (rénovations, projets évolutifs...)</span>
                                 </small>
                             </div>
