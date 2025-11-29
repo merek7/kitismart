@@ -97,7 +97,13 @@ class Database
         );
 
         R::useFeatureSet('latest');
-        R::freeze(false); // En développement seulement
+
+        // Freeze en production pour éviter les modifications automatiques du schéma
+        $isProduction = ($_ENV['APP_ENV'] ?? 'prod') === 'prod';
+        R::freeze($isProduction);
+
+        // Debug seulement en développement
+        R::debug($isProduction ? false : true, 1);
     }
 
 }
