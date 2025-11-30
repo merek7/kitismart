@@ -115,11 +115,14 @@ class ExpenseController extends Controller
                         error_log("Stack trace: " . $e->getTraceAsString());
                     }
                 }
+                $expenseIds = array_map(function($exp) { return $exp['id']; }, $createdExpenses);
+
                 return $this->jsonResponse([
                     'success' => count($createdExpenses) > 0,
                     'message' => count($errors) > 0 ? 'Création partielle avec erreurs' : 'Dépenses créées avec succès',
                     'created_count' => count($createdExpenses),
                     'expenses' => $createdExpenses,
+                    'expense_ids' => $expenseIds,
                     'errors' => $errors
                 ]);
             } else {
@@ -145,7 +148,8 @@ class ExpenseController extends Controller
                         'amount' => (float)$expense->amount,
                         'payment_date' => $expense->payment_date,
                         'status' => $expense->status
-                    ]
+                    ],
+                    'expense_ids' => [(int)$expense->id]
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -266,6 +270,12 @@ class ExpenseController extends Controller
             // Récupérer les dépenses de l'utilisateur pour le budget sélectionné
             $expenses = Expense::getExpensesByUser($budgetId, $userId);
 
+            // Ajouter le comptage des pièces jointes pour chaque dépense
+            foreach ($expenses as $expense) {
+                $attachments = \App\Models\ExpenseAttachment::findByExpense($expense->id);
+                $expense->attachments_count = count($attachments);
+            }
+
             // Récupérer les catégories pour le filtre
             $categories = Categorie::getDefaultCategories();
             $customCategories = CustomCategory::findByUser($userId);
@@ -352,6 +362,13 @@ class ExpenseController extends Controller
             error_log("BEFORE CustomCategory::findByUser() with userId=$userId");
             $customCategories = CustomCategory::findByUser($userId);
             error_log("AFTER CustomCategory::findByUser() - Got " . count($customCategories) . " custom categories");
+
+            // Ajouter le comptage des pièces jointes pour chaque dépense
+            foreach ($paginatedExpenses['expenses'] as $expense) {
+                $attachments = \App\Models\ExpenseAttachment::findByExpense($expense->id);
+                $expense->attachments_count = count($attachments);
+            }
+
             // Calculer les statistiques pour les dépenses de la page
             $stats = [
                 'total' => 0,

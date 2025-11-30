@@ -266,14 +266,15 @@ class Expense
 
             $updateData = [];
 
-            foreach(['amount','paid_at','description','status'] as $field){
+            foreach(['amount','paid_at','description','status','payment_date'] as $field){
                 if(isset($data[$field])){
                     $updateData[$field] = $data[$field];
                 }
             }
-            $categorie = Categorie::findByType($data['category_type']);
 
-            if(isset($data['category_type'])){
+            // Mettre à jour la catégorie seulement si elle est fournie
+            if(isset($data['category_type']) && !empty($data['category_type'])){
+                $categorie = Categorie::findByType($data['category_type']);
                 $updateData['categorie_id'] = $categorie->id;
                 $updateData['is_fixed'] = $data['category_type'] === Categorie::TYPE_FIXE;
             }

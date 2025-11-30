@@ -243,6 +243,24 @@
     font-size: 0.65rem;
 }
 
+/* Indicateur de pièces jointes */
+.attachment-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    margin-top: 0.375rem;
+}
+
+.attachment-indicator i {
+    font-size: 0.65rem;
+}
+
 /* Boutons d'action */
 .expense-actions {
     display: flex;
@@ -526,4 +544,414 @@
 
 .expense-card {
     animation: fadeIn 0.3s ease-out;
+}
+
+/* ================================
+   ATTACHMENTS SECTION
+   ================================ */
+
+.attachments-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.attachments-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.attachments-section h4 i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.attachment-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.upload-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.upload-buttons .btn {
+    flex: 1;
+    min-width: 120px;
+}
+
+.attachment-upload .form-text {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+/* Affichage conditionnel mobile/desktop */
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: inline-flex;
+    }
+
+    .desktop-only {
+        display: none;
+    }
+
+    .upload-buttons .btn {
+        min-width: 100px;
+    }
+}
+
+.attachments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.5rem 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+    .attachments-list {
+        max-height: 300px;
+    }
+
+    /* Rendre le modal scrollable sur mobile */
+    .modal-container {
+        max-height: 90vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-body {
+        max-height: none;
+        overflow: visible;
+    }
+}
+
+.attachments-list:empty::before {
+    content: "Aucune pièce jointe";
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+    display: block;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    gap: 0.75rem;
+}
+
+.attachment-item:hover {
+    background: #f3f4f6;
+    border-color: var(--primary-color);
+}
+
+/* Aperçu d'image pour les pièces jointes */
+.attachment-item.has-preview {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.attachment-preview {
+    width: 100%;
+    max-height: 200px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    background: #e5e7eb;
+}
+
+.attachment-preview img {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: contain;
+    display: block;
+}
+
+.attachment-preview-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 150px;
+    color: var(--text-secondary);
+}
+
+.attachment-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.attachment-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    min-width: 2rem;
+    text-align: center;
+}
+
+.attachment-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.attachment-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    word-break: break-all;
+}
+
+.attachment-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.attachment-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.attachment-actions .btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+.btn-outline-primary {
+    background: white;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-outline-danger {
+    background: white;
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+}
+
+.btn-outline-danger:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+/* Loading state pour upload */
+.attachment-uploading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.attachment-uploading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--primary-color);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* ================================
+   DELETE CONFIRMATION DIALOG
+   ================================ */
+
+.delete-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.delete-confirm-overlay.active {
+    opacity: 1;
+}
+
+.delete-confirm-box {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.delete-confirm-overlay.active .delete-confirm-box {
+    transform: scale(1);
+}
+
+.delete-confirm-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    background: #fee2e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-confirm-icon i {
+    font-size: 1.5rem;
+    color: var(--danger-color);
+}
+
+.delete-confirm-box h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.delete-confirm-box p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    word-break: break-all;
+}
+
+.delete-confirm-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.delete-confirm-actions .btn {
+    flex: 1;
+    max-width: 150px;
+}
+
+/* ================================
+   FILE VIEWER MODAL
+   ================================ */
+
+#file-viewer-modal {
+    z-index: 10001;
+}
+
+.file-viewer-container {
+    max-width: 900px;
+    width: 95%;
+    max-height: 90vh;
+}
+
+.file-viewer-body {
+    padding: 0;
+    max-height: 70vh;
+    overflow: hidden;
+}
+
+#file-viewer-content {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+}
+
+#file-viewer-content iframe {
+    width: 100%;
+    height: 70vh;
+    border: none;
+    background: #f9fafb;
+}
+
+.file-info-display {
+    padding: 2rem;
+    text-align: center;
+}
+
+.file-info-icon {
+    font-size: 4rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.file-info-details {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.file-info-details p {
+    margin: 0.5rem 0;
+}
+
+.file-info-details strong {
+    color: var(--text-primary);
+}
+
+.modal-close-btn {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .file-viewer-container {
+        max-height: 95vh;
+    }
+
+    #file-viewer-content iframe {
+        height: 60vh;
+    }
 }

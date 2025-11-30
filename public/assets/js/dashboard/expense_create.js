@@ -270,22 +270,28 @@ $(document).ready(function () {
                 formToSubmit.removeClass('form-loading');
 
                 if (response.success) {
-                    // Afficher un message différent selon s'il y a des erreurs partielles
-                    if (response.errors && response.errors.length > 0) {
-                        let errorsList = response.errors.join('<br>');
-                        showGlobalMessage(
-                            `${response.created_count} dépense(s) créée(s) avec succès, mais avec des erreurs :<br>${errorsList}`,
-                            'warning'
-                        );
-                        // Rediriger quand même après un succès partiel
-                        setTimeout(() => {
-                            window.location.href = '/expenses/list';
-                        }, 3000);
+                    // Vérifier si on doit uploader des pièces jointes
+                    if (response.expense_ids && expenseAttachments.size > 0) {
+                        // Uploader les pièces jointes puis rediriger
+                        showGlobalMessage('Dépenses enregistrées ! Upload des pièces jointes...', 'success');
+                        uploadAttachmentsForExpenses(response.expense_ids);
                     } else {
-                        showGlobalMessage('Dépenses enregistrées avec succès ! Redirection...', 'success');
-                        setTimeout(() => {
-                            window.location.href = '/expenses/list';
-                        }, 1500);
+                        // Pas de pièces jointes, rediriger directement
+                        if (response.errors && response.errors.length > 0) {
+                            let errorsList = response.errors.join('<br>');
+                            showGlobalMessage(
+                                `${response.created_count} dépense(s) créée(s) avec succès, mais avec des erreurs :<br>${errorsList}`,
+                                'warning'
+                            );
+                            setTimeout(() => {
+                                window.location.href = '/expenses/list';
+                            }, 3000);
+                        } else {
+                            showGlobalMessage('Dépenses enregistrées avec succès ! Redirection...', 'success');
+                            setTimeout(() => {
+                                window.location.href = '/expenses/list';
+                            }, 1500);
+                        }
                     }
                 } else {
                     // Afficher les erreurs détaillées si disponibles
@@ -347,6 +353,9 @@ $(document).ready(function () {
             savingsGoalSelector.find('input[type="radio"][value=""]').prop('checked', true); // Sélectionner "Ne pas lier"
         }
 
+        // Vider la liste des pièces jointes pour la nouvelle dépense
+        expenseItem.find('.attachments-preview-list').empty();
+
         // Ajouter une classe pour l'animation
         expenseItem.css('opacity', 0);
         expenseContainer.append(expenseItem);
@@ -368,7 +377,16 @@ $(document).ready(function () {
         expenseItem.animate({
             opacity: 1,
             transform: 'translateY(0)'
-        }, 400);
+        }, 400, function() {
+            // Après l'animation, mettre le focus sur le champ montant
+            const amountField = expenseItem.find('.amount-input');
+            amountField.focus();
+
+            // Faire défiler vers la nouvelle dépense
+            $('html, body').animate({
+                scrollTop: expenseItem.offset().top - 100
+            }, 300);
+        });
 
         // Mettre à jour le résumé avec animation
         updateExpenseSummaryWithAnimation();
@@ -481,6 +499,252 @@ $(document).ready(function () {
 
     // Initialiser le résumé des dépenses et du budget au chargement de la page
     updateBudgetSummary();
+
+    // ===================================
+    // GESTION DES PIÈCES JOINTES
+    // (Identique à expense_list.js pour cohérence)
+    // ===================================
+
+    // Stocker les fichiers pour chaque dépense
+    const expenseAttachments = new Map();
+
+    // Fonction pour obtenir l'index de la dépense
+    function getExpenseIndex($element) {
+        return $element.closest('.expense-item').index();
+    }
+
+    // Fonction pour formater la taille du fichier
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    // Fonction pour obtenir l'icône selon le type de fichier
+    function getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return 'fa-image';
+        if (ext === 'pdf') return 'fa-file-pdf';
+        if (['doc', 'docx'].includes(ext)) return 'fa-file-word';
+        if (['xls', 'xlsx'].includes(ext)) return 'fa-file-excel';
+        return 'fa-file';
+    }
+
+    // Fonction pour vérifier si c'est une image
+    function isImageFile(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+    }
+
+    // Fonction pour afficher les aperçus des fichiers
+    function displayAttachmentPreviews($expenseItem) {
+        const expenseIndex = getExpenseIndex($expenseItem);
+        const files = expenseAttachments.get(expenseIndex) || [];
+        const $previewList = $expenseItem.find('.attachments-preview-list');
+
+        $previewList.empty();
+
+        files.forEach((file, fileIndex) => {
+            const isImage = isImageFile(file.name);
+            const icon = getFileIcon(file.name);
+
+            const $preview = $(`
+                <div class="attachment-preview-item ${isImage ? 'is-image' : 'is-document'}" data-file-index="${fileIndex}">
+                    <button type="button" class="attachment-remove-btn" data-file-index="${fileIndex}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <span class="attachment-file-size">${formatFileSize(file.size)}</span>
+                </div>
+            `);
+
+            if (isImage) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $preview.prepend(`<img src="${e.target.result}" alt="${file.name}">`);
+                    $preview.data('fileUrl', e.target.result);
+                    $preview.data('isImage', true);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                $preview.append(`
+                    <i class="fas ${icon}"></i>
+                    <div class="file-name">${file.name}</div>
+                `);
+
+                if (file.type === 'application/pdf') {
+                    const blobUrl = URL.createObjectURL(file);
+                    $preview.data('fileUrl', blobUrl);
+                    $preview.data('isPdf', true);
+                }
+            }
+
+            $preview.data('fileName', file.name);
+            $preview.data('fileSize', formatFileSize(file.size));
+            $preview.data('fileIcon', icon);
+            $previewList.append($preview);
+        });
+    }
+
+    // Visualiser un fichier
+    $(document).on('click', '.attachment-preview-item', function(e) {
+        if ($(e.target).closest('.attachment-remove-btn').length) {
+            return;
+        }
+
+        const fileUrl = $(this).data('fileUrl');
+        const fileName = $(this).data('fileName');
+        const fileSize = $(this).data('fileSize');
+        const fileIcon = $(this).data('fileIcon');
+        const isPdf = $(this).data('isPdf');
+        const isImage = $(this).data('isImage');
+
+        $('#file-viewer-title').text(fileName);
+
+        let content = '';
+        if (isPdf) {
+            content = `<iframe src="${fileUrl}" title="${fileName}"></iframe>`;
+        } else if (isImage) {
+            content = `
+                <div class="file-info-display">
+                    <img src="${fileUrl}" alt="${fileName}" style="max-width: 100%; max-height: 60vh;">
+                </div>
+            `;
+        } else {
+            content = `
+                <div class="file-info-display">
+                    <div class="file-info-icon">
+                        <i class="fas ${fileIcon}"></i>
+                    </div>
+                    <div class="file-info-details">
+                        <p><strong>Nom :</strong> ${fileName}</p>
+                        <p><strong>Taille :</strong> ${fileSize}</p>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Ce fichier sera uploadé après la création de la dépense
+                    </p>
+                </div>
+            `;
+        }
+
+        $('#file-viewer-content').html(content);
+        $('#file-viewer-modal').addClass('active');
+        $('body').css('overflow', 'hidden');
+    });
+
+    // Fermer le modal de visualisation
+    function hideFileViewer() {
+        $('#file-viewer-modal').removeClass('active');
+        $('body').css('overflow', '');
+        $('#file-viewer-content').empty();
+    }
+
+    $('#file-viewer-close, #file-viewer-cancel').on('click', hideFileViewer);
+
+    $('#file-viewer-modal').on('click', function(e) {
+        if (e.target === this) {
+            hideFileViewer();
+        }
+    });
+
+    // Bouton ajouter fichiers
+    $(document).on('click', '.add-attachment-create-btn', function() {
+        const $fileInput = $(this).closest('.attachment-upload-zone').find('.attachment-file-input');
+        $fileInput.removeAttr('capture');
+        $fileInput.attr('accept', '.jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx');
+        $fileInput.click();
+    });
+
+    // Bouton prendre photo (mobile)
+    $(document).on('click', '.take-photo-create-btn', function() {
+        const $fileInput = $(this).closest('.attachment-upload-zone').find('.attachment-file-input');
+        $fileInput.attr('capture', 'environment');
+        $fileInput.attr('accept', 'image/*');
+        $fileInput.click();
+    });
+
+    // Gérer la sélection de fichiers
+    $(document).on('change', '.attachment-file-input', function() {
+        const $expenseItem = $(this).closest('.expense-item');
+        const expenseIndex = getExpenseIndex($expenseItem);
+        const files = Array.from(this.files);
+
+        // Valider les fichiers
+        const validFiles = [];
+        for (const file of files) {
+            if (file.size > 5 * 1024 * 1024) {
+                showGlobalMessage(`Le fichier "${file.name}" est trop volumineux (max 5 MB)`, 'error');
+                continue;
+            }
+            validFiles.push(file);
+        }
+
+        // Ajouter aux fichiers existants
+        const existingFiles = expenseAttachments.get(expenseIndex) || [];
+        expenseAttachments.set(expenseIndex, [...existingFiles, ...validFiles]);
+
+        // Afficher les aperçus
+        displayAttachmentPreviews($expenseItem);
+
+        // Réinitialiser l'input
+        this.value = '';
+    });
+
+    // Supprimer un fichier
+    $(document).on('click', '.attachment-remove-btn', function(e) {
+        e.stopPropagation();
+        const $expenseItem = $(this).closest('.expense-item');
+        const expenseIndex = getExpenseIndex($expenseItem);
+        const fileIndex = $(this).data('file-index');
+
+        const files = expenseAttachments.get(expenseIndex) || [];
+        files.splice(fileIndex, 1);
+
+        if (files.length === 0) {
+            expenseAttachments.delete(expenseIndex);
+        } else {
+            expenseAttachments.set(expenseIndex, files);
+        }
+
+        displayAttachmentPreviews($expenseItem);
+    });
+
+    // Fonction pour uploader les fichiers après création des dépenses
+    function uploadAttachmentsForExpenses(expenseIds) {
+        const uploadPromises = [];
+
+        expenseIds.forEach((expenseId, index) => {
+            const files = expenseAttachments.get(index);
+            if (files && files.length > 0) {
+                files.forEach(file => {
+                    const formData = new FormData();
+                    formData.append('attachment', file);
+                    formData.append('expense_id', expenseId);
+
+                    const promise = $.ajax({
+                        url: '/expenses/attachments/upload',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    });
+
+                    uploadPromises.push(promise);
+                });
+            }
+        });
+
+        // Attendre que tous les uploads soient terminés
+        Promise.all(uploadPromises)
+            .then(() => {
+                window.location.href = '/expenses/list';
+            })
+            .catch(() => {
+                // Même en cas d'erreur d'upload, rediriger (les dépenses sont créées)
+                window.location.href = '/expenses/list';
+            });
+    }
 });
 
 

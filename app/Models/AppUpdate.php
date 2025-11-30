@@ -7,10 +7,36 @@ use RedBeanPHP\R as R;
 class AppUpdate
 {
     // Version actuelle de l'application - à incrémenter à chaque mise à jour importante
-    public const CURRENT_VERSION = '1.4.0';
+    public const CURRENT_VERSION = '1.5.0';
 
     // Changelog des versions
     public const CHANGELOG = [
+        '1.5.0' => [
+            'title' => 'Pièces jointes sur les dépenses',
+            'date' => '2025-01-30',
+            'features' => [
+                [
+                    'icon' => 'fa-paperclip',
+                    'title' => 'Pièces jointes',
+                    'description' => 'Ajoutez des photos, factures ou reçus à vos dépenses pour garder une trace de vos achats.'
+                ],
+                [
+                    'icon' => 'fa-camera',
+                    'title' => 'Capture photo mobile',
+                    'description' => 'Prenez directement une photo depuis votre téléphone pour l\'ajouter à une dépense.'
+                ],
+                [
+                    'icon' => 'fa-users',
+                    'title' => 'Pièces jointes partagées',
+                    'description' => 'Les invités d\'un budget partagé peuvent aussi ajouter des pièces jointes à leurs dépenses.'
+                ],
+                [
+                    'icon' => 'fa-eye',
+                    'title' => 'Visualisation intégrée',
+                    'description' => 'Consultez vos images et PDF directement dans l\'application sans téléchargement.'
+                ]
+            ]
+        ],
         '1.4.0' => [
             'title' => 'Objectifs d\'épargne & Budgets flexibles',
             'date' => '2025-01-27',

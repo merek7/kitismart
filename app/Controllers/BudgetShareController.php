@@ -292,6 +292,12 @@ class BudgetShareController extends Controller
         // Récupérer les dépenses
         $expenses = Expense::getExpensesByUser($budgetId, null); // null car invité
 
+        // Ajouter le comptage des pièces jointes pour chaque dépense
+        foreach ($expenses as $expense) {
+            $attachments = \App\Models\ExpenseAttachment::findByExpense($expense->id);
+            $expense->attachments_count = count($attachments);
+        }
+
         // Calculer les statistiques si permission
         $stats = null;
         if (BudgetShare::hasPermission($permissions, 'view_stats')) {
@@ -337,7 +343,8 @@ class BudgetShareController extends Controller
             'csrfToken' => $csrfToken,
             'guestName' => $_SESSION['guest_name'] ?? 'Invité',
             'layout' => 'guest',
-            'styles' => ['budget/shared_dashboard.css']
+            'styles' => ['budget/shared_dashboard.css'],
+            'pageScripts' => ['budget/shared_dashboard.js']
         ]);
     }
 
@@ -404,6 +411,7 @@ class BudgetShareController extends Controller
             return $this->jsonResponse([
                 'success' => true,
                 'message' => 'Dépense créée avec succès',
+                'expense_id' => (int)$expense->id, // Pour l'upload des pièces jointes
                 'expense' => [
                     'id' => (int)$expense->id,
                     'description' => $expense->description,

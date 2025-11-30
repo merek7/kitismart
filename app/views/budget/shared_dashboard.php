@@ -141,9 +141,32 @@
                                     <?php endif; ?>
                                 </div>
                             <?php else: ?>
+                                <div class="expense-filters mb-3">
+                                    <div class="row">
+                                        <div class="col-md-8 mb-2">
+                                            <div class="input-with-icon">
+                                                <i class="fas fa-search"></i>
+                                                <input type="text" id="expense-search" class="form-control" placeholder="Rechercher par description...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <div class="input-with-icon">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                <input type="date" id="expense-date-filter" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="expenses-list">
                                     <?php foreach ($expenses as $expense): ?>
-                                        <div class="expense-item" data-id="<?= $expense->id ?>">
+                                        <div class="expense-item expense-item-clickable"
+                                             data-id="<?= $expense->id ?>"
+                                             data-description="<?= htmlspecialchars($expense->description ?: 'Sans description') ?>"
+                                             data-amount="<?= $expense->amount ?>"
+                                             data-category="<?= htmlspecialchars($expense->category ?? 'Non catégorisé') ?>"
+                                             data-status="<?= $expense->status ?>"
+                                             data-date="<?= $expense->payment_date ?>"
+                                             data-has-attachments="<?= !empty($expense->attachments_count) && $expense->attachments_count > 0 ? '1' : '0' ?>">
                                             <?php
                                             $moisFr = ['', 'jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc'];
                                             $moisNum = (int)date('n', strtotime($expense->payment_date));
@@ -155,6 +178,11 @@
                                             <div class="expense-details">
                                                 <div class="expense-description">
                                                     <?= htmlspecialchars($expense->description ?: 'Sans description') ?>
+                                                    <?php if (!empty($expense->attachments_count) && $expense->attachments_count > 0): ?>
+                                                        <span class="attachment-badge">
+                                                            <i class="fas fa-paperclip"></i> <?= $expense->attachments_count ?>
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </div>
                                                 <div class="expense-meta">
                                                     <span class="expense-category">
@@ -296,6 +324,24 @@
                         </div>
                     </div>
 
+                    <!-- Section Pièces jointes -->
+                    <div class="form-group attachments-section-create">
+                        <label><i class="fas fa-paperclip"></i> Pièces jointes (optionnel)</label>
+                        <div class="attachment-upload-zone">
+                            <input type="file" class="attachment-file-input" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx" multiple style="display: none;">
+                            <div class="upload-buttons">
+                                <button type="button" class="btn btn-outline-primary btn-sm add-attachment-shared-btn">
+                                    <i class="fas fa-paperclip"></i> <span class="desktop-only">Ajouter fichiers</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm mobile-only take-photo-shared-btn">
+                                    <i class="fas fa-camera"></i> Photo
+                                </button>
+                            </div>
+                            <small class="form-text text-muted">Images, PDF, Word, Excel (max 5 MB chacun)</small>
+                            <div class="attachments-preview-list"></div>
+                        </div>
+                    </div>
+
                     <div id="expense-message" class="alert-container"></div>
                 </form>
             </div>
@@ -312,8 +358,79 @@
 </div>
 <?php endif; ?>
 
-<!-- Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- Modal de détails de dépense -->
+<div id="expense-details-modal" class="modal-overlay">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle"></i> Détails de la dépense
+                </h5>
+                <button type="button" class="close-modal" data-dismiss="modal" id="details-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="expense-details-content">
+                    <div class="detail-row">
+                        <label><i class="fas fa-align-left"></i> Description</label>
+                        <div id="detail-description" class="detail-value"></div>
+                    </div>
+                    <div class="detail-row">
+                        <label><i class="fas fa-coins"></i> Montant</label>
+                        <div id="detail-amount" class="detail-value detail-amount-value"></div>
+                    </div>
+                    <div class="detail-row">
+                        <label><i class="fas fa-tag"></i> Catégorie</label>
+                        <div id="detail-category" class="detail-value"></div>
+                    </div>
+                    <div class="detail-row">
+                        <label><i class="fas fa-calendar-alt"></i> Date</label>
+                        <div id="detail-date" class="detail-value"></div>
+                    </div>
+                    <div class="detail-row">
+                        <label><i class="fas fa-flag"></i> Statut</label>
+                        <div id="detail-status" class="detail-value"></div>
+                    </div>
+
+                    <!-- Section pièces jointes -->
+                    <div class="detail-attachments" id="detail-attachments-section" style="display: none;">
+                        <label><i class="fas fa-paperclip"></i> Pièces jointes</label>
+                        <div id="detail-attachments-list" class="attachments-list-readonly"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modale de visualisation de fichiers -->
+<div id="file-viewer-modal" class="modal-overlay">
+    <div class="modal-container file-viewer-container">
+        <div class="modal-header">
+            <i class="fas fa-file modal-icon"></i>
+            <h3 id="file-viewer-title">Visualisation du fichier</h3>
+            <button type="button" class="modal-close-btn" id="file-viewer-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body file-viewer-body">
+            <div id="file-viewer-content"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-cancel" id="file-viewer-cancel">
+                <i class="fas fa-times"></i> Fermer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Select2 JS supprimé d'ici, doit être chargé après jQuery dans le layout -->
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -385,59 +502,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Soumission du formulaire
-    const form = document.getElementById('add-expense-form');
-    if (form) {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const messageContainer = document.getElementById('expense-message');
-            const submitBtn = document.querySelector('button[form="add-expense-form"]');
-
-            // Récupérer les données
-            const formData = {
-                csrf_token: form.querySelector('[name="csrf_token"]').value,
-                category_type: form.querySelector('[name="category"]').value,
-                amount: parseFloat(form.querySelector('[name="amount"]').value),
-                payment_date: form.querySelector('[name="payment_date"]').value,
-                status: form.querySelector('[name="status"]').value,
-                description: form.querySelector('[name="description"]').value || ''
-            };
-
-            // Validation
-            if (!formData.category_type || !formData.amount || !formData.payment_date) {
-                messageContainer.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Veuillez remplir tous les champs obligatoires.</div>';
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enregistrement...';
-
-            try {
-                const response = await fetch('/budget/shared/expense/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    messageContainer.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> ' + data.message + '</div>';
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                } else {
-                    messageContainer.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ' + data.message + '</div>';
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer';
-                }
-            } catch (error) {
-                console.error('Erreur:', error);
-                messageContainer.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Erreur de connexion.</div>';
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer';
-            }
-        });
-    }
+    // La gestion du formulaire et des pièces jointes est dans /assets/js/budget/shared_dashboard.js
 });
 </script>

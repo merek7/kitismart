@@ -155,6 +155,13 @@
                                 </div>
                             <?php endif; ?>
 
+                            <?php if (!empty($expense->attachments_count) && $expense->attachments_count > 0): ?>
+                                <div class="attachment-indicator view-attachments-trigger" data-id="<?= $expense->id ?>" style="cursor: pointer;">
+                                    <i class="fas fa-paperclip"></i>
+                                    <span><?= $expense->attachments_count ?> pièce<?= $expense->attachments_count > 1 ? 's' : '' ?> jointe<?= $expense->attachments_count > 1 ? 's' : '' ?></span>
+                                </div>
+                            <?php endif; ?>
+
                             <div class="expense-details">
                                 <span class="category-badge"><?= ucfirst(htmlspecialchars($categoryName)) ?></span>
                                 <p class="expense-amount"><?= number_format($expense->amount, 2, ',', ' ') ?> FCFA</p>
@@ -283,6 +290,30 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Section Pièces jointes -->
+                <div class="attachments-section">
+                    <h4><i class="fas fa-paperclip"></i> Pièces jointes</h4>
+
+                    <!-- Upload -->
+                    <div class="attachment-upload">
+                        <input type="file" id="attachment-file" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx" style="display: none;">
+                        <div class="upload-buttons">
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-attachment-btn">
+                                <i class="fas fa-paperclip"></i> <span class="desktop-only">Ajouter</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-sm mobile-only" id="take-photo-btn">
+                                <i class="fas fa-camera"></i> Photo
+                            </button>
+                        </div>
+                        <small class="form-text">Images, PDF, Word, Excel (max 5 MB)</small>
+                    </div>
+
+                    <!-- Liste des pièces jointes -->
+                    <div id="attachments-list" class="attachments-list">
+                        <!-- Les pièces jointes seront chargées ici -->
+                    </div>
+                </div>
             </form>
         </div>
         <div class="modal-footer">
@@ -291,6 +322,30 @@
             </button>
             <button type="button" class="btn btn-primary" id="edit-modal-confirm">
                 <i class="fas fa-check"></i> Enregistrer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modale de visualisation de fichiers -->
+<div id="file-viewer-modal" class="modal-overlay">
+    <div class="modal-container file-viewer-container">
+        <div class="modal-header">
+            <i class="fas fa-file modal-icon"></i>
+            <h3 id="file-viewer-title">Visualisation du fichier</h3>
+            <button type="button" class="modal-close-btn" id="file-viewer-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body file-viewer-body">
+            <div id="file-viewer-content"></div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" id="file-download-link" class="btn btn-primary" download>
+                <i class="fas fa-download"></i> Télécharger
+            </a>
+            <button type="button" class="btn btn-cancel" id="file-viewer-cancel">
+                <i class="fas fa-times"></i> Fermer
             </button>
         </div>
     </div>
@@ -316,6 +371,29 @@
             </button>
             <button type="button" class="btn btn-danger" id="delete-modal-confirm">
                 <i class="fas fa-trash"></i> Supprimer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modale de visualisation des pièces jointes (Liste) -->
+<div id="view-attachments-modal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <i class="fas fa-paperclip modal-icon"></i>
+            <h3>Pièces jointes</h3>
+            <button type="button" class="modal-close-btn" id="view-attachments-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="view-attachments-list" class="attachments-list">
+                <!-- Les pièces jointes seront chargées ici -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="view-attachments-cancel">
+                <i class="fas fa-times"></i> Fermer
             </button>
         </div>
     </div>

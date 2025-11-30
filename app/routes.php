@@ -58,6 +58,12 @@ return [
     ['DELETE', '/expenses/delete/[i:id]', 'ExpenseController#delete', 'expense_delete'],
     ['GET', '/expenses/export/csv', 'ExportController#exportCsv', 'export_csv'],
     ['GET', '/expenses/export/pdf', 'ExportController#exportPdf', 'export_pdf'],
+
+    // Expense Attachments Routes
+    ['POST', '/expenses/attachments/upload', 'ExpenseAttachmentController#upload', 'attachment_upload'],
+    ['GET', '/expenses/[i:id]/attachments', 'ExpenseAttachmentController#list', 'attachment_list'],
+    ['DELETE', '/attachments/[i:id]', 'ExpenseAttachmentController#delete', 'attachment_delete'],
+    ['GET', '/attachments/[i:id]/download', 'ExpenseAttachmentController#download', 'attachment_download'],
     ['GET', '/expenses/recurrences', 'RecurrenceController#index', 'recurrences_list'],
     ['POST', '/expenses/recurrences/create', 'RecurrenceController#create', 'recurrence_create'],
     ['POST', '/expenses/recurrences/toggle/[i:id]', 'RecurrenceController#toggle', 'recurrence_toggle'],

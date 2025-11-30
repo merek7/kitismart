@@ -170,6 +170,24 @@
                                             </div>
                                         </div>
 
+                                        <!-- Section Pièces jointes -->
+                                        <div class="form-group attachments-section-create">
+                                            <label><i class="fas fa-paperclip"></i> Pièces jointes (optionnel)</label>
+                                            <div class="attachment-upload-zone">
+                                                <input type="file" class="attachment-file-input" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx" multiple style="display: none;">
+                                                <div class="upload-buttons">
+                                                    <button type="button" class="btn btn-outline-primary btn-sm add-attachment-create-btn">
+                                                        <i class="fas fa-paperclip"></i> <span class="desktop-only">Ajouter fichiers</span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm mobile-only take-photo-create-btn">
+                                                        <i class="fas fa-camera"></i> Photo
+                                                    </button>
+                                                </div>
+                                                <small class="form-text">Images, PDF, Word, Excel (max 5 MB chacun)</small>
+                                                <div class="attachments-preview-list"></div>
+                                            </div>
+                                        </div>
+
                                         <!-- Sélecteur d'objectif d'épargne (affiché seulement si catégorie = epargne) -->
                                         <?php if (!empty($savingsGoals)): ?>
                                         <div class="form-group savings-goal-selector" style="display: none;">
@@ -258,6 +276,27 @@
                     <i class="fas fa-check"></i> Confirmer
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modale de visualisation de fichiers -->
+<div id="file-viewer-modal" class="modal-overlay">
+    <div class="modal-container file-viewer-container">
+        <div class="modal-header">
+            <i class="fas fa-file modal-icon"></i>
+            <h3 id="file-viewer-title">Visualisation du fichier</h3>
+            <button type="button" class="modal-close-btn" id="file-viewer-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body file-viewer-body">
+            <div id="file-viewer-content"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-cancel" id="file-viewer-cancel">
+                <i class="fas fa-times"></i> Fermer
+            </button>
         </div>
     </div>
 </div>
