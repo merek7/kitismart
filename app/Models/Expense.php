@@ -327,6 +327,9 @@ class Expense
                 }
             }
 
+            // Supprimer les pièces jointes associées (fichiers + BDD)
+            \App\Models\ExpenseAttachment::deleteByExpense((int)$id);
+
             R::trash($expense);
             R::commit();
         } catch (\Exception $e) {

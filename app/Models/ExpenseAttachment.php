@@ -55,6 +55,14 @@ class ExpenseAttachment
      */
     public static function delete(int $id, int $userId): bool
     {
+        return self::deleteWithGuestSupport($id, $userId, false, null);
+    }
+
+    /**
+     * Supprimer une pièce jointe avec support des guests
+     */
+    public static function deleteWithGuestSupport(int $id, ?int $userId, bool $isGuest = false, ?int $guestBudgetId = null): bool
+    {
         $attachment = R::load('expenseattachment', $id);
 
         if (!$attachment->id) {
@@ -74,15 +82,23 @@ class ExpenseAttachment
         }
 
         $hasAccess = false;
-        if ($budget->user_id == $userId) {
-            // Utilisateur est propriétaire
-            $hasAccess = true;
-        } else {
-            // Vérifier si l'utilisateur est invité sur ce budget
-            $sharedBudget = R::findOne('shared_budgets', 'budget_id = ? AND guest_user_id = ?',
-                [$expense->budget_id, $userId]);
-            if ($sharedBudget) {
+
+        if ($isGuest && $guestBudgetId) {
+            // Pour un guest, vérifier qu'il a accès au budget
+            if ($expense->budget_id == $guestBudgetId) {
                 $hasAccess = true;
+            }
+        } elseif ($userId) {
+            if ($budget->user_id == $userId) {
+                // Utilisateur est propriétaire
+                $hasAccess = true;
+            } else {
+                // Vérifier si l'utilisateur est invité sur ce budget
+                $sharedBudget = R::findOne('shared_budgets', 'budget_id = ? AND guest_user_id = ?',
+                    [$expense->budget_id, $userId]);
+                if ($sharedBudget) {
+                    $hasAccess = true;
+                }
             }
         }
 
@@ -99,6 +115,25 @@ class ExpenseAttachment
         // Supprimer l'entrée en base
         R::trash($attachment);
         return true;
+    }
+
+    /**
+     * Supprimer toutes les pièces jointes d'une dépense (pour suppression en cascade)
+     */
+    public static function deleteByExpense(int $expenseId): void
+    {
+        $attachments = self::findByExpense($expenseId);
+        
+        foreach ($attachments as $attachment) {
+            // Supprimer le fichier physique
+            $filePath = __DIR__ . '/../../public/' . $attachment->file_path;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            
+            // Supprimer l'entrée en base
+            R::trash($attachment);
+        }
     }
 
     /**

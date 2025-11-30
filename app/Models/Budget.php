@@ -299,9 +299,9 @@ class Budget {
     }
 
     /**
-     * Récupérer l'historique des budgets avec filtres
+     * Récupérer l'historique des budgets avec filtres et pagination
      */
-    public static function getHistory(int $userId, ?int $year = null, ?int $month = null, ?string $status = null) {
+    public static function getHistory(int $userId, ?int $year = null, ?int $month = null, ?string $status = null, int $page = 1, int $perPage = 12) {
         $sql = 'user_id = ?';
         $params = [$userId];
 
@@ -322,16 +322,50 @@ class Budget {
             $params[] = $status;
         }
 
-        $sql .= ' ORDER BY start_date DESC';
+        // Trier par statut (actif en premier) puis par date décroissante
+        $sql .= ' ORDER BY CASE WHEN status = ? THEN 0 ELSE 1 END, start_date DESC';
+        $params[] = self::STATUS_ACTIVE;
+
+        // Pagination
+        $offset = ($page - 1) * $perPage;
+        $sql .= ' LIMIT ? OFFSET ?';
+        $params[] = $perPage;
+        $params[] = $offset;
 
         return R::find('budget', $sql, $params);
+    }
+
+    /**
+     * Compter le nombre total de budgets pour la pagination
+     */
+    public static function countHistory(int $userId, ?int $year = null, ?int $month = null, ?string $status = null): int {
+        $sql = 'SELECT COUNT(*) FROM budget WHERE user_id = ?';
+        $params = [$userId];
+
+        if ($year) {
+            $sql .= ' AND EXTRACT(YEAR FROM start_date) = ?';
+            $params[] = $year;
+        }
+
+        if ($month) {
+            $sql .= ' AND EXTRACT(MONTH FROM start_date) = ?';
+            $params[] = $month;
+        }
+
+        if ($status && in_array($status, [self::STATUS_ACTIVE, self::STATUS_CLOSED])) {
+            $sql .= ' AND status = ?';
+            $params[] = $status;
+        }
+
+        return (int) R::getCell($sql, $params);
     }
 
     /**
      * Récupérer les statistiques de l'historique
      */
     public static function getHistoryStats(int $userId, ?int $year = null, ?int $month = null) {
-        $budgets = self::getHistory($userId, $year, $month);
+        // Récupérer tous les budgets sans pagination pour les stats
+        $budgets = self::getHistory($userId, $year, $month, null, 1, 10000);
 
         $stats = [
             'total_budgets' => count($budgets),

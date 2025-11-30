@@ -27,11 +27,15 @@ class BudgetHistoryController extends Controller
             $year = isset($_GET['year']) ? (int)$_GET['year'] : null;
             $month = isset($_GET['month']) ? (int)$_GET['month'] : null;
             $status = isset($_GET['status']) ? $_GET['status'] : null;
+            $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+            $perPage = 12;
 
-            // Récupérer l'historique des budgets
+            // Récupérer l'historique des budgets avec pagination
             error_log("Budget History: Fetching history for user $userId");
-            $budgets = Budget::getHistory($userId, $year, $month, $status);
-            error_log("Budget History: Found " . count($budgets) . " budgets");
+            $budgets = Budget::getHistory($userId, $year, $month, $status, $page, $perPage);
+            $totalBudgets = Budget::countHistory($userId, $year, $month, $status);
+            $totalPages = ceil($totalBudgets / $perPage);
+            error_log("Budget History: Found " . count($budgets) . " budgets (page $page/$totalPages)");
 
             // Calculer les statistiques globales
             error_log("Budget History: Calculating stats");
@@ -56,6 +60,9 @@ class BudgetHistoryController extends Controller
                 'selectedYear' => $year,
                 'selectedMonth' => $month,
                 'selectedStatus' => $status,
+                'page' => $page,
+                'totalPages' => $totalPages,
+                'totalBudgets' => $totalBudgets,
                 'styles' => ['dashboard/budget_history.css'],
                 'pageScripts' => ['dashboard/budget_history.js'],
                 'layout' => 'dashboard'

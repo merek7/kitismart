@@ -150,7 +150,12 @@
             ?>
             <div class="budget-card" data-id="<?= $budget->id ?>">
               <div class="budget-header">
-                <span class="budget-status status-<?= $statusClass ?>"><?= $statusLabel ?></span>
+                <div class="budget-badges">
+                  <span class="budget-status status-<?= $statusClass ?>"><?= $statusLabel ?></span>
+                  <?php if ($budget->type === 'secondaire'): ?>
+                    <span class="budget-type-badge type-annexe"><i class="fas fa-layer-group"></i> Annexe</span>
+                  <?php endif; ?>
+                </div>
                 <span class="budget-date">
                   <i class="fas fa-calendar"></i>
                   <?= date('d/m/Y', strtotime($budget->start_date)) ?>
@@ -159,6 +164,9 @@
                   <?php endif; ?>
                 </span>
               </div>
+              <?php if (!empty($budget->name) && $budget->name !== 'Budget'): ?>
+              <div class="budget-name"><?= htmlspecialchars($budget->name) ?></div>
+              <?php endif; ?>
 
               <div class="budget-amounts">
                 <div class="amount-item">
@@ -190,6 +198,65 @@
           <?php endforeach; ?>
         <?php endif; ?>
       </div>
+
+      <?php if ($totalPages > 1): ?>
+      <!-- Pagination -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          Page <?= $page ?> sur <?= $totalPages ?> (<?= $totalBudgets ?> budgets)
+        </div>
+        <div class="pagination-buttons">
+          <?php
+            // Construire l'URL de base avec les filtres
+            $baseUrl = '/budgets/history?';
+            $params = [];
+            if ($selectedYear) $params[] = 'year=' . $selectedYear;
+            if ($selectedMonth) $params[] = 'month=' . $selectedMonth;
+            if ($selectedStatus) $params[] = 'status=' . $selectedStatus;
+            $baseUrl .= implode('&', $params);
+            if (!empty($params)) $baseUrl .= '&';
+          ?>
+          
+          <?php if ($page > 1): ?>
+            <a href="<?= $baseUrl ?>page=<?= $page - 1 ?>" class="btn btn-secondary">
+              <i class="fas fa-chevron-left"></i> Précédent
+            </a>
+          <?php endif; ?>
+
+          <div class="pagination-pages">
+            <?php
+              $startPage = max(1, $page - 2);
+              $endPage = min($totalPages, $page + 2);
+              
+              if ($startPage > 1): ?>
+                <a href="<?= $baseUrl ?>page=1" class="btn btn-page">1</a>
+                <?php if ($startPage > 2): ?>
+                  <span class="pagination-ellipsis">...</span>
+                <?php endif; ?>
+              <?php endif;
+              
+              for ($i = $startPage; $i <= $endPage; $i++): ?>
+                <a href="<?= $baseUrl ?>page=<?= $i ?>" class="btn btn-page <?= $i === $page ? 'active' : '' ?>">
+                  <?= $i ?>
+                </a>
+              <?php endfor;
+              
+              if ($endPage < $totalPages): ?>
+                <?php if ($endPage < $totalPages - 1): ?>
+                  <span class="pagination-ellipsis">...</span>
+                <?php endif; ?>
+                <a href="<?= $baseUrl ?>page=<?= $totalPages ?>" class="btn btn-page"><?= $totalPages ?></a>
+              <?php endif; ?>
+          </div>
+
+          <?php if ($page < $totalPages): ?>
+            <a href="<?= $baseUrl ?>page=<?= $page + 1 ?>" class="btn btn-primary">
+              Suivant <i class="fas fa-chevron-right"></i>
+            </a>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php endif; ?>
     </div>
   </section>
 </div>

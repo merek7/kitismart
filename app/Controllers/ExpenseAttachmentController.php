@@ -212,10 +212,19 @@ class ExpenseAttachmentController extends Controller
                 ], 405);
             }
 
-            $userId = (int)$_SESSION['user_id'];
+            // Récupérer l'ID utilisateur (user authentifié OU guest)
+            $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+            $isGuest = isset($_SESSION['guest_authenticated']) && $_SESSION['guest_authenticated'] === true;
             $id = (int)$id;
 
-            $deleted = ExpenseAttachment::delete($id, $userId);
+            // Pour les guests, récupérer l'ID du propriétaire du budget
+            if ($isGuest && !$userId) {
+                $guestBudgetId = (int)$_SESSION['guest_budget_id'];
+                $budget = \RedBeanPHP\R::load('budget', $guestBudgetId);
+                $userId = (int)$budget->user_id;
+            }
+
+            $deleted = ExpenseAttachment::deleteWithGuestSupport($id, $userId, $isGuest, $_SESSION['guest_budget_id'] ?? null);
 
             if (!$deleted) {
                 return $this->jsonResponse([

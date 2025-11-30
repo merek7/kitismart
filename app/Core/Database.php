@@ -98,9 +98,9 @@ class Database
 
         R::useFeatureSet('latest');
 
-        // Freeze en production pour éviter les modifications automatiques du schéma
+        // Mode fluid (dev) pour permettre les modifications automatiques du schéma
         $isProduction = ($_ENV['APP_ENV'] ?? 'prod') === 'prod';
-        R::freeze($isProduction);
+        R::freeze(false);
 
         // Debug seulement en développement
         R::debug($isProduction ? false : true, 1);
