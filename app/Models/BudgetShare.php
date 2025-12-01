@@ -382,9 +382,9 @@ class BudgetShare
     }
 
     /**
-     * Obtenir les logs d'un partage
+     * Obtenir les logs d'un partage avec pagination
      */
-    public static function getShareLogs(int $shareId, int $userId, int $limit = 50)
+    public static function getShareLogs(int $shareId, int $userId, int $limit = 50, int $offset = 0)
     {
         // Vérifier que le partage appartient à l'utilisateur
         $share = R::load('budgetshare', $shareId);
@@ -393,9 +393,103 @@ class BudgetShare
         }
 
         return R::find('budgetshare_log',
-            'share_id = ? ORDER BY created_at DESC LIMIT ?',
-            [$shareId, $limit]
+            'share_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
+            [$shareId, $limit, $offset]
         );
+    }
+
+    /**
+     * Compter les logs d'un partage
+     */
+    public static function countShareLogs(int $shareId, int $userId): int
+    {
+        $share = R::load('budgetshare', $shareId);
+        if (!$share->id || $share->created_by_user_id != $userId) {
+            return 0;
+        }
+
+        return (int)R::count('budgetshare_log', 'share_id = ?', [$shareId]);
+    }
+
+    /**
+     * Mettre à jour un partage
+     */
+    public static function updateShare(int $shareId, int $userId, array $data)
+    {
+        $share = R::load('budgetshare', $shareId);
+
+        if (!$share->id || $share->created_by_user_id != $userId) {
+            throw new \Exception("Partage non trouvé ou accès non autorisé");
+        }
+
+        // Mettre à jour le nom si fourni
+        if (isset($data['name'])) {
+            $share->name = $data['name'];
+        }
+
+        // Mettre à jour les permissions si fournies
+        if (isset($data['permissions']) && is_array($data['permissions'])) {
+            $share->permissions = json_encode($data['permissions']);
+        }
+
+        // Mettre à jour l'expiration si fournie
+        if (array_key_exists('expires_at', $data)) {
+            $share->expires_at = $data['expires_at'] ?: null;
+        }
+
+        // Mettre à jour le max_uses si fourni
+        if (array_key_exists('max_uses', $data)) {
+            $share->max_uses = $data['max_uses'] ? (int)$data['max_uses'] : null;
+        }
+
+        $share->updated_at = date('Y-m-d H:i:s');
+        R::store($share);
+
+        return $share;
+    }
+
+    /**
+     * Régénérer le mot de passe d'un partage
+     */
+    public static function regeneratePassword(int $shareId, int $userId, string $newPassword): bool
+    {
+        $share = R::load('budgetshare', $shareId);
+
+        if (!$share->id || $share->created_by_user_id != $userId) {
+            throw new \Exception("Partage non trouvé ou accès non autorisé");
+        }
+
+        if (strlen($newPassword) < 6) {
+            throw new \Exception("Le mot de passe doit contenir au moins 6 caractères");
+        }
+
+        $share->password_hash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $share->updated_at = date('Y-m-d H:i:s');
+        R::store($share);
+
+        // Logger l'action
+        self::logAccess($shareId, 'password_regenerated', $_SERVER['REMOTE_ADDR'] ?? null);
+
+        return true;
+    }
+
+    /**
+     * Obtenir les partages avec pagination
+     */
+    public static function getAllSharesByUserPaginated(int $userId, int $limit = 10, int $offset = 0)
+    {
+        return R::find('budgetshare',
+            'created_by_user_id = ? ORDER BY is_active DESC, created_at DESC LIMIT ? OFFSET ?',
+            [$userId, $limit, $offset]
+        );
+    }
+
+    /**
+     * Compter tous les partages d'un utilisateur
+     */
+    public static function countAllSharesByUser(int $userId): int
+    {
+        return (int)R::count('budgetshare', 'created_by_user_id = ?', [$userId]);
     }
 
     /**

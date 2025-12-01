@@ -644,20 +644,32 @@ $(document).ready(function () {
         });
     });
 
-    // Visualiser un fichier (PDF, Word, Excel)
+    // Visualiser un fichier (images, PDF, Word, Excel)
     $(document).on('click', '.view-attachment-btn', function () {
-        const url = $(this).data('url');
-        const filename = $(this).data('filename');
-        const icon = $(this).data('icon');
-        const size = $(this).data('size');
+        showFileInViewer($(this).data('url'), $(this).data('filename'), $(this).data('icon'), $(this).data('size'));
+    });
 
+    // Clic sur l'aperçu d'une image pour l'agrandir
+    $(document).on('click', '.attachment-preview img', function () {
+        const item = $(this).closest('.attachment-item');
+        const url = $(this).attr('src');
+        const filename = item.find('.attachment-name').text();
+        showFileInViewer(url, filename, 'fa-image', '');
+    });
+
+    // Fonction pour afficher un fichier dans le viewer
+    function showFileInViewer(url, filename, icon, size) {
         $('#file-viewer-title').text(filename);
-        $('#file-download-link').attr('href', url);
+        $('#file-download-link').attr('href', url.replace('/view', '/download'));
 
         const fileExtension = filename.split('.').pop().toLowerCase();
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         let content = '';
 
-        if (fileExtension === 'pdf') {
+        if (imageExtensions.includes(fileExtension)) {
+            // Afficher l'image
+            content = `<div class="file-viewer-image"><img src="${url}" alt="${filename}"></div>`;
+        } else if (fileExtension === 'pdf') {
             // Afficher le PDF dans un iframe
             content = `<iframe src="${url}" title="${filename}"></iframe>`;
         } else {
@@ -675,7 +687,7 @@ $(document).ready(function () {
                     <div class="file-info-details">
                         <p><strong>Nom :</strong> ${filename}</p>
                         <p><strong>Type :</strong> ${fileType}</p>
-                        <p><strong>Taille :</strong> ${size}</p>
+                        ${size ? `<p><strong>Taille :</strong> ${size}</p>` : ''}
                     </div>
                     <p style="color: var(--text-secondary); font-size: 0.9rem;">
                         <i class="fas fa-info-circle"></i> Ce type de fichier ne peut pas être affiché dans le navigateur.<br>
@@ -688,7 +700,7 @@ $(document).ready(function () {
         $('#file-viewer-content').html(content);
         $('#file-viewer-modal').addClass('active');
         $('body').css('overflow', 'hidden');
-    });
+    }
 
     // Fermer le modal de visualisation
     function hideFileViewer() {
@@ -803,7 +815,7 @@ $(document).ready(function () {
             const isImage = fileType.startsWith('image/');
             const icon = getFileIcon(fileType);
             const formattedSize = formatFileSize(attachment.file_size);
-            const url = '/' + attachment.file_path; // Construct URL
+            const url = attachment.url; // Use secure URL from server
 
             let itemHTML = `<div class="attachment-item ${isImage ? 'has-preview' : ''}">`;
 

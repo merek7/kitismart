@@ -405,7 +405,7 @@ async function loadExpenseAttachments(expenseId) {
                 const attachmentItem = document.createElement('div');
                 attachmentItem.className = 'attachment-item-readonly';
                 attachmentItem.setAttribute('data-attachment-id', attachment.id);
-                attachmentItem.setAttribute('data-file-path', attachment.file_path);
+                attachmentItem.setAttribute('data-url', attachment.url);
                 attachmentItem.setAttribute('data-file-name', attachment.file_name);
                 attachmentItem.setAttribute('data-file-type', attachment.file_type);
 
@@ -480,7 +480,7 @@ document.addEventListener('click', async function (e) {
         e.stopPropagation();
         const attachmentId = viewBtn.getAttribute('data-attachment-id');
         const attachmentItem = viewBtn.closest('.attachment-item-readonly');
-        const filePath = attachmentItem.getAttribute('data-file-path');
+        const fileUrl = attachmentItem.getAttribute('data-url');
         const fileName = attachmentItem.getAttribute('data-file-name');
         const fileType = attachmentItem.getAttribute('data-file-type');
 
@@ -492,13 +492,14 @@ document.addEventListener('click', async function (e) {
 
         const isImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(fileType);
         const isPdf = fileType === 'application/pdf';
+        const downloadUrl = `/attachments/${attachmentId}/download`;
 
         let content = '';
         if (isPdf) {
-            content = `<iframe src="/${filePath}" title="${fileName}"></iframe>`;
+            content = `<iframe src="${fileUrl}" title="${fileName}"></iframe>`;
         } else if (isImage) {
             content = `<div class="file-info-display">
-                <img src="/${filePath}" alt="${fileName}" style="max-width: 100%; max-height: 70vh;">
+                <img src="${fileUrl}" alt="${fileName}" style="max-width: 100%; max-height: 70vh;">
             </div>`;
         } else {
             const icon = getFileIcon(fileName);
@@ -508,7 +509,7 @@ document.addEventListener('click', async function (e) {
                     <p><strong>Nom :</strong> ${fileName}</p>
                     <p><strong>Type :</strong> ${fileType}</p>
                 </div>
-                <a href="/${filePath}" download="${fileName}" class="btn btn-primary" style="margin-top: 1rem;">
+                <a href="${downloadUrl}" class="btn btn-primary" style="margin-top: 1rem;">
                     <i class="fas fa-download"></i> Télécharger
                 </a>
             </div>`;

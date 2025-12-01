@@ -10,6 +10,20 @@ $title = 'Connexion - KitiSmart';
 
         <div id="error-container" style="display: none;"></div>
 
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger" style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
+                <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($_SESSION['error']) ?>
+            </div>
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="alert alert-success" style="background: #d1fae5; border: 1px solid #6ee7b7; color: #065f46; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
+                <i class="fas fa-check-circle"></i> <?= htmlspecialchars($_SESSION['success']) ?>
+            </div>
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
         <form id="loginForm" action="/login" method="POST">
             <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
 

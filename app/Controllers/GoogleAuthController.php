@@ -61,8 +61,14 @@ class GoogleAuthController extends Controller
     public function callback()
     {
         try {
+            // Log pour debug
+            error_log("Google OAuth callback started");
+            error_log("Session state: " . ($_SESSION['google_oauth_state'] ?? 'NOT SET'));
+            error_log("GET state: " . ($_GET['state'] ?? 'NOT SET'));
+
             // Verifier le state pour la securite CSRF
             if (!isset($_GET['state']) || $_GET['state'] !== ($_SESSION['google_oauth_state'] ?? '')) {
+                error_log("Google OAuth: State mismatch - Session: " . ($_SESSION['google_oauth_state'] ?? 'null') . " vs GET: " . ($_GET['state'] ?? 'null'));
                 throw new \Exception('State invalide. Possible attaque CSRF.');
             }
             unset($_SESSION['google_oauth_state']);
@@ -78,21 +84,29 @@ class GoogleAuthController extends Controller
             }
 
             // Echanger le code contre un token
+            error_log("Google OAuth: Exchanging code for tokens");
             $tokens = $this->getTokens($_GET['code']);
 
             if (!isset($tokens['access_token'])) {
+                error_log("Google OAuth: No access token received. Response: " . json_encode($tokens));
                 throw new \Exception('Token d\'acces non recu.');
             }
+            error_log("Google OAuth: Access token received successfully");
 
             // Recuperer les informations utilisateur
+            error_log("Google OAuth: Fetching user info");
             $googleUser = $this->getUserInfo($tokens['access_token']);
 
             if (!isset($googleUser['id']) || !isset($googleUser['email'])) {
+                error_log("Google OAuth: Incomplete user info. Data: " . json_encode($googleUser));
                 throw new \Exception('Informations utilisateur incompletes.');
             }
+            error_log("Google OAuth: User info received - Email: " . $googleUser['email']);
 
             // Trouver ou creer l'utilisateur
+            error_log("Google OAuth: Finding or creating user");
             $user = $this->findOrCreateUser($googleUser);
+            error_log("Google OAuth: User found/created with ID: " . $user->id);
 
             // Connecter l'utilisateur
             $_SESSION['user_id'] = $user->id;
@@ -100,6 +114,8 @@ class GoogleAuthController extends Controller
             $_SESSION['user_email'] = $user->email;
 
             $_SESSION['success'] = 'Connexion reussie avec Google !';
+
+            error_log("Google OAuth: Login successful, redirecting to dashboard");
 
             // Rediriger vers le dashboard
             $this->redirectTo('/dashboard');
@@ -210,46 +226,57 @@ class GoogleAuthController extends Controller
         $name = $googleUser['name'] ?? ($googleUser['given_name'] ?? 'Utilisateur');
         $picture = $googleUser['picture'] ?? null;
 
-        // Chercher par google_id
-        $user = R::findOne('users', 'google_id = ?', [$googleId]);
+        try {
+            // Chercher par google_id
+            error_log("Google OAuth: Searching user by google_id: " . $googleId);
+            $user = R::findOne('users', 'google_id = ?', [$googleId]);
 
-        if ($user) {
-            // Mettre a jour les infos si necessaire
-            $user->last_login = date('Y-m-d H:i:s');
-            R::store($user);
-            return $user;
-        }
-
-        // Chercher par email
-        $user = R::findOne('users', 'email = ?', [$email]);
-
-        if ($user) {
-            // Lier le compte Google a l'utilisateur existant
-            $user->google_id = $googleId;
-            $user->last_login = date('Y-m-d H:i:s');
-            if ($picture && empty($user->avatar)) {
-                $user->avatar = $picture;
+            if ($user) {
+                error_log("Google OAuth: Found existing user by google_id");
+                // Mettre a jour les infos si necessaire
+                $user->last_login = date('Y-m-d H:i:s');
+                R::store($user);
+                return $user;
             }
-            R::store($user);
+
+            // Chercher par email
+            error_log("Google OAuth: Searching user by email: " . $email);
+            $user = R::findOne('users', 'email = ?', [$email]);
+
+            if ($user) {
+                error_log("Google OAuth: Found existing user by email, linking Google account");
+                // Lier le compte Google a l'utilisateur existant
+                $user->google_id = $googleId;
+                $user->last_login = date('Y-m-d H:i:s');
+                if ($picture && empty($user->avatar)) {
+                    $user->avatar = $picture;
+                }
+                R::store($user);
+                return $user;
+            }
+
+            // Creer un nouvel utilisateur
+            error_log("Google OAuth: Creating new user");
+            $user = R::dispense('users');
+            $user->nom = $name;
+            $user->email = $email;
+            $user->google_id = $googleId;
+            $user->avatar = $picture;
+            $user->password = null; // Pas de mot de passe pour les comptes Google
+            $user->email_verified = true; // Email deja verifie par Google
+            $user->email_verified_at = date('Y-m-d H:i:s');
+            $user->onboarding_completed = false;
+            $user->created_at = date('Y-m-d H:i:s');
+            $user->last_login = date('Y-m-d H:i:s');
+
+            $userId = R::store($user);
+            error_log("Google OAuth: New user created with ID: " . $userId);
+
             return $user;
+        } catch (\Exception $e) {
+            error_log("Google OAuth: Database error in findOrCreateUser - " . $e->getMessage());
+            throw $e;
         }
-
-        // Creer un nouvel utilisateur
-        $user = R::dispense('users');
-        $user->nom = $name;
-        $user->email = $email;
-        $user->google_id = $googleId;
-        $user->avatar = $picture;
-        $user->password = null; // Pas de mot de passe pour les comptes Google
-        $user->email_verified = true; // Email deja verifie par Google
-        $user->email_verified_at = date('Y-m-d H:i:s');
-        $user->onboarding_completed = false;
-        $user->created_at = date('Y-m-d H:i:s');
-        $user->last_login = date('Y-m-d H:i:s');
-
-        R::store($user);
-
-        return $user;
     }
 
     /**

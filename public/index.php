@@ -28,7 +28,9 @@ session_set_cookie_params([
 session_start();
 
 // Ne régénérer l'ID que périodiquement pour éviter les problèmes
-if (!isset($_SESSION['last_regeneration']) || time() - $_SESSION['last_regeneration'] > 300) {
+// Skip regeneration during OAuth callbacks to preserve state
+$isOAuthCallback = strpos($_SERVER['REQUEST_URI'] ?? '', '/auth/google/callback') !== false;
+if (!$isOAuthCallback && (!isset($_SESSION['last_regeneration']) || time() - $_SESSION['last_regeneration'] > 300)) {
     session_regenerate_id(true);
     $_SESSION['last_regeneration'] = time();
 }

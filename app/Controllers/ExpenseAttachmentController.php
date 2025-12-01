@@ -106,7 +106,7 @@ class ExpenseAttachmentController extends Controller
                     'filename' => $attachment->original_filename,
                     'size' => ExpenseAttachment::formatFileSize($attachment->file_size),
                     'icon' => ExpenseAttachment::getFileIcon($attachment->mime_type),
-                    'url' => '/' . $attachment->file_path
+                    'url' => '/attachments/' . $attachment->id . '/view'
                 ]
             ]);
 
@@ -179,7 +179,7 @@ class ExpenseAttachmentController extends Controller
                 $result[] = [
                     'id' => $attachment->id,
                     'file_name' => $attachment->original_filename,
-                    'file_path' => $attachment->file_path,
+                    'url' => '/attachments/' . $attachment->id . '/view',
                     'file_type' => $attachment->mime_type,
                     'file_size' => $attachment->file_size,
                     'uploaded_at' => date('d/m/Y H:i', strtotime($attachment->uploaded_at))
@@ -251,6 +251,22 @@ class ExpenseAttachmentController extends Controller
      */
     public function download($id)
     {
+        $this->serveFile($id, true);
+    }
+
+    /**
+     * Visualiser une pièce jointe (affichage dans le navigateur)
+     */
+    public function show($id)
+    {
+        $this->serveFile($id, false);
+    }
+
+    /**
+     * Servir un fichier avec vérification des permissions
+     */
+    private function serveFile($id, $forceDownload = false)
+    {
         try {
             // Récupérer l'ID utilisateur (user authentifié OU guest)
             $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
@@ -304,7 +320,7 @@ class ExpenseAttachmentController extends Controller
                 return;
             }
 
-            // Télécharger le fichier
+            // Servir le fichier
             $filePath = __DIR__ . '/../../public/' . $attachment->file_path;
 
             if (!file_exists($filePath)) {
@@ -313,9 +329,21 @@ class ExpenseAttachmentController extends Controller
                 return;
             }
 
+            // Headers de cache pour les images
+            $cacheableTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (in_array($attachment->mime_type, $cacheableTypes)) {
+                header('Cache-Control: private, max-age=86400'); // 24h cache
+            }
+
             header('Content-Type: ' . $attachment->mime_type);
-            header('Content-Disposition: attachment; filename="' . $attachment->original_filename . '"');
             header('Content-Length: ' . filesize($filePath));
+
+            if ($forceDownload) {
+                header('Content-Disposition: attachment; filename="' . $attachment->original_filename . '"');
+            } else {
+                header('Content-Disposition: inline; filename="' . $attachment->original_filename . '"');
+            }
+
             readfile($filePath);
             exit;
 
