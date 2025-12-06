@@ -184,6 +184,14 @@
     background: #f8f9fa;
 }
 
+.share-buttons {
+    display: flex;
+}
+
+.share-buttons .btn-label {
+    display: none;
+}
+
 .share-card-footer {
     padding: 15px 20px;
     background: #f8f9fa;
@@ -739,20 +747,205 @@
     cursor: pointer;
 }
 
-/* Responsive */
+/* Responsive Tablette */
+@media (max-width: 992px) {
+    .row.mb-4 {
+        gap: 15px;
+    }
+
+    .row.mb-4 > div {
+        flex: 0 0 calc(50% - 10px);
+        max-width: calc(50% - 10px);
+    }
+}
+
+/* Responsive Mobile */
 @media (max-width: 768px) {
     .col-md-6 {
         flex: 0 0 100%;
         max-width: 100%;
     }
 
+    .row.mb-4 > div {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    /* Stats cards */
+    .stats-card {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .stats-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+
+    .stats-value {
+        font-size: 1.4rem;
+    }
+
+    .stats-label {
+        font-size: 0.85rem;
+    }
+
+    /* Shares grid */
+    .shares-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .share-card {
+        border-radius: 12px;
+    }
+
+    .share-card-header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .share-budget-info h4 {
+        font-size: 1.1rem;
+    }
+
+    .share-date {
+        font-size: 0.8rem;
+    }
+
+    .share-card-body {
+        padding: 15px;
+    }
+
+    .share-usage {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+    }
+
+    .usage-stat {
+        font-size: 0.9rem;
+    }
+
+    .share-permissions-list {
+        margin-bottom: 15px;
+    }
+
+    .permissions-badges {
+        gap: 6px;
+    }
+
+    .permission-badge {
+        padding: 4px 10px;
+        font-size: 0.8rem;
+    }
+
+    /* URL container */
+    .share-url-container {
+        margin-bottom: 0;
+    }
+
+    .share-url-container label {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+    }
+
+    .share-url-container .input-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .share-url-container .input-group .form-control {
+        border-radius: 10px !important;
+        border: 2px solid #e0e0e0 !important;
+        font-size: 0.7rem;
+        width: 100%;
+        text-overflow: ellipsis;
+        padding: 10px 12px;
+    }
+
+    .share-url-container .share-buttons {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .share-url-container .share-buttons .btn {
+        border-radius: 10px !important;
+        border: 2px solid #e0e0e0;
+        flex: 1;
+        justify-content: center;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .share-url-container .share-buttons .btn i {
+        margin-right: 6px;
+    }
+
+    .share-url-container .share-buttons .btn-label {
+        display: inline;
+    }
+
+    /* Actions */
+    .share-card-footer {
+        padding: 12px 15px;
+    }
+
+    .share-actions-group {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .share-actions-group .btn-sm {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Modal */
+    .modal-overlay {
+        padding: 10px;
+    }
+
     .modal-dialog {
-        margin: 10px;
+        margin: 0;
         max-height: 95vh;
+        border-radius: 12px;
+    }
+
+    .modal-header {
+        padding: 15px;
+    }
+
+    .modal-title {
+        font-size: 1.1rem;
     }
 
     .modal-body {
-        max-height: 50vh;
+        padding: 15px;
+        max-height: 55vh;
+    }
+
+    .modal-footer {
+        padding: 12px 15px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .modal-footer .btn {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    /* Forms */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        padding: 10px 12px;
+        font-size: 0.95rem;
     }
 
     .permissions-checkboxes {
@@ -761,59 +954,160 @@
 
     .checkbox-label {
         width: 100%;
+        padding: 8px 12px;
     }
 
-    .share-actions-group {
-        justify-content: center;
+    /* Logs */
+    .log-item {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .log-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .log-action {
+        font-size: 0.9rem;
     }
 
     .log-meta {
         flex-direction: column;
-        gap: 5px;
+        gap: 3px;
+        font-size: 0.8rem;
+    }
+
+    /* Pagination */
+    .pagination-wrapper {
+        margin-top: 20px;
+        padding-top: 15px;
     }
 
     .pagination-nav {
         flex-direction: column;
         gap: 10px;
     }
-}
 
-/* Responsive */
-@media (max-width: 768px) {
-    .shares-grid {
-        grid-template-columns: 1fr;
+    .pagination-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
     }
 
+    /* QR Modal */
+    .qr-preview {
+        padding: 15px;
+    }
+
+    .qr-options {
+        padding: 12px;
+    }
+
+    /* Page header */
+    .page-header h1 {
+        font-size: 1.4rem;
+    }
+
+    .breadcrumb {
+        font-size: 0.85rem;
+    }
+
+    /* Card */
+    .card-header {
+        padding: 15px;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    /* No shares */
+    .no-shares {
+        padding: 40px 15px;
+    }
+
+    .no-shares i {
+        font-size: 3rem;
+    }
+
+    .no-shares p {
+        font-size: 1rem;
+    }
+}
+
+/* Responsive very small mobile */
+@media (max-width: 480px) {
     .stats-card {
-        padding: 20px;
+        padding: 12px;
+        gap: 12px;
     }
 
     .stats-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
     }
 
     .stats-value {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
     }
 
     .share-card-header {
-        flex-direction: column;
-        gap: 15px;
+        padding: 12px;
     }
 
-    .share-url-container .input-group {
-        flex-direction: column;
+    .share-budget-info h4 {
+        font-size: 1rem;
     }
 
-    .share-url-container .input-group .form-control,
-    .share-url-container .input-group .btn {
-        border-radius: 10px;
-        border: 2px solid #e0e0e0;
+    .share-card-body {
+        padding: 12px;
     }
 
-    .share-url-container .input-group .btn {
-        margin-top: 10px;
+    .share-card-footer {
+        padding: 10px 12px;
+    }
+
+    .share-actions-group {
+        gap: 5px;
+    }
+
+    .share-actions-group .btn-sm {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    .modal-header {
+        padding: 12px;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+
+    .modal-footer {
+        padding: 10px 12px;
+    }
+
+    .modal-footer .btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .card-header {
+        padding: 12px;
+    }
+
+    .card-body {
+        padding: 12px;
     }
 }

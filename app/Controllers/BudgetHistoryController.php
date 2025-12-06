@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Budget;
 use App\Models\Expense;
+use App\Models\ExpenseAttachment;
 
 class BudgetHistoryController extends Controller
 {
@@ -119,21 +120,37 @@ class BudgetHistoryController extends Controller
                 $categoryName = 'Autre';
 
                 // Vérifier d'abord si c'est une catégorie personnalisée
-                if (!empty($expense->custom_category_id)) {
+                $customCatId = $expense->custom_category_id ?? null;
+                $catId = $expense->categorie_id ?? null;
+
+                if (!empty($customCatId)) {
                     $customCat = \App\Models\CustomCategory::findById(
-                        (int)$expense->custom_category_id,
+                        (int)$customCatId,
                         $userId
                     );
-                    if ($customCat && $customCat->id) {
-                        $categoryName = $customCat->name;
+                    if ($customCat && isset($customCat->id) && $customCat->id) {
+                        $categoryName = $customCat->name ?? 'Autre';
                     }
                 }
                 // Sinon, récupérer la catégorie par défaut
-                elseif (!empty($expense->categorie_id)) {
-                    $categorie = \App\Models\Categorie::findById((int)$expense->categorie_id);
-                    if ($categorie && $categorie->id) {
-                        $categoryName = $categorie->type;
+                elseif (!empty($catId)) {
+                    $categorie = \App\Models\Categorie::findById((int)$catId);
+                    if ($categorie && isset($categorie->id) && $categorie->id) {
+                        $categoryName = $categorie->type ?? 'Autre';
                     }
+                }
+
+                // Récupérer les pièces jointes de cette dépense
+                $attachments = ExpenseAttachment::findByExpense((int)$expense->id);
+                $attachmentData = [];
+                foreach ($attachments as $attachment) {
+                    $attachmentData[] = [
+                        'id' => $attachment->id,
+                        'original_name' => $attachment->original_name,
+                        'file_type' => $attachment->file_type,
+                        'file_size' => $attachment->file_size,
+                        'uploaded_at' => $attachment->uploaded_at
+                    ];
                 }
 
                 $enrichedExpenses[] = [
@@ -142,7 +159,9 @@ class BudgetHistoryController extends Controller
                     'amount' => $expense->amount,
                     'payment_date' => $expense->payment_date,
                     'status' => $expense->status,
-                    'category' => $categoryName
+                    'category' => $categoryName,
+                    'attachments' => $attachmentData,
+                    'attachments_count' => count($attachmentData)
                 ];
             }
 
@@ -157,7 +176,9 @@ class BudgetHistoryController extends Controller
                 'paid_expenses' => $paidExpenses,
                 'pending_expenses' => $pendingExpenses,
                 'expense_count' => count($expenses),
-                'usage_percent' => round(($totalExpenses / $budget->initial_amount) * 100, 2)
+                'usage_percent' => $budget->initial_amount > 0 
+                    ? round(($totalExpenses / $budget->initial_amount) * 100, 2) 
+                    : 0
             ];
 
             return $this->jsonResponse([

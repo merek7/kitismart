@@ -204,17 +204,21 @@
                                                                    class="form-control share-url"
                                                                    value="<?= htmlspecialchars($shareUrl) ?>"
                                                                    readonly>
-                                                            <button class="btn btn-outline-secondary copy-link-btn"
-                                                                    data-url="<?= htmlspecialchars($shareUrl) ?>"
-                                                                    title="Copier le lien">
-                                                                <i class="fas fa-copy"></i>
-                                                            </button>
-                                                            <button class="btn btn-outline-secondary qr-code-btn"
-                                                                    data-share-id="<?= $share->id ?>"
-                                                                    data-share-url="<?= htmlspecialchars($shareUrl) ?>"
-                                                                    title="Afficher QR Code">
-                                                                <i class="fas fa-qrcode"></i>
-                                                            </button>
+                                                            <div class="share-buttons">
+                                                                <button class="btn btn-outline-secondary copy-link-btn"
+                                                                        data-url="<?= htmlspecialchars($shareUrl) ?>"
+                                                                        title="Copier">
+                                                                    <i class="fas fa-copy"></i>
+                                                                    <span class="btn-label">Copier</span>
+                                                                </button>
+                                                                <button class="btn btn-outline-secondary qr-code-btn"
+                                                                        data-share-id="<?= $share->id ?>"
+                                                                        data-share-url="<?= htmlspecialchars($shareUrl) ?>"
+                                                                        title="QR Code">
+                                                                    <i class="fas fa-qrcode"></i>
+                                                                    <span class="btn-label">QR Code</span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 <?php endif; ?>
