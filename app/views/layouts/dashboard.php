@@ -37,6 +37,18 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/dashboard/index.css') ?>">
+
+    <?php if (!empty($_ENV['CLARITY_PROJECT_ID'])): ?>
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "<?= htmlspecialchars($_ENV['CLARITY_PROJECT_ID']) ?>");
+    </script>
+    <?php endif; ?>
+
     <?php if (!empty($styles)): ?>
         <?php foreach ($styles as $style): ?>
             <link rel="stylesheet" href="<?= \App\Core\Config::asset('/assets/css/' . htmlspecialchars($style)) ?>">
