@@ -118,12 +118,18 @@ class FinancialPlannerController extends Controller
         $result = [];
         $total = 0;
         
-        // 1. Récupérer les dépenses récurrentes actives (via les budgets de l'utilisateur)
+        // Récupérer le budget principal (tagué comme salaire ou le plus récent actif)
+        $mainBudget = Budget::getMainBudget($userId);
+        if (!$mainBudget) {
+            return ['items' => [], 'total' => 0];
+        }
+        $mainBudgetId = $mainBudget->id;
+        
+        // 1. Récupérer les dépenses récurrentes actives du budget principal
         $recurrences = R::getAll(
             'SELECT er.* FROM expenserecurrence er
-             JOIN budget b ON er.budget_id = b.id
-             WHERE b.user_id = ? AND er.is_active = 1',
-            [$userId]
+             WHERE er.budget_id = ? AND er.is_active = 1',
+            [$mainBudgetId]
         );
         
         foreach ($recurrences as $rec) {
@@ -151,19 +157,18 @@ class FinancialPlannerController extends Controller
             $total += round($amount, 0);
         }
         
-        // 2. Chercher aussi les dépenses avec catégorie type "fixe"
+        // 2. Chercher aussi les dépenses avec catégorie type "fixe" du budget principal
         $startDate = (new \DateTime())->modify('-3 months')->format('Y-m-d');
         
         // Chercher les dépenses avec catégorie type "fixe"
         $fixedExpenses = R::getAll(
             'SELECT e.description, SUM(e.amount) as total_amount, COUNT(*) as occurrences
              FROM expense e
-             JOIN budget b ON e.budget_id = b.id
              JOIN categorie c ON e.categorie_id = c.id
-             WHERE b.user_id = ? AND e.payment_date >= ? AND LOWER(c.type) = ?
+             WHERE e.budget_id = ? AND e.payment_date >= ? AND LOWER(c.type) = ?
              GROUP BY e.description
              ORDER BY total_amount DESC',
-            [$userId, $startDate, 'fixe']
+            [$mainBudgetId, $startDate, 'fixe']
         );
         
         foreach ($fixedExpenses as $expense) {
@@ -179,18 +184,17 @@ class FinancialPlannerController extends Controller
             $total += $avgAmount;
         }
         
-        // 3. Si toujours vide, chercher les dépenses qui se répètent
+        // 3. Si toujours vide, chercher les dépenses qui se répètent dans le budget principal
         if (empty($result)) {
             $expenses = R::getAll(
                 'SELECT e.description, AVG(e.amount) as avg_amount, COUNT(*) as occurrences
                  FROM expense e
-                 JOIN budget b ON e.budget_id = b.id
-                 WHERE b.user_id = ? AND e.payment_date >= ?
+                 WHERE e.budget_id = ? AND e.payment_date >= ?
                  GROUP BY e.description
                  HAVING COUNT(*) >= 2
                  ORDER BY avg_amount DESC
                  LIMIT 10',
-                [$userId, $startDate]
+                [$mainBudgetId, $startDate]
             );
             
             foreach ($expenses as $expense) {
