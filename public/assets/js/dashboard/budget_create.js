@@ -93,6 +93,7 @@ $(document).ready(function () {
             description: $('#description').val().trim(),
             type: $('input[name="type"]:checked').val() || 'principal',
             color: $('input[name="color"]:checked').val() || '#0d9488',
+            source_type: $('#source_type').val() || null,
             csrf_token: $('input[name="csrf_token"]').val(),
             unlimited_budget: isUnlimited
         };

@@ -7,10 +7,46 @@ use RedBeanPHP\R as R;
 class AppUpdate
 {
     // Version actuelle de l'application - à incrémenter à chaque mise à jour importante
-    public const CURRENT_VERSION = '1.5.0';
+    public const CURRENT_VERSION = '1.6.0';
 
     // Changelog des versions
     public const CHANGELOG = [
+        '1.6.0' => [
+            'title' => 'Planificateur Financier & Coach IA',
+            'date' => '2024-12-19',
+            'features' => [
+                [
+                    'icon' => 'fa-calculator',
+                    'title' => 'Planificateur Financier',
+                    'description' => 'Visualisez vos revenus, charges fixes et simulez vos objectifs d\'épargne avec des scénarios personnalisés.'
+                ],
+                [
+                    'icon' => 'fa-user-tie',
+                    'title' => 'Kiti Coach - IA',
+                    'description' => 'Votre conseiller financier intelligent ! Posez vos questions et recevez des conseils personnalisés basés sur votre situation.'
+                ],
+                [
+                    'icon' => 'fa-tags',
+                    'title' => 'Tagging des revenus',
+                    'description' => 'Catégorisez vos budgets par source (salaire, prime, freelance...) pour une meilleure analyse de vos revenus.'
+                ],
+                [
+                    'icon' => 'fa-bullseye',
+                    'title' => 'Création d\'objectifs simplifiée',
+                    'description' => 'Choisissez un scénario et créez directement un objectif d\'épargne avec icône et couleur personnalisées.'
+                ],
+                [
+                    'icon' => 'fa-comments',
+                    'title' => 'Interface chat moderne',
+                    'description' => 'Discutez avec Kiti Coach dans une interface conversationnelle intuitive avec suggestions rapides.'
+                ],
+                [
+                    'icon' => 'fa-chart-pie',
+                    'title' => 'Aperçu des objectifs',
+                    'description' => 'Visualisez la progression de vos objectifs avec un cercle animé et des statistiques détaillées.'
+                ]
+            ]
+        ],
         '1.5.0' => [
             'title' => 'Pièces jointes sur les dépenses',
             'date' => '2025-01-30',

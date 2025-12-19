@@ -133,6 +133,9 @@
                         <a href="/savings/goals" class="dropdown-item <?= $currentPage === 'savings' ? 'active' : '' ?>">
                             <i class="fas fa-bullseye"></i> Objectifs d'épargne
                         </a>
+                        <a href="/planner" class="dropdown-item <?= $currentPage === 'planner' ? 'active' : '' ?>">
+                            <i class="fas fa-calculator"></i> Planificateur
+                        </a>
                         <a href="/expenses/recurrences" class="dropdown-item <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
                             <i class="fas fa-sync-alt"></i> Récurrences
                         </a>
@@ -167,6 +170,9 @@
                 </a>
                 <a href="/savings/goals" class="nav-link nav-mobile-only <?= $currentPage === 'savings' ? 'active' : '' ?>">
                     <i class="fas fa-bullseye"></i> Objectifs
+                </a>
+                <a href="/planner" class="nav-link nav-mobile-only <?= $currentPage === 'planner' ? 'active' : '' ?>">
+                    <i class="fas fa-calculator"></i> Planificateur
                 </a>
                 <a href="/expenses/recurrences" class="nav-link nav-mobile-only <?= $currentPage === 'recurrences' ? 'active' : '' ?>">
                     <i class="fas fa-sync-alt"></i> Récurrences

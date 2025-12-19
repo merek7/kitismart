@@ -15,6 +15,24 @@ class Budget {
     const TYPE_PRIMARY = 'principal';
     const TYPE_SECONDARY = 'secondaire';
 
+    // Types de source de revenu
+    const SOURCE_SALARY = 'salaire';
+    const SOURCE_BONUS = 'prime';
+    const SOURCE_FREELANCE = 'freelance';
+    const SOURCE_RENTAL = 'revenu_locatif';
+    const SOURCE_GIFT = 'don';
+    const SOURCE_OTHER = 'autre';
+
+    // Sources disponibles avec labels
+    const SOURCES = [
+        self::SOURCE_SALARY => 'Salaire',
+        self::SOURCE_BONUS => 'Prime',
+        self::SOURCE_FREELANCE => 'Freelance',
+        self::SOURCE_RENTAL => 'Revenu locatif',
+        self::SOURCE_GIFT => 'Don / Cadeau',
+        self::SOURCE_OTHER => 'Autre',
+    ];
+
     // Couleurs prédéfinies pour les budgets
     const COLORS = [
         '#0d9488' => 'Teal',
@@ -52,6 +70,7 @@ class Budget {
             $budget->description = $data['description'] ?? null;
             $budget->color = $data['color'] ?? '#0d9488';
             $budget->type = $type;
+            $budget->source_type = $data['source_type'] ?? null;
             $budget->start_date = $data['start_date'];
             $budget->end_date = null;
             $budget->initial_amount = $data['initial_amount'];
@@ -143,6 +162,32 @@ class Budget {
             'user_id = ? AND status = ? AND (type = ? OR type IS NULL) ORDER BY start_date DESC',
             [$userId, self::STATUS_ACTIVE, self::TYPE_PRIMARY]
         );
+    }
+    
+    /**
+     * Alias pour getActivePrimaryBudget
+     */
+    public static function getMainBudget($userId) {
+        return self::getActivePrimaryBudget($userId);
+    }
+    
+    /**
+     * Met à jour la source d'un budget
+     */
+    public static function updateSourceType(int $budgetId, int $userId, ?string $sourceType): bool {
+        $budget = self::getById($budgetId, $userId);
+        if (!$budget) {
+            return false;
+        }
+        
+        $validSources = array_keys(self::getAvailableSources());
+        if ($sourceType !== null && !in_array($sourceType, $validSources)) {
+            return false;
+        }
+        
+        $budget->source_type = $sourceType;
+        R::store($budget);
+        return true;
     }
 
     /**
@@ -654,4 +699,139 @@ class Budget {
 
         return $result;
     }
-} 
+
+    /**
+     * Récupérer les sources disponibles
+     */
+    public static function getAvailableSources(): array
+    {
+        return self::SOURCES;
+    }
+
+    /**
+     * Récupérer le label d'une source
+     */
+    public static function getSourceLabel(?string $sourceType): string
+    {
+        if (!$sourceType) {
+            return 'Non défini';
+        }
+        return self::SOURCES[$sourceType] ?? $sourceType;
+    }
+
+    /**
+     * Récupérer les budgets par source de revenu
+     */
+    public static function findBySource(int $userId, string $sourceType): array
+    {
+        return R::find('budget',
+            'user_id = ? AND source_type = ? ORDER BY start_date DESC',
+            [$userId, $sourceType]
+        );
+    }
+
+    /**
+     * Calculer les statistiques de revenus par source
+     */
+    public static function getIncomeStatsBySource(int $userId, ?int $year = null): array
+    {
+        $year = $year ?? (int)date('Y');
+        $startDate = "$year-01-01";
+        $endDate = "$year-12-31";
+
+        $stats = [];
+        foreach (self::SOURCES as $source => $label) {
+            $budgets = R::getAll(
+                'SELECT SUM(initial_amount) as total, COUNT(*) as count 
+                 FROM budget 
+                 WHERE user_id = ? AND source_type = ? 
+                 AND start_date >= ? AND start_date <= ?',
+                [$userId, $source, $startDate, $endDate]
+            );
+            
+            $stats[$source] = [
+                'label' => $label,
+                'total' => (float)($budgets[0]['total'] ?? 0),
+                'count' => (int)($budgets[0]['count'] ?? 0)
+            ];
+        }
+
+        // Budgets sans source définie
+        $untagged = R::getAll(
+            'SELECT SUM(initial_amount) as total, COUNT(*) as count 
+             FROM budget 
+             WHERE user_id = ? AND source_type IS NULL 
+             AND start_date >= ? AND start_date <= ?',
+            [$userId, $startDate, $endDate]
+        );
+        
+        $stats['non_defini'] = [
+            'label' => 'Non défini',
+            'total' => (float)($untagged[0]['total'] ?? 0),
+            'count' => (int)($untagged[0]['count'] ?? 0)
+        ];
+
+        return $stats;
+    }
+
+    /**
+     * Calculer le revenu mensuel moyen de l'utilisateur
+     */
+    public static function getAverageMonthlyIncome(int $userId, int $months = 12): float
+    {
+        $startDate = (new \DateTime())->modify("-$months months")->format('Y-m-d');
+        
+        $result = R::getCell(
+            'SELECT SUM(initial_amount) FROM budget 
+             WHERE user_id = ? AND start_date >= ?',
+            [$userId, $startDate]
+        );
+
+        return $result ? round((float)$result / $months, 0) : 0;
+    }
+
+    /**
+     * Calculer les charges fixes moyennes de l'utilisateur
+     */
+    public static function getAverageFixedExpenses(int $userId, int $months = 6): float
+    {
+        $startDate = (new \DateTime())->modify("-$months months")->format('Y-m-d');
+        
+        // Récupérer les dépenses fixes (categorie_id pour type 'fixe')
+        $result = R::getCell(
+            'SELECT SUM(e.amount) FROM expense e
+             JOIN budget b ON e.budget_id = b.id
+             JOIN categorie c ON e.categorie_id = c.id
+             WHERE b.user_id = ? AND c.type = ? AND e.payment_date >= ?',
+            [$userId, 'fixe', $startDate]
+        );
+
+        return $result ? round((float)$result / $months, 0) : 0;
+    }
+
+    /**
+     * Calculer la capacité d'épargne mensuelle estimée
+     */
+    public static function getEstimatedSavingsCapacity(int $userId): array
+    {
+        $avgIncome = self::getAverageMonthlyIncome($userId);
+        $avgExpenses = self::getAverageFixedExpenses($userId);
+        $available = $avgIncome - $avgExpenses;
+        
+        // Suggestions basées sur des ratios recommandés
+        $conservative = round($available * 0.10, 0); // 10%
+        $moderate = round($available * 0.20, 0);     // 20%
+        $aggressive = round($available * 0.30, 0);   // 30%
+
+        return [
+            'average_income' => $avgIncome,
+            'average_expenses' => $avgExpenses,
+            'available' => $available,
+            'suggestions' => [
+                'conservative' => ['percent' => 10, 'amount' => max(0, $conservative)],
+                'moderate' => ['percent' => 20, 'amount' => max(0, $moderate)],
+                'aggressive' => ['percent' => 30, 'amount' => max(0, $aggressive)]
+            ]
+        ];
+    }
+}

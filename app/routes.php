@@ -113,6 +113,15 @@ return [
     // API utilitaires
     ['GET', '/api/csrf-token', 'ApiController#getCsrfToken', 'api_csrf_token'],
 
+    // Financial Planner Routes
+    ['GET', '/planner', 'FinancialPlannerController#index', 'financial_planner'],
+    ['POST', '/planner/simulate', 'FinancialPlannerController#simulate', 'financial_planner_simulate'],
+    ['GET', '/planner/data', 'FinancialPlannerController#getData', 'financial_planner_data'],
+    ['POST', '/planner/create-goal', 'FinancialPlannerController#createGoal', 'financial_planner_create_goal'],
+    ['POST', '/planner/tag-budget', 'FinancialPlannerController#tagBudget', 'financial_planner_tag_budget'],
+    ['POST', '/planner/ai-advice', 'FinancialPlannerController#getAIAdvice', 'financial_planner_ai_advice'],
+    ['GET', '/planner/ai-status', 'FinancialPlannerController#checkAIStatus', 'financial_planner_ai_status'],
+
     // Admin - Test des emails (DEV ONLY)
     ['GET', '/admin/email-test', 'EmailTestController#index', 'email_test'],
     ['POST', '/admin/email-test/send', 'EmailTestController#sendTest', 'email_test_send'],

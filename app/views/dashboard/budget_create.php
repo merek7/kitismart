@@ -180,32 +180,54 @@
                         </div>
                     </div>
 
-                    <!-- Couleur du budget -->
-                    <div class="form-group">
-                        <label>Couleur du budget</label>
-                        <div class="color-selector">
-                            <?php
-                            $colors = [
-                                '#0d9488' => 'Teal',
-                                '#3b82f6' => 'Bleu',
-                                '#8b5cf6' => 'Violet',
-                                '#ec4899' => 'Rose',
-                                '#f59e0b' => 'Orange',
-                                '#10b981' => 'Vert',
-                                '#ef4444' => 'Rouge',
-                                '#6366f1' => 'Indigo',
-                            ];
-                            $first = true;
-                            foreach ($colors as $hex => $name):
-                            ?>
-                                <label class="color-option" title="<?= $name ?>">
-                                    <input type="radio" name="color" value="<?= $hex ?>" <?= $first ? 'checked' : '' ?>>
-                                    <span class="color-dot" style="background-color: <?= $hex ?>"></span>
-                                </label>
-                            <?php
-                            $first = false;
-                            endforeach;
-                            ?>
+                    <div class="form-grid">
+                        <!-- Couleur du budget -->
+                        <div class="form-group">
+                            <label>Couleur du budget</label>
+                            <div class="color-selector">
+                                <?php
+                                $colors = [
+                                    '#0d9488' => 'Teal',
+                                    '#3b82f6' => 'Bleu',
+                                    '#8b5cf6' => 'Violet',
+                                    '#ec4899' => 'Rose',
+                                    '#f59e0b' => 'Orange',
+                                    '#10b981' => 'Vert',
+                                    '#ef4444' => 'Rouge',
+                                    '#6366f1' => 'Indigo',
+                                ];
+                                $first = true;
+                                foreach ($colors as $hex => $name):
+                                ?>
+                                    <label class="color-option" title="<?= $name ?>">
+                                        <input type="radio" name="color" value="<?= $hex ?>" <?= $first ? 'checked' : '' ?>>
+                                        <span class="color-dot" style="background-color: <?= $hex ?>"></span>
+                                    </label>
+                                <?php
+                                $first = false;
+                                endforeach;
+                                ?>
+                            </div>
+                        </div>
+
+                        <!-- Source de revenu (optionnel) -->
+                        <div class="form-group">
+                            <label for="source_type">Source de revenu <small class="text-muted">(optionnel)</small></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <select class="form-control" id="source_type" name="source_type">
+                                    <option value="">-- Non défini --</option>
+                                    <?php
+                                    $sources = \App\Models\Budget::getAvailableSources();
+                                    foreach ($sources as $value => $label):
+                                    ?>
+                                        <option value="<?= $value ?>"><?= $label ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <small class="form-hint">
+                                <i class="fas fa-lightbulb"></i> Utile pour le planificateur financier
+                            </small>
                         </div>
                     </div>
 

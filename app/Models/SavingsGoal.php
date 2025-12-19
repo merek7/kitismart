@@ -58,6 +58,7 @@ class SavingsGoal
                 'target_amount' => $data['target_amount'],
                 'current_amount' => $data['current_amount'] ?? 0,
                 'target_date' => $data['target_date'] ?? null,
+                'monthly_contribution' => $data['monthly_contribution'] ?? 0,
                 'icon' => $data['icon'] ?? 'fa-piggy-bank',
                 'color' => $data['color'] ?? '#0d9488',
                 'status' => self::STATUS_ACTIVE,
